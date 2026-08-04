@@ -298,6 +298,14 @@ export const App: React.FC = () => {
         isOpen={isMasudaOpen}
         onClose={() => setIsMasudaOpen(false)}
       />
+
+      {/* Créditos y Descargo Legal */}
+      <footer className="app-footer">
+        <span className="footer-disclaimer">
+          Pokémon y todos los sprites/arte son propiedad de Nintendo, Game Freak y The Pokémon Company. Esta herramienta es solo un asistente informativo de uso visual: no está afiliada ni respaldada por los titulares de los derechos y no representa afiliación alguna con ellos.
+        </span>
+        <span className="footer-brand-tag">El mejor Pokémon marica!!!</span>
+      </footer>
     </div>
   );
 };
