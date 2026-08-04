@@ -236,6 +236,11 @@ export const App: React.FC = () => {
                     {activeProject.goal.useZeroAtk && (
                       <span className="zero-badge">0 IVs ATK</span>
                     )}
+                    {activeProject.goal.targetGender && activeProject.goal.targetGender !== 'any' && (
+                      <span className="gender-badge">
+                        {activeProject.goal.targetGender === 'female' ? '♀ Hembra' : '♂ Macho'}
+                      </span>
+                    )}
                     {activeProject.isFinished && (
                       <span className="finished-badge">🎉 Crianza Finalizada</span>
                     )}

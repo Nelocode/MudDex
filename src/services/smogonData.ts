@@ -444,14 +444,42 @@ export const SMOGON_BUILDS: Record<string, SmogonBuild[]> = {
 };
 
 export function getSmogonBuilds(pokemonName: string): SmogonBuild[] {
-
-
   const key = pokemonName.toLowerCase();
   if (SMOGON_BUILDS[key]) {
     return SMOGON_BUILDS[key];
   }
 
   // Generar un build por defecto inteligente según stats si no está en la base de datos previa
+  // Compañeros variados para que no se repitan siempre los mismos para distintos Pokémon
+  const TEAMMATE_POOL = [
+    { name: 'Gholdengo', id: 999, reason: 'Excelente pivote y bloqueo de hazards.' },
+    { name: 'Toxapex', id: 747, reason: 'Soporte defensivo y regeneración.' },
+    { name: 'Corviknight', id: 823, reason: 'Pivote de acero/volador para cubrir debilidades.' },
+    { name: 'Great Tusk', id: 984, reason: 'Limpia hazards y aporta presión física.' },
+    { name: 'Kingambit', id: 983, reason: 'Limpiador de late-game de tipo Acero/Siniestro.' },
+    { name: 'Dragapult', id: 887, reason: 'Sweeper de alta velocidad con cobertura de Fantasma/Dragón.' },
+    { name: 'Flutter Mane', id: 987, reason: 'Atacante especial devastador.' },
+    { name: 'Garchomp', id: 445, reason: 'Atacante físico con STAB Tierra/Dragón.' },
+    { name: 'Clefable', id: 35, reason: 'Support versátil con Guardia Mágica.' },
+    { name: 'Landorus-Therian', id: 645, reason: 'Intimidación y presión ofensiva de tierra.' },
+    { name: 'Scizor', id: 212, reason: 'Pivote de acero que resiste ataques físicos.' },
+    { name: 'Tinkaton', id: 959, reason: 'Aporta trampa rocas y resistencia Psíquica/Siniestra.' },
+    { name: 'Dragonite', id: 149, reason: 'Sweeper físico con Multiescala.' },
+    { name: 'Rotom-Wash', id: 479, reason: 'Pivote de agua/eléctrico con Levitación.' }
+  ];
+
+  // Selecciona 2 compañeros distintos de forma determinista según el nombre del Pokémon
+  let hash = 0;
+  for (let i = 0; i < key.length; i++) {
+    hash = (hash * 31 + key.charCodeAt(i)) >>> 0;
+  }
+  const idx1 = hash % TEAMMATE_POOL.length;
+  const idx2 = (hash * 7 + 13) % TEAMMATE_POOL.length;
+  const friends = [
+    TEAMMATE_POOL[idx1],
+    TEAMMATE_POOL[idx2 !== idx1 ? idx2 : (idx2 + 1) % TEAMMATE_POOL.length]
+  ];
+
   return [
     {
       tier: 'Competitivo Estándar Gen 9',
@@ -469,10 +497,7 @@ export function getSmogonBuilds(pokemonName: string): SmogonBuild[] {
         ['Protect / Substitute', 'Protección / Sustituto']
       ],
       description: 'Build recomendado para maximizar el rendimiento competitivo en combates de liga.',
-      teammates: [
-        { name: 'Gholdengo', id: 999, reason: 'Excelente pivote y bloqueo de hazards.' },
-        { name: 'Toxapex', id: 747, reason: 'Soporte defensivo y regeneración.' }
-      ]
+      teammates: friends
     }
   ];
 }

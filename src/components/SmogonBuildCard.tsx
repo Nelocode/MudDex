@@ -1,7 +1,7 @@
-import React from 'react';
-import { Award, Zap, ShieldCheck, Users, Sparkles, BookOpen } from 'lucide-react';
+import React, { useState } from 'react';
+import { Award, Zap, ShieldCheck, Users, Sparkles, BookOpen, Filter } from 'lucide-react';
 import { SmogonBuild, PokemonSummary } from '../types/pokemon';
-import { STAT_NAMES_ES } from '../services/pokeapi';
+import { STAT_NAMES_ES, getGenerationFromId } from '../services/pokeapi';
 
 interface SmogonBuildCardProps {
   pokemon: PokemonSummary;
@@ -16,7 +16,16 @@ export const SmogonBuildCard: React.FC<SmogonBuildCardProps> = ({
   selectedBuildIndex,
   onSelectBuildIndex
 }) => {
+  // Filtro de generaciones de compañeros: solo muestra compañeros de gen <= maxGen
+  const [maxGen, setMaxGen] = useState<number | 'all'>('all');
+
   const currentBuild = builds[selectedBuildIndex] || builds[0];
+
+  // Compañeros filtrados por generación
+  const baseTeammates = currentBuild.teammates || [];
+  const filteredTeammates = maxGen === 'all'
+    ? baseTeammates
+    : baseTeammates.filter(tm => getGenerationFromId(tm.id) <= maxGen);
 
   return (
     <div className="smogon-card glass-panel">
@@ -116,21 +125,60 @@ export const SmogonBuildCard: React.FC<SmogonBuildCardProps> = ({
           <h4 className="card-subtitle" style={{ marginTop: '1.5rem' }}>
             <Users size={18} color="#00E676" /> Compañeros de Equipo & Sinergias Sugeridas
           </h4>
-          <div className="teammates-grid">
-            {currentBuild.teammates.map((tm, idx) => (
-              <div key={idx} className="teammate-card">
-                <img
-                  src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${tm.id}.png`}
-                  alt={tm.name}
-                  className="teammate-sprite"
-                />
-                <div>
-                  <span className="teammate-name">{tm.name}</span>
-                  <span className="teammate-reason">{tm.reason}</span>
-                </div>
-              </div>
-            ))}
+
+          {/* Filtro por Generación del Jugador */}
+          <div className="teammate-gen-filter">
+            <span className="teammate-filter-label"><Filter size={14} /> Mostrar compañeros hasta Gen:</span>
+            <div className="teammate-gen-pills">
+              <button
+                className={`gen-pill teammate-gen-pill ${maxGen === 'all' ? 'active' : ''}`}
+                onClick={() => setMaxGen('all')}
+              >
+                Todas
+              </button>
+              {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(g => (
+                <button
+                  key={g}
+                  className={`gen-pill teammate-gen-pill ${maxGen === g ? 'active' : ''}`}
+                  onClick={() => setMaxGen(g)}
+                  title={`Solo compañeros de la Gen 1 a la ${g}`}
+                >
+                  ≤Gen {g}
+                </button>
+              ))}
+            </div>
+            <p className="teammate-filter-hint">
+              Ajusta el filtro según tu progreso en el juego: si apenas vas por la Gen {Math.max(1, pokemon.generation === 9 ? 6 : pokemon.generation)} o similar, elige esa generación para ver compañeros que ya puedes conseguir.
+            </p>
           </div>
+
+          <div className="teammates-grid">
+            {filteredTeammates.length > 0 ? (
+              filteredTeammates.map((tm, idx) => (
+                <div key={idx} className="teammate-card">
+                  <img
+                    src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${tm.id}.png`}
+                    alt={tm.name}
+                    className="teammate-sprite"
+                  />
+                  <div>
+                    <span className="teammate-name">{tm.name} <span className="teammate-gen">(Gen {getGenerationFromId(tm.id)})</span></span>
+                    <span className="teammate-reason">{tm.reason}</span>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="teammates-empty">
+                ⚠️ Ningún compañero de la build original está disponible en esa generación. Para equipos realistas con tu progreso, sube el filtro o considera compañeros alternativos.
+              </div>
+            )}
+          </div>
+
+          {filteredTeammates.length < baseTeammates.length && baseTeammates.length >= 2 && (
+            <p className="teammate-filtered-note">
+              Se ocultaron compañeros de generaciones posteriores a la Gen {maxGen} para que el equipo sea realista con tu progreso.
+            </p>
+          )}
         </div>
       </div>
     </div>

@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { Target, CheckCircle2, ShieldAlert, Sparkles, HelpCircle, Award } from 'lucide-react';
+import { Target, CheckCircle2, ShieldAlert, Sparkles, HelpCircle, Award, Plus, Lightbulb } from 'lucide-react';
 import { PokemonSummary, GoalConfig, StatDict, StatName } from '../types/pokemon';
 import { NATURES_LIST, STAT_NAMES_ES } from '../services/pokeapi';
 import { getSmogonBuilds } from '../services/smogonData';
+import { getSuggestedEggMoves } from '../services/eggMoves';
 
 interface GoalConfiguratorProps {
   pokemon: PokemonSummary;
@@ -41,6 +42,14 @@ export const GoalConfigurator: React.FC<GoalConfiguratorProps> = ({
   );
   const [eggMoveInput, setEggMoveInput] = useState<string>('');
   const [eggMoves, setEggMoves] = useState<string[]>([]);
+  const suggestedEggMoves = getSuggestedEggMoves(pokemon);
+  const [targetGender, setTargetGender] = useState<'male' | 'female' | 'any'>('any');
+
+  // Cálculo de proporción de sexo según genderRate
+  // genderRate: -1 = sin género; 0..8 = octavos de HEMBRA (rate/8)
+  const genderless = pokemon.genderRate < 0;
+  const femalePct = genderless ? 0 : Math.round((pokemon.genderRate / 8) * 100);
+  const malePct = genderless ? 0 : 100 - femalePct;
 
   // Apply Smogon preset build
   const applySmogonPreset = (buildIndex: number) => {
@@ -64,6 +73,13 @@ export const GoalConfigurator: React.FC<GoalConfiguratorProps> = ({
     setEggMoves(eggMoves.filter(m => m !== move));
   };
 
+  const handleAddSuggestedMove = (move: string, spanish: string) => {
+    const label = `${move} (${spanish})`;
+    if (move && !eggMoves.includes(label) && !eggMoves.includes(move)) {
+      setEggMoves([...eggMoves, label]);
+    }
+  };
+
   const handleConfirmGoal = () => {
     const finalIvs: StatDict = { ...targetIvs };
     if (useZeroAtk) finalIvs.atk = 0;
@@ -79,7 +95,8 @@ export const GoalConfigurator: React.FC<GoalConfiguratorProps> = ({
       isHiddenAbility: targetAbility.includes('HO') || targetAbility.includes('Oculta'),
       eggMoves,
       useZeroAtk,
-      useZeroSpe
+      useZeroSpe,
+      targetGender
     };
 
     onGeneratePlan(goal);
@@ -251,6 +268,40 @@ export const GoalConfigurator: React.FC<GoalConfiguratorProps> = ({
           </button>
         </div>
 
+        {/* Movimientos de Huevo Sugeridos por Pokémon */}
+        {suggestedEggMoves.length > 0 && (
+          <div className="suggested-egg-moves-box">
+            <div className="suggested-egg-moves-title">
+              <Lightbulb size={16} color="#FFD700" />
+              <span>Movimientos de Huevo Sugeridos para {pokemon.spanishName} (toca para añadir):</span>
+            </div>
+            <div className="suggested-egg-moves-grid">
+              {suggestedEggMoves.map((m, idx) => {
+                const isAdded = eggMoves.includes(m.move) || eggMoves.includes(`${m.move} (${m.spanish})`);
+                return (
+                  <button
+                    key={idx}
+                    className={`suggested-egg-move ${isAdded ? 'added' : ''}`}
+                    onClick={() => handleAddSuggestedMove(m.move, m.spanish)}
+                    disabled={isAdded}
+                    title={m.note}
+                  >
+                    <span className="suggested-move-name">{m.move}</span>
+                    <span className="suggested-move-spanish">{m.spanish}</span>
+                    {!isAdded && <Plus size={14} className="suggested-move-plus" />}
+                    {isAdded && <span className="suggested-move-check">✓</span>}
+                  </button>
+                );
+              })}
+            </div>
+            {suggestedEggMoves.some(m => m.note) && (
+              <p className="suggested-egg-moves-note">
+                Basados en builds competitivos de Smogon. Haz clic para añadirlos a tu objetivo de huevo.
+              </p>
+            )}
+          </div>
+        )}
+
         {eggMoves.length > 0 && (
           <div className="egg-move-tags">
             {eggMoves.map((m, idx) => (
@@ -268,6 +319,77 @@ export const GoalConfigurator: React.FC<GoalConfiguratorProps> = ({
             <strong>Tip Maestro Gen 9 (Escarlata y Púrpura):</strong> En la novena generación no necesitas criar obligatoriamente para aprender Movimientos de Huevo. Puedes equipar una <strong>Hierba Copia (*Mirror Herb*)</strong> a tu Pokémon con un hueco libre en sus movimientos e iniciar un Picnic con cualquier Pokémon que conozca el movimiento.
           </span>
         </div>
+      </div>
+
+      {/* Selector de Sexo de la Cría con porcentajes */}
+      <div className="config-section">
+        <label className="config-label">
+          <Sparkles size={18} /> 6. Sexo Deseado de la Cría ({pokemon.spanishName}):
+        </label>
+
+        <div className="gender-selector-row">
+          {genderless ? (
+            <div className="genderless-notice">
+              <span className="genderless-icon">⚧</span>
+              <span><strong>{pokemon.spanishName}</strong> no tiene género (no se puede elegir sexo).</span>
+            </div>
+          ) : (
+            <>
+              <button
+                className={`gender-card ${targetGender === 'any' ? 'active' : ''}`}
+                onClick={() => setTargetGender('any')}
+              >
+                <span className="gender-icon-any">⚖️</span>
+                <span className="gender-name">Indiferente</span>
+                <span className="gender-desc">Cualquier sexo sirve (el más rápido de conseguir).</span>
+              </button>
+              <button
+                className={`gender-card ${targetGender === 'female' ? 'active' : ''}`}
+                onClick={() => setTargetGender('female')}
+              >
+                <span className="gender-icon female">♀</span>
+                <span className="gender-name">Hembra</span>
+                <span className="gender-desc">
+                  Proporción del huevo: <strong>{femalePct}%</strong>
+                </span>
+              </button>
+              <button
+                className={`gender-card ${targetGender === 'male' ? 'active' : ''}`}
+                onClick={() => setTargetGender('male')}
+              >
+                <span className="gender-icon male">♂</span>
+                <span className="gender-name">Macho</span>
+                <span className="gender-desc">
+                  Proporción del huevo: <strong>{malePct}%</strong>
+                </span>
+              </button>
+            </>
+          )}
+        </div>
+
+        {!genderless && (
+          <div className="gender-probability-bar">
+            <div className="prob-track">
+              <div
+                className={`prob-fill prob-female ${targetGender === 'female' ? 'highlighted' : ''}`}
+                style={{ width: `${femalePct}%` }}
+              ></div>
+              <div
+                className={`prob-fill prob-male ${targetGender === 'male' ? 'highlighted' : ''}`}
+                style={{ width: `${malePct}%` }}
+              ></div>
+            </div>
+            <div className="prob-labels">
+              <span className="prob-label-female">♀ Hembra {femalePct}%</span>
+              <span className="prob-label-male">♂ Macho {malePct}%</span>
+            </div>
+            <p className="gender-hint">
+              💡 El sexo del huevo es aleatorio (no hay truco 100% para forzarlo). Si buscas un sexo específico,
+              tenlo en cuenta: <strong>{femalePct}%</strong> de los huevos serán ♀ y <strong>{malePct}%</strong> serán ♂.
+              Conseguir el sexo deseado puede requerir varios huevos.
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Botones de Acción */}

@@ -78,6 +78,7 @@ export interface GoalConfig {
   eggMoves: string[];
   useZeroAtk: boolean;
   useZeroSpe: boolean;
+  targetGender: 'male' | 'female' | 'any';
 }
 
 export interface ItemRequired {

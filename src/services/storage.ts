@@ -1,10 +1,18 @@
-import { BreedingProject, BoxPokemon } from '../types/pokemon';
+import { BreedingProject, BoxPokemon, GoalConfig } from '../types/pokemon';
 
 const STORAGE_KEYS = {
   PROJECTS: 'pokelinker_projects_v1',
   ACTIVE_PROJECT_ID: 'pokelinker_active_project_id_v1',
   BOX: 'pokelinker_user_box_v1'
 };
+
+// Normaliza proyectos guardados de versiones anteriores (añade campos nuevos con defaults)
+function normalizeProject(p: BreedingProject): BreedingProject {
+  if (!p.goal) return p;
+  const goal = { ...p.goal } as GoalConfig & { targetGender?: string };
+  if (!goal.targetGender) goal.targetGender = 'any';
+  return { ...p, goal: goal as GoalConfig };
+}
 
 // Default initial box data for new users so they can start instantly
 const DEFAULT_BOX: BoxPokemon[] = [
@@ -41,7 +49,9 @@ const DEFAULT_BOX: BoxPokemon[] = [
 export function getSavedProjects(): BreedingProject[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEYS.PROJECTS);
-    return raw ? JSON.parse(raw) : [];
+    if (!raw) return [];
+    const parsed: BreedingProject[] = JSON.parse(raw);
+    return parsed.map(p => normalizeProject(p));
   } catch (e) {
     console.error('Error al leer proyectos guardados:', e);
     return [];

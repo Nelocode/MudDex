@@ -102,8 +102,17 @@ export const BreedingTree: React.FC<BreedingTreeProps> = ({
       </div>
 
       <div className="tree-steps-flow">
-        {steps.map(step => {
+        {steps.map((step, stepIdx) => {
           const validation = validateEggGroupCompatibility(step.parentA, step.parentB);
+          const isLastStep = stepIdx === steps.length - 1;
+
+          // Derivar el nombre de la cría: "Cría N" para intermedias, "Cría Final" para la última
+          const matchCria = step.targetChild.spanishName.match(/CRÍA\s*(\d+)/i);
+          const childLabel = isLastStep
+            ? '🎯 Cría Final (Objetivo)'
+            : matchCria
+              ? `🥚 Cría ${matchCria[1]}`
+              : '🥚 Cría';
 
           return (
             <div
@@ -241,7 +250,7 @@ export const BreedingTree: React.FC<BreedingTreeProps> = ({
                 {/* CRÍA RESULTANTE */}
                 <div className="child-box">
                   <div className="child-header">
-                    <span className="child-badge">✨ Cría Objetivo</span>
+                    <span className={`child-badge ${isLastStep ? 'child-badge-final' : ''}`}>{childLabel}</span>
                   </div>
                   <div className="child-content">
                     <img src={step.targetChild.sprite} alt={step.targetChild.spanishName} className="child-sprite" />
