@@ -68,6 +68,8 @@ export interface SpawnCondition {
   structures?: string[];
   moonPhase?: string;
   presetName?: string;
+  neededBlocks?: string[];
+  blockInstruction?: string;
 }
 
 export interface SpawnEntry {
