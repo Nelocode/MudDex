@@ -206,11 +206,11 @@ export const SpawnRadarView: React.FC<SpawnRadarViewProps> = ({ onSelectPokemonF
                     {/* Card Top: Image, Name & Bucket Badge */}
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex items-center gap-3">
-                        <div className="w-14 h-14 rounded-xl bg-slate-950 border border-slate-800 p-1 flex items-center justify-center group-hover:scale-105 transition-transform">
+                        <div className="w-14 h-14 rounded-xl bg-slate-950 border border-slate-800 p-1 flex items-center justify-center group-hover:scale-110 transition-transform">
                           <img
-                            src={pokemon.artworkUrl || pokemon.spriteUrl}
+                            src={pokemon.spriteUrl || pokemon.artworkUrl}
                             alt={pokemon.name}
-                            className="w-12 h-12 object-contain drop-shadow-md"
+                            className="w-12 h-12 object-contain filter drop-shadow-md"
                           />
                         </div>
                         <div>

@@ -14,7 +14,7 @@ export const COBBLEMON_POKEDEX: Pokemon[] = [
     baseStats: { hp: 45, attack: 49, defense: 49, specialAttack: 65, specialDefense: 65, speed: 45 },
     abilities: { normal: ['Overgrow'], hidden: 'Chlorophyll' },
     isAlphaAvailable: true,
-    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png',
+    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/1.gif',
     artworkUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/1.png'
   },
   {
@@ -30,7 +30,7 @@ export const COBBLEMON_POKEDEX: Pokemon[] = [
     baseStats: { hp: 39, attack: 52, defense: 43, specialAttack: 60, specialDefense: 50, speed: 65 },
     abilities: { normal: ['Blaze'], hidden: 'Solar Power' },
     isAlphaAvailable: true,
-    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/4.png',
+    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/4.gif',
     artworkUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/4.png'
   },
   {
@@ -46,7 +46,7 @@ export const COBBLEMON_POKEDEX: Pokemon[] = [
     baseStats: { hp: 44, attack: 48, defense: 65, specialAttack: 50, specialDefense: 64, speed: 43 },
     abilities: { normal: ['Torrent'], hidden: 'Rain Dish' },
     isAlphaAvailable: true,
-    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/7.png',
+    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/7.gif',
     artworkUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/7.png'
   },
   {
@@ -62,7 +62,7 @@ export const COBBLEMON_POKEDEX: Pokemon[] = [
     baseStats: { hp: 35, attack: 55, defense: 40, specialAttack: 50, specialDefense: 50, speed: 90 },
     abilities: { normal: ['Static'], hidden: 'Lightning Rod' },
     isAlphaAvailable: true,
-    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png',
+    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/25.gif',
     artworkUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png'
   },
   {
@@ -78,7 +78,7 @@ export const COBBLEMON_POKEDEX: Pokemon[] = [
     baseStats: { hp: 60, attack: 65, defense: 60, specialAttack: 130, specialDefense: 75, speed: 110 },
     abilities: { normal: ['Cursed Body'] },
     isAlphaAvailable: true,
-    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/94.png',
+    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/94.gif',
     artworkUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/94.png'
   },
   {
@@ -94,7 +94,7 @@ export const COBBLEMON_POKEDEX: Pokemon[] = [
     baseStats: { hp: 95, attack: 125, defense: 79, specialAttack: 60, specialDefense: 100, speed: 81 },
     abilities: { normal: ['Intimidate'], hidden: 'Moxie' },
     isAlphaAvailable: true,
-    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/130.png',
+    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/130.gif',
     artworkUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/130.png'
   },
   {
@@ -110,7 +110,7 @@ export const COBBLEMON_POKEDEX: Pokemon[] = [
     baseStats: { hp: 160, attack: 110, defense: 65, specialAttack: 65, specialDefense: 110, speed: 30 },
     abilities: { normal: ['Immunity', 'Thick Fat'], hidden: 'Gluttony' },
     isAlphaAvailable: true,
-    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/143.png',
+    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/143.gif',
     artworkUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/143.png'
   },
   {
@@ -126,7 +126,7 @@ export const COBBLEMON_POKEDEX: Pokemon[] = [
     baseStats: { hp: 91, attack: 134, defense: 95, specialAttack: 100, specialDefense: 100, speed: 80 },
     abilities: { normal: ['Inner Focus'], hidden: 'Multiscale' },
     isAlphaAvailable: true,
-    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/149.png',
+    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/149.gif',
     artworkUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/149.png'
   },
   {
@@ -142,7 +142,7 @@ export const COBBLEMON_POKEDEX: Pokemon[] = [
     baseStats: { hp: 106, attack: 110, defense: 90, specialAttack: 154, specialDefense: 90, speed: 130 },
     abilities: { normal: ['Pressure'], hidden: 'Unnerve' },
     isAlphaAvailable: true,
-    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/150.png',
+    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/150.gif',
     artworkUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/150.png'
   },
   {
@@ -156,9 +156,9 @@ export const COBBLEMON_POKEDEX: Pokemon[] = [
     weightKg: 202.0,
     heightM: 2.0,
     baseStats: { hp: 100, attack: 134, defense: 110, specialAttack: 95, specialDefense: 100, speed: 61 },
-    abilities: { normal: ['Stream Stream'], hidden: 'Unnerve' },
+    abilities: { normal: ['Sand Stream'], hidden: 'Unnerve' },
     isAlphaAvailable: true,
-    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/248.png',
+    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/248.gif',
     artworkUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/248.png'
   },
   {
@@ -174,7 +174,7 @@ export const COBBLEMON_POKEDEX: Pokemon[] = [
     baseStats: { hp: 68, attack: 65, defense: 65, specialAttack: 125, specialDefense: 115, speed: 80 },
     abilities: { normal: ['Synchronize', 'Trace'], hidden: 'Telepathy' },
     isAlphaAvailable: true,
-    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/282.png',
+    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/282.gif',
     artworkUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/282.png'
   },
   {
@@ -190,7 +190,7 @@ export const COBBLEMON_POKEDEX: Pokemon[] = [
     baseStats: { hp: 70, attack: 110, defense: 70, specialAttack: 115, specialDefense: 70, speed: 90 },
     abilities: { normal: ['Steadfast', 'Inner Focus'], hidden: 'Justified' },
     isAlphaAvailable: true,
-    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/448.png',
+    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/448.gif',
     artworkUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/448.png'
   },
   {
@@ -206,7 +206,7 @@ export const COBBLEMON_POKEDEX: Pokemon[] = [
     baseStats: { hp: 108, attack: 130, defense: 95, specialAttack: 80, specialDefense: 85, speed: 102 },
     abilities: { normal: ['Sand Veil'], hidden: 'Rough Skin' },
     isAlphaAvailable: true,
-    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/445.png',
+    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/445.gif',
     artworkUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/445.png'
   },
   {
@@ -222,7 +222,7 @@ export const COBBLEMON_POKEDEX: Pokemon[] = [
     baseStats: { hp: 72, attack: 95, defense: 67, specialAttack: 103, specialDefense: 71, speed: 122 },
     abilities: { normal: ['Torrent'], hidden: 'Protean' },
     isAlphaAvailable: true,
-    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/658.png',
+    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/658.gif',
     artworkUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/658.png'
   },
   {
@@ -238,7 +238,7 @@ export const COBBLEMON_POKEDEX: Pokemon[] = [
     baseStats: { hp: 55, attack: 90, defense: 80, specialAttack: 50, specialDefense: 105, speed: 96 },
     abilities: { normal: ['Disguise'] },
     isAlphaAvailable: true,
-    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/778.png',
+    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/778.gif',
     artworkUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/778.png'
   },
   {
@@ -254,7 +254,7 @@ export const COBBLEMON_POKEDEX: Pokemon[] = [
     baseStats: { hp: 88, attack: 120, defense: 75, specialAttack: 100, specialDefense: 75, speed: 142 },
     abilities: { normal: ['Clear Body', 'Infiltrator'], hidden: 'Cursed Body' },
     isAlphaAvailable: true,
-    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/887.png',
+    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/887.gif',
     artworkUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/887.png'
   },
   {
@@ -270,7 +270,7 @@ export const COBBLEMON_POKEDEX: Pokemon[] = [
     baseStats: { hp: 75, attack: 125, defense: 80, specialAttack: 60, specialDefense: 100, speed: 85 },
     abilities: { normal: ['Flash Fire'], hidden: 'Weak Armor' },
     isAlphaAvailable: true,
-    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/937.png',
+    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/937.gif',
     artworkUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/937.png'
   },
   {
@@ -286,7 +286,7 @@ export const COBBLEMON_POKEDEX: Pokemon[] = [
     baseStats: { hp: 85, attack: 75, defense: 77, specialAttack: 70, specialDefense: 105, speed: 94 },
     abilities: { normal: ['Mold Breaker', 'Own Tempo'], hidden: 'Pickpocket' },
     isAlphaAvailable: true,
-    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/959.png',
+    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/959.gif',
     artworkUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/959.png'
   }
 ];

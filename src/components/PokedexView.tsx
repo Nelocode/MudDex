@@ -134,11 +134,11 @@ export const PokedexView: React.FC<PokedexViewProps> = ({
               )}
             </div>
 
-            <div className="w-full h-28 bg-slate-950 border border-slate-800 rounded-xl p-2 flex items-center justify-center group-hover:scale-105 transition-transform">
+            <div className="w-full h-28 bg-slate-950/80 border border-slate-800 rounded-xl p-2 flex items-center justify-center group-hover:scale-110 transition-transform">
               <img
-                src={p.artworkUrl || p.spriteUrl}
+                src={p.spriteUrl || p.artworkUrl}
                 alt={p.name}
-                className="max-h-full max-w-full object-contain drop-shadow-md"
+                className="max-h-full max-w-full object-contain filter drop-shadow-md"
               />
             </div>
 

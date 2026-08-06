@@ -93,34 +93,41 @@ export function App() {
       </div>
 
       {/* Footer */}
-      <footer className="relative z-10 border-t border-slate-800/80 bg-slate-950/90 py-8 px-4 mt-12">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
+      <footer className="relative z-10 border-t border-slate-800/80 bg-slate-950/90 py-10 px-4 mt-12">
+        <div className="max-w-7xl mx-auto flex flex-col items-center justify-center space-y-6 text-center">
           
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-cyan-500 to-indigo-600 p-0.5 shadow-md shadow-cyan-500/20">
-              <div className="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center">
-                <Sparkles className="w-4 h-4 text-cyan-400" />
-              </div>
-            </div>
-            <div>
-              <h3 className="font-extrabold text-sm text-white">Diosesmon Dex</h3>
-              <p className="text-xs text-slate-500">Cobblemon 1.7.3 • Fabric 1.21.1 Companion Platform</p>
+          {/* Mudkill Logo & Brand */}
+          <div className="flex flex-col items-center gap-3">
+            <img
+              src="/Mudkill.png"
+              alt="Mudkill Logo"
+              className="h-16 w-auto object-contain drop-shadow-xl hover:scale-105 transition-transform duration-300"
+            />
+            <div className="flex items-center gap-2">
+              <span className="font-extrabold text-lg tracking-tight bg-gradient-to-r from-cyan-400 via-sky-300 to-indigo-300 bg-clip-text text-transparent">
+                Diosesmon Dex
+              </span>
+              <span className="px-2 py-0.5 text-[10px] font-bold rounded-md bg-cyan-500/10 text-cyan-400 border border-cyan-500/30">
+                PRO 1.7.3
+              </span>
             </div>
           </div>
 
-          <div className="flex items-center gap-4 text-xs text-slate-400">
+          <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-slate-400">
             <button
               onClick={() => setIsInfoModalOpen(true)}
-              className="hover:text-cyan-300 transition-colors flex items-center gap-1"
+              className="hover:text-cyan-300 transition-colors flex items-center gap-1 font-semibold"
             >
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" /> mc.diosesmon.net
+              <ShieldCheck className="w-4 h-4 text-emerald-400" /> Servidor Oficial: mc.diosesmon.net
             </button>
             <span>•</span>
-            <span className="text-slate-500">No afiliado a Nintendo, Game Freak o Mojang.</span>
+            <span className="text-slate-500 max-w-lg leading-relaxed">
+              No oficial. Diosesmon Dex es un proyecto independiente y no está afiliado, avalado ni patrocinado por Pokémon, Nintendo, Game Freak ni Mojang.
+            </span>
           </div>
 
-          <div className="text-xs text-slate-500 flex items-center gap-1">
-            <span>Hecho con</span> <Heart className="w-3.5 h-3.5 text-rose-500 inline fill-rose-500" /> <span>para la comunidad Diosesmon</span>
+          <div className="text-xs text-slate-500 flex items-center gap-1.5 pt-2 border-t border-slate-900 w-full justify-center">
+            <span>Desarrollado con</span> <Heart className="w-4 h-4 text-rose-500 inline fill-rose-500 animate-pulse" /> <span>para la comunidad de Diosesmon & Cobblemon</span>
           </div>
 
         </div>

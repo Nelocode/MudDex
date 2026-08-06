@@ -65,9 +65,9 @@ export const CatchCalculatorView: React.FC<CatchCalculatorViewProps> = ({ initia
 
             <div className="flex items-center gap-3 bg-slate-950 border border-slate-800 rounded-xl p-3">
               <img
-                src={currentPokemon.artworkUrl || currentPokemon.spriteUrl}
+                src={currentPokemon.spriteUrl || currentPokemon.artworkUrl}
                 alt={currentPokemon.name}
-                className="w-14 h-14 object-contain drop-shadow-md"
+                className="w-14 h-14 object-contain filter drop-shadow-md animate-pulse"
               />
               <div className="flex-1 min-w-0">
                 <select
