@@ -232,6 +232,24 @@ export const App: React.FC = () => {
       />
 
       <main className="main-content-container">
+        {/* Banner Prominente de Magic Login / Sincronización */}
+        <div className="magic-sync-banner glass-panel">
+          <div className="banner-left">
+            <span className="banner-icon">🪄</span>
+            <div>
+              <strong>{magicSession ? `Sesión Mágica Activa: ${magicSession.trainerName}` : 'Guarda tu Pokémon en Crianza y Cajas en la Nube'}</strong>
+              <p>
+                {magicSession
+                  ? `Tus Pokémon y tus cajas están vinculados a tu sesión. Copia tu Enlace Mágico para abrir en otros dispositivos.`
+                  : `Ingresa tu correo o tag de entrenador sin contraseñas para sincronizar tu progreso.`}
+              </p>
+            </div>
+          </div>
+          <button className="btn-magic-login" onClick={() => setIsMagicLoginOpen(true)}>
+            {magicSession ? '⚙️ Opciones de Sesión' : '🔐 Iniciar Sesión / Magic Login'}
+          </button>
+        </div>
+
         {/* VISTA 1: SELECTOR DE POKÉMON */}
         {view === 'selector' && (
           <PokemonSelector onSelectPokemon={handleSelectPokemon} />

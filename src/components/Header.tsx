@@ -61,12 +61,12 @@ export const Header: React.FC<HeaderProps> = ({
           )}
 
           <button
-            className={`btn-secondary ${magicSession ? 'magic-session-btn-active' : ''}`}
+            className={`btn-magic-login ${magicSession ? 'magic-active' : ''}`}
             onClick={onOpenMagicLogin}
             title="Guarda y sincroniza tus Pokémon en crianza y cajas"
           >
-            <Wand2 size={18} color={magicSession ? '#00D2FF' : 'currentColor'} />
-            <span>{magicSession ? `🪄 ${magicSession.trainerName}` : 'Magic Login'}</span>
+            <Wand2 size={18} color="#00D2FF" />
+            <span>{magicSession ? `🪄 Sesión: ${magicSession.trainerName}` : '🔐 Iniciar Sesión / Magic Login'}</span>
           </button>
 
           <button className="btn-secondary" onClick={onOpenBox} title="Gestionar tu Caja de Pokémon">
