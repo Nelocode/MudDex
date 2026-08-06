@@ -56,7 +56,16 @@ export const App: React.FC = () => {
       setMagicSession(newSess);
     }
 
-    const projects = getSavedProjects();
+    const rawProjects = getSavedProjects();
+    const box = getUserBox();
+    const projects = rawProjects.map(p => {
+      const freshSteps = generateBreedingTree(p.targetPokemon, p.goal, box);
+      const mergedSteps = freshSteps.map((fs, idx) => ({
+        ...fs,
+        isCompleted: p.steps[idx]?.isCompleted || false
+      }));
+      return { ...p, steps: mergedSteps };
+    });
     setSavedProjects(projects);
 
     const activeId = getActiveProjectId();

@@ -95,6 +95,28 @@ export function getPowerItemForStat(stat: StatName): ItemRequired {
   }
 }
 
+export function createSingleIvObject(targetStat: StatName, targetVal = 31, fallbackVal = 10): Record<StatName, number> {
+  return {
+    hp: targetStat === 'hp' ? targetVal : fallbackVal,
+    atk: targetStat === 'atk' ? targetVal : fallbackVal,
+    def: targetStat === 'def' ? targetVal : fallbackVal,
+    spa: targetStat === 'spa' ? targetVal : fallbackVal,
+    spd: targetStat === 'spd' ? targetVal : fallbackVal,
+    spe: targetStat === 'spe' ? targetVal : fallbackVal,
+  };
+}
+
+export function createMultiIvObject(stats: StatName[], targetVal = 31, fallbackVal = 15): Record<StatName, number> {
+  return {
+    hp: stats.includes('hp') ? targetVal : fallbackVal,
+    atk: stats.includes('atk') ? targetVal : fallbackVal,
+    def: stats.includes('def') ? targetVal : fallbackVal,
+    spa: stats.includes('spa') ? targetVal : fallbackVal,
+    spd: stats.includes('spd') ? targetVal : fallbackVal,
+    spe: stats.includes('spe') ? targetVal : fallbackVal,
+  };
+}
+
 export function validateEggGroupCompatibility(
   parentA: ParentPokemon,
   parentB: ParentPokemon
@@ -343,7 +365,7 @@ export function generateBreedingTree(
     spanishName: `Padre A (${breedSpanishName} Salvaje 1x31 ${stat1.toUpperCase()})`,
     sprite: breedSprite,
     gender: isGenderless ? 'genderless' : 'female',
-    ivs: { hp: stat1 === 'hp' ? 31 : 10, atk: 10, def: stat1 === 'def' ? 31 : 10, spa: 10, spd: stat1 === 'spd' ? 31 : 10, spe: 10 },
+    ivs: createSingleIvObject(stat1, 31, 10),
     nature: 'Aleatoria',
     heldItem: getPowerItemForStat(stat1),
     eggGroups: breedEggGroups,
@@ -356,7 +378,7 @@ export function generateBreedingTree(
     spanishName: `Padre B / Ditto (Salvaje 1x31 ${stat2.toUpperCase()})`,
     sprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/132.png',
     gender: 'genderless',
-    ivs: { hp: stat2 === 'hp' ? 31 : 10, atk: 10, def: stat2 === 'def' ? 31 : 10, spa: 10, spd: stat2 === 'spd' ? 31 : 10, spe: 10 },
+    ivs: createSingleIvObject(stat2, 31, 10),
     heldItem: getPowerItemForStat(stat2),
     eggGroups: breedEggGroups,
     isDitto: true,
@@ -376,7 +398,7 @@ export function generateBreedingTree(
       spanishName: `🥚 CRÍA 1 (${breedSpanishName} 2x31 ${stat1.toUpperCase()}/${stat2.toUpperCase()})`,
       sprite: breedSprite,
       gender: isGenderless ? 'genderless' : 'female',
-      ivs: { hp: stat1 === 'hp' || stat2 === 'hp' ? 31 : 15, atk: 15, def: stat1 === 'def' || stat2 === 'def' ? 31 : 15, spa: 15, spd: stat1 === 'spd' || stat2 === 'spd' ? 31 : 15, spe: 15 },
+      ivs: createMultiIvObject([stat1, stat2], 31, 15),
       nature: undefined,
       eggGroups: breedEggGroups,
       source: 'bred'
@@ -397,7 +419,7 @@ export function generateBreedingTree(
       spanishName: `Padre C (${breedSpanishName} Salvaje 1x31 ${stat3.toUpperCase()})`,
       sprite: breedSprite,
       gender: isGenderless ? 'genderless' : 'female',
-      ivs: { hp: stat3 === 'hp' ? 31 : 10, atk: 10, def: stat3 === 'def' ? 31 : 10, spa: 10, spd: stat3 === 'spd' ? 31 : 10, spe: 10 },
+      ivs: createSingleIvObject(stat3, 31, 10),
       nature: 'Aleatoria',
       heldItem: getPowerItemForStat(stat3),
       eggGroups: breedEggGroups,
@@ -410,7 +432,7 @@ export function generateBreedingTree(
       spanishName: `Padre D / Ditto (Salvaje 1x31 ${stat4.toUpperCase()})`,
       sprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/132.png',
       gender: 'genderless',
-      ivs: { hp: stat4 === 'hp' ? 31 : 10, atk: 10, def: stat4 === 'def' ? 31 : 10, spa: 10, spd: stat4 === 'spd' ? 31 : 10, spe: 10 },
+      ivs: createSingleIvObject(stat4, 31, 10),
       heldItem: getPowerItemForStat(stat4),
       eggGroups: breedEggGroups,
       isDitto: true,
@@ -430,7 +452,7 @@ export function generateBreedingTree(
         spanishName: `🥚 CRÍA 2 (${breedSpanishName} 2x31 ${stat3.toUpperCase()}/${stat4.toUpperCase()})`,
         sprite: breedSprite,
         gender: isGenderless ? 'genderless' : 'male',
-        ivs: { hp: stat3 === 'hp' || stat4 === 'hp' ? 31 : 15, atk: 15, def: stat3 === 'def' || stat4 === 'def' ? 31 : 15, spa: 15, spd: stat3 === 'spd' || stat4 === 'spd' ? 31 : 15, spe: 15 },
+        ivs: createMultiIvObject([stat3, stat4], 31, 15),
         nature: undefined,
         eggGroups: breedEggGroups,
         source: 'bred'
@@ -476,7 +498,7 @@ export function generateBreedingTree(
         spanishName: `🥚 CRÍA 3 (${breedSpanishName} 3x31)`,
         sprite: breedSprite,
         gender: isGenderless ? 'genderless' : 'female',
-        ivs: { hp: 31, atk: 15, def: 31, spa: 15, spd: 31, spe: 15 },
+        ivs: createMultiIvObject([stat1, stat2, stat3], 31, 15),
         nature: undefined,
         eggGroups: breedEggGroups,
         source: 'bred'
@@ -510,7 +532,7 @@ export function generateBreedingTree(
         : `Padre B: Ditto / Macho Salvaje (Naturaleza ${goal.targetNature})`,
       sprite: natureParentInBox ? natureParentInBox.sprite : 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/132.png',
       gender: 'male',
-      ivs: { hp: 31, atk: 15, def: 31, spa: 15, spd: 31, spe: 15 },
+      ivs: createMultiIvObject([stat1, stat2, stat3], 31, 15),
       nature: goal.targetNature,
       heldItem: BREEDING_ITEMS.everstone,
       eggGroups: breedEggGroups,
@@ -531,7 +553,7 @@ export function generateBreedingTree(
         spanishName: `🥚 CRÍA ${currentCriaNum} (${breedSpanishName} 3x31 - ${goal.targetNature})`,
         sprite: breedSprite,
         gender: isGenderless ? 'genderless' : 'female',
-        ivs: { hp: 31, atk: 15, def: 31, spa: 15, spd: 31, spe: 15 },
+        ivs: createMultiIvObject([stat1, stat2, stat3], 31, 15),
         nature: goal.targetNature,
         eggGroups: breedEggGroups,
         source: 'bred'
@@ -563,7 +585,7 @@ export function generateBreedingTree(
       spanishName: isGenderless || is100PercentMale ? `Padre B: Ditto Fértil (4x31 IVs)` : `Padre B: CRÍA 2 / Macho Fértil (2x31/3x31 en stats secundarios)`,
       sprite: isGenderless || is100PercentMale ? 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/132.png' : breedSprite,
       gender: isGenderless ? 'genderless' : 'male',
-      ivs: { hp: 31, atk: 31, def: 31, spa: 15, spd: 31, spe: 15 },
+      ivs: createMultiIvObject([stat1, stat2, stat3, stat4], 31, 15),
       heldItem: BREEDING_ITEMS.destinyKnot,
       eggGroups: breedEggGroups,
       isDitto: isGenderless || is100PercentMale,
@@ -585,7 +607,7 @@ export function generateBreedingTree(
         spanishName: `🥚 CRÍA ${currentCriaNum} (${breedSpanishName} 4x31${goal.useNature ? ` - ${goal.targetNature}` : ''})`,
         sprite: breedSprite,
         gender: isGenderless ? 'genderless' : 'female',
-        ivs: { hp: 31, atk: goal.useZeroAtk ? 0 : 31, def: 31, spa: 31, spd: 31, spe: 15 },
+        ivs: createMultiIvObject([stat1, stat2, stat3, stat4], 31, 15),
         nature: goal.useNature ? goal.targetNature : undefined,
         eggGroups: breedEggGroups,
         source: 'bred'
