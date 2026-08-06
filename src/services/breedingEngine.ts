@@ -7,7 +7,8 @@ import {
   StatName,
   BoxPokemon,
   EggGroupValidationResult,
-  PrerequisiteCheckItem
+  PrerequisiteCheckItem,
+  EggGroup
 } from '../types/pokemon';
 import { EGG_GROUPS_ES } from './pokeapi';
 
@@ -149,12 +150,20 @@ export function validateEggGroupCompatibility(
   };
 }
 
+// Baby Pokemon IDs (Undiscovered group)
+const BABY_POKEMON_IDS = new Set([
+  172, 173, 174, 175, 236, 238, 239, 240, 298, 360, 406, 433, 438, 439, 440, 446, 447, 848
+]);
+
 export function generatePrerequisitesList(
   targetPokemon: PokemonSummary,
   goal: GoalConfig,
   steps: BreedingStepNode[]
 ): PrerequisiteCheckItem[] {
   const items: PrerequisiteCheckItem[] = [];
+
+  const isNidoLine = [29, 30, 31, 32, 33, 34].includes(targetPokemon.id) ||
+    ['nidoran-f', 'nidorina', 'nidoqueen', 'nidoran-m', 'nidorino', 'nidoking'].includes(targetPokemon.name.toLowerCase());
 
   items.push({
     id: 'prereq-destiny-knot',
@@ -205,12 +214,29 @@ export function generatePrerequisitesList(
     });
   }
 
+  // Regla Especial Nidoran: Piedra Lunar para evolucionar a Nidoqueen o Nidoking
+  if (isNidoLine && [30, 31, 33, 34].includes(targetPokemon.id)) {
+    items.push({
+      id: 'prereq-moon-stone',
+      title: 'Piedra Lunar (Moon Stone)',
+      category: 'item',
+      iconUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/moon-stone.png',
+      description: `Para evolucionar la cría final (${targetPokemon.id === 30 || targetPokemon.id === 31 ? 'Nidorina → Nidoqueen' : 'Nidorino → Nidoking'}).`,
+      isChecked: false
+    });
+  }
+
+  const baseParentName = (targetPokemon.id === 30 || targetPokemon.id === 31) ? 'Nidoran♀' : targetPokemon.spanishName;
+  const baseParentSprite = (targetPokemon.id === 30 || targetPokemon.id === 31)
+    ? 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/29.png'
+    : targetPokemon.sprite;
+
   items.push({
     id: 'prereq-parent-female',
-    title: `Padre Base / Hembra de ${targetPokemon.spanishName}`,
+    title: `Padre Base / Hembra de ${baseParentName}`,
     category: 'parent',
-    iconUrl: targetPokemon.sprite,
-    description: `1x Hembra de la especie de ${targetPokemon.spanishName} (o Ditto) para definir la especie resultante.`,
+    iconUrl: baseParentSprite,
+    description: `1x Hembra Fértil de ${baseParentName} (o Ditto) para iniciar la cadena de crianza real.`,
     isChecked: false
   });
 
@@ -255,6 +281,19 @@ export function generateBreedingTree(
   const targetIvCount = goal.targetIvCount;
   const hatchBaseSteps = (targetPokemon.hatchCounter + 1) * 256;
 
+  // REGLAS ESPECIALES DE ESPECIES
+  const isNidoFemaleLine = targetPokemon.id === 30 || targetPokemon.id === 31 || targetPokemon.name === 'nidoqueen' || targetPokemon.name === 'nidorina';
+  const isNidoMaleLine = targetPokemon.id === 33 || targetPokemon.id === 34 || targetPokemon.name === 'nidoking' || targetPokemon.name === 'nidorino';
+  const isGenderless = targetPokemon.genderRate === -1;
+  const is100PercentMale = targetPokemon.genderRate === 0;
+
+  // Si se eligió Nidoqueen o Nidorina (que están en Grupo No Descubierto), la especie real de crianza es Nidoran♀ (ID 29)
+  const breedPokemonId = isNidoFemaleLine ? 29 : targetPokemon.id;
+  const breedSpeciesName = isNidoFemaleLine ? 'nidoran-f' : targetPokemon.name;
+  const breedSpanishName = isNidoFemaleLine ? 'Nidoran♀' : targetPokemon.spanishName;
+  const breedSprite = isNidoFemaleLine ? 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/29.png' : targetPokemon.sprite;
+  const breedEggGroups: EggGroup[] = isNidoFemaleLine ? ['monster', 'field'] : targetPokemon.eggGroups;
+
   // Order stats to build up: hp -> def -> spd -> spa/atk -> spe
   const selectedStats: StatName[] = [];
   if (goal.targetIvs.hp === 31) selectedStats.push('hp');
@@ -273,7 +312,7 @@ export function generateBreedingTree(
 
   const natureParentInBox = userBox.find(p =>
     p.nature.toLowerCase() === goal.targetNature?.toLowerCase() &&
-    (p.isDitto || p.eggGroups.some(eg => targetPokemon.eggGroups.includes(eg)))
+    (p.isDitto || p.eggGroups.some(eg => breedEggGroups.includes(eg)))
   );
 
   const bestDitto = userBox.find(p => p.isDitto && Object.values(p.ivs).filter(v => v === 31).length >= 5);
@@ -283,19 +322,31 @@ export function generateBreedingTree(
   const stat3 = selectedStats[2] || 'spd';
   const stat4 = selectedStats[3] || 'spa';
 
+  // Nota explicativa especial para Nidoran / Sin Género / Manaphy
+  let specialRuleNote = '';
+  if (isNidoFemaleLine) {
+    specialRuleNote = ` ⚠️ REGLA ESPECIAL NIDOQUEEN/NIDORINA: Nidoqueen y Nidorina pertenecen al grupo 'No Descubierto' y NO pueden criar. La crianza se realiza utilizando a Nidoran♀. Los huevos nacidos tienen un 50% de probabilidad de ser Nidoran♀ y 50% Nidoran♂. Al obtener la cría final de 5x31, se evoluciona a Nidoqueen usando una Piedra Lunar.`;
+  } else if (isNidoMaleLine) {
+    specialRuleNote = ` 💡 REGLA ESPECIAL NIDOKING: Al criar con Nidoran♀ o Ditto, los huevos tienen 50% probabilidad de ser Nidoran♂ y 50% Nidoran♀. Para obtener a Nidoking, evoluciona el Nidoran♂ 5x31 final con una Piedra Lunar.`;
+  } else if (isGenderless || is100PercentMale) {
+    specialRuleNote = ` 💡 REGLA ESPECIAL (Sin Género / 100% Macho): Esta especie solo puede criar con Ditto para obtener huevos de su misma especie.`;
+  } else if (targetPokemon.id === 490) {
+    specialRuleNote = ` ⚠️ ATENCIÓN MANAPHY: Criar a Manaphy con Ditto produce huevos de Phione (Phione NUNCA evoluciona a Manaphy).`;
+  }
+
   // =========================================================================
   // PASO 1: Cruza 1x31 + 1x31 -> CRÍA 1 (2x31)
   // =========================================================================
   const parentA1: ParentPokemon = {
-    pokemonId: targetPokemon.id,
-    speciesName: targetPokemon.name,
-    spanishName: `Padre A (Salvaje 1x31 ${stat1.toUpperCase()})`,
-    sprite: targetPokemon.sprite,
-    gender: 'female',
+    pokemonId: breedPokemonId,
+    speciesName: breedSpeciesName,
+    spanishName: `Padre A (${breedSpanishName} Salvaje 1x31 ${stat1.toUpperCase()})`,
+    sprite: breedSprite,
+    gender: isGenderless ? 'genderless' : 'female',
     ivs: { hp: stat1 === 'hp' ? 31 : 10, atk: 10, def: stat1 === 'def' ? 31 : 10, spa: 10, spd: stat1 === 'spd' ? 31 : 10, spe: 10 },
     nature: 'Aleatoria',
     heldItem: getPowerItemForStat(stat1),
-    eggGroups: targetPokemon.eggGroups,
+    eggGroups: breedEggGroups,
     source: 'wild'
   };
 
@@ -304,10 +355,10 @@ export function generateBreedingTree(
     speciesName: 'ditto',
     spanishName: `Padre B / Ditto (Salvaje 1x31 ${stat2.toUpperCase()})`,
     sprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/132.png',
-    gender: 'male',
+    gender: 'genderless',
     ivs: { hp: stat2 === 'hp' ? 31 : 10, atk: 10, def: stat2 === 'def' ? 31 : 10, spa: 10, spd: stat2 === 'spd' ? 31 : 10, spe: 10 },
     heldItem: getPowerItemForStat(stat2),
-    eggGroups: targetPokemon.eggGroups,
+    eggGroups: breedEggGroups,
     isDitto: true,
     source: 'wild'
   };
@@ -315,19 +366,19 @@ export function generateBreedingTree(
   steps.push({
     stepNumber: 1,
     title: `Paso 1: Obtener CRÍA 1 (2x31 ${stat1.toUpperCase()} + ${stat2.toUpperCase()})`,
-    description: `Captura dos Pokémon o Ditto salvajes con 1x31 IV cada uno. Equipa a Madre A con **${parentA1.heldItem?.spanishName}** y al Padre B con **${parentB1.heldItem?.spanishName}**. Heredarás con 100% de certeza ambos IVs, obteniendo tu **CRÍA 1** (2x31).`,
+    description: `Captura dos Pokémon o Ditto salvajes con 1x31 IV cada uno. Equipa a Madre A con **${parentA1.heldItem?.spanishName}** y al Padre B con **${parentB1.heldItem?.spanishName}**. Heredarás con 100% de certeza ambos IVs, obteniendo tu **CRÍA 1** (2x31).${specialRuleNote}`,
     parentA: parentA1,
     parentB: parentB1,
     requiredItems: [parentA1.heldItem!, parentB1.heldItem!],
     targetChild: {
-      pokemonId: targetPokemon.id,
-      speciesName: targetPokemon.name,
-      spanishName: `🥚 CRÍA 1 (${targetPokemon.spanishName} 2x31 ${stat1.toUpperCase()}/${stat2.toUpperCase()})`,
-      sprite: targetPokemon.sprite,
-      gender: 'female',
+      pokemonId: breedPokemonId,
+      speciesName: breedSpeciesName,
+      spanishName: `🥚 CRÍA 1 (${breedSpanishName} 2x31 ${stat1.toUpperCase()}/${stat2.toUpperCase()})`,
+      sprite: breedSprite,
+      gender: isGenderless ? 'genderless' : 'female',
       ivs: { hp: stat1 === 'hp' || stat2 === 'hp' ? 31 : 15, atk: 15, def: stat1 === 'def' || stat2 === 'def' ? 31 : 15, spa: 15, spd: stat1 === 'spd' || stat2 === 'spd' ? 31 : 15, spe: 15 },
       nature: undefined,
-      eggGroups: targetPokemon.eggGroups,
+      eggGroups: breedEggGroups,
       source: 'bred'
     },
     successChance: 100,
@@ -341,15 +392,15 @@ export function generateBreedingTree(
   // =========================================================================
   if (targetIvCount >= 3) {
     const parentA2: ParentPokemon = {
-      pokemonId: targetPokemon.id,
-      speciesName: targetPokemon.name,
-      spanishName: `Padre C (Salvaje 1x31 ${stat3.toUpperCase()})`,
-      sprite: targetPokemon.sprite,
-      gender: 'female',
+      pokemonId: breedPokemonId,
+      speciesName: breedSpeciesName,
+      spanishName: `Padre C (${breedSpanishName} Salvaje 1x31 ${stat3.toUpperCase()})`,
+      sprite: breedSprite,
+      gender: isGenderless ? 'genderless' : 'female',
       ivs: { hp: stat3 === 'hp' ? 31 : 10, atk: 10, def: stat3 === 'def' ? 31 : 10, spa: 10, spd: stat3 === 'spd' ? 31 : 10, spe: 10 },
       nature: 'Aleatoria',
       heldItem: getPowerItemForStat(stat3),
-      eggGroups: targetPokemon.eggGroups,
+      eggGroups: breedEggGroups,
       source: 'wild'
     };
 
@@ -358,10 +409,10 @@ export function generateBreedingTree(
       speciesName: 'ditto',
       spanishName: `Padre D / Ditto (Salvaje 1x31 ${stat4.toUpperCase()})`,
       sprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/132.png',
-      gender: 'male',
+      gender: 'genderless',
       ivs: { hp: stat4 === 'hp' ? 31 : 10, atk: 10, def: stat4 === 'def' ? 31 : 10, spa: 10, spd: stat4 === 'spd' ? 31 : 10, spe: 10 },
       heldItem: getPowerItemForStat(stat4),
-      eggGroups: targetPokemon.eggGroups,
+      eggGroups: breedEggGroups,
       isDitto: true,
       source: 'wild'
     };
@@ -374,14 +425,14 @@ export function generateBreedingTree(
       parentB: parentB2,
       requiredItems: [parentA2.heldItem!, parentB2.heldItem!],
       targetChild: {
-        pokemonId: targetPokemon.id,
-        speciesName: targetPokemon.name,
-        spanishName: `🥚 CRÍA 2 (${targetPokemon.spanishName} 2x31 ${stat3.toUpperCase()}/${stat4.toUpperCase()})`,
-        sprite: targetPokemon.sprite,
-        gender: 'male',
+        pokemonId: breedPokemonId,
+        speciesName: breedSpeciesName,
+        spanishName: `🥚 CRÍA 2 (${breedSpanishName} 2x31 ${stat3.toUpperCase()}/${stat4.toUpperCase()})`,
+        sprite: breedSprite,
+        gender: isGenderless ? 'genderless' : 'male',
         ivs: { hp: stat3 === 'hp' || stat4 === 'hp' ? 31 : 15, atk: 15, def: stat3 === 'def' || stat4 === 'def' ? 31 : 15, spa: 15, spd: stat3 === 'spd' || stat4 === 'spd' ? 31 : 15, spe: 15 },
         nature: undefined,
-        eggGroups: targetPokemon.eggGroups,
+        eggGroups: breedEggGroups,
         source: 'bred'
       },
       successChance: 100,
@@ -400,13 +451,15 @@ export function generateBreedingTree(
 
     const parentA3: ParentPokemon = {
       ...child1,
-      spanishName: `Madre A: CRÍA 1 (${targetPokemon.spanishName} 2x31 de Paso 1)`,
+      spanishName: `Madre A: CRÍA 1 (${breedSpanishName} 2x31 de Paso 1)`,
       heldItem: BREEDING_ITEMS.destinyKnot
     };
 
     const parentB3: ParentPokemon = {
       ...child2,
-      spanishName: `Padre B: CRÍA 2 (${targetPokemon.spanishName} 2x31 de Paso 2)`,
+      spanishName: isGenderless || is100PercentMale
+        ? `Padre B: Ditto / Macho Fértil (Salvaje 1x31 ${stat3.toUpperCase()})`
+        : `Padre B: CRÍA 2 (${breedSpanishName} 2x31 de Paso 2)`,
       heldItem: getPowerItemForStat(stat3)
     };
 
@@ -418,14 +471,14 @@ export function generateBreedingTree(
       parentB: parentB3,
       requiredItems: [BREEDING_ITEMS.destinyKnot, parentB3.heldItem!],
       targetChild: {
-        pokemonId: targetPokemon.id,
-        speciesName: targetPokemon.name,
-        spanishName: `🥚 CRÍA 3 (${targetPokemon.spanishName} 3x31)`,
-        sprite: targetPokemon.sprite,
-        gender: 'female',
+        pokemonId: breedPokemonId,
+        speciesName: breedSpeciesName,
+        spanishName: `🥚 CRÍA 3 (${breedSpanishName} 3x31)`,
+        sprite: breedSprite,
+        gender: isGenderless ? 'genderless' : 'female',
         ivs: { hp: 31, atk: 15, def: 31, spa: 15, spd: 31, spe: 15 },
         nature: undefined,
-        eggGroups: targetPokemon.eggGroups,
+        eggGroups: breedEggGroups,
         source: 'bred'
       },
       successChance: 25,
@@ -445,7 +498,7 @@ export function generateBreedingTree(
 
     const parentA4: ParentPokemon = {
       ...lastChild,
-      spanishName: `Madre A: CRÍA ${prevCriaNum} (${targetPokemon.spanishName} 3x31 de Paso ${prevCriaNum})`,
+      spanishName: `Madre A: CRÍA ${prevCriaNum} (${breedSpanishName} 3x31 de Paso ${prevCriaNum})`,
       heldItem: BREEDING_ITEMS.destinyKnot
     };
 
@@ -460,7 +513,7 @@ export function generateBreedingTree(
       ivs: { hp: 31, atk: 15, def: 31, spa: 15, spd: 31, spe: 15 },
       nature: goal.targetNature,
       heldItem: BREEDING_ITEMS.everstone,
-      eggGroups: targetPokemon.eggGroups,
+      eggGroups: breedEggGroups,
       isDitto: true,
       source: natureParentInBox ? 'box' : 'wild'
     };
@@ -473,14 +526,14 @@ export function generateBreedingTree(
       parentB: parentB4,
       requiredItems: [BREEDING_ITEMS.destinyKnot, BREEDING_ITEMS.everstone],
       targetChild: {
-        pokemonId: targetPokemon.id,
-        speciesName: targetPokemon.name,
-        spanishName: `🥚 CRÍA ${currentCriaNum} (${targetPokemon.spanishName} 3x31 - ${goal.targetNature})`,
-        sprite: targetPokemon.sprite,
-        gender: 'female',
+        pokemonId: breedPokemonId,
+        speciesName: breedSpeciesName,
+        spanishName: `🥚 CRÍA ${currentCriaNum} (${breedSpanishName} 3x31 - ${goal.targetNature})`,
+        sprite: breedSprite,
+        gender: isGenderless ? 'genderless' : 'female',
         ivs: { hp: 31, atk: 15, def: 31, spa: 15, spd: 31, spe: 15 },
         nature: goal.targetNature,
-        eggGroups: targetPokemon.eggGroups,
+        eggGroups: breedEggGroups,
         source: 'bred'
       },
       successChance: 25,
@@ -500,19 +553,20 @@ export function generateBreedingTree(
 
     const parentA5: ParentPokemon = {
       ...lastChild,
-      spanishName: `Madre A: CRÍA ${prevCriaNum} (${targetPokemon.spanishName} 3x31 con Naturaleza ${goal.targetNature || ''})`,
+      spanishName: `Madre A: CRÍA ${prevCriaNum} (${breedSpanishName} 3x31 con Naturaleza ${goal.targetNature || ''})`,
       heldItem: goal.useNature ? BREEDING_ITEMS.everstone : BREEDING_ITEMS.destinyKnot
     };
 
     const parentB5: ParentPokemon = {
-      pokemonId: targetPokemon.id,
-      speciesName: targetPokemon.name,
-      spanishName: `Padre B: CRÍA 2 / Macho Fértil (2x31/3x31 en stats secundarios)`,
-      sprite: targetPokemon.sprite,
-      gender: 'male',
+      pokemonId: isGenderless || is100PercentMale ? 132 : breedPokemonId,
+      speciesName: isGenderless || is100PercentMale ? 'ditto' : breedSpeciesName,
+      spanishName: isGenderless || is100PercentMale ? `Padre B: Ditto Fértil (4x31 IVs)` : `Padre B: CRÍA 2 / Macho Fértil (2x31/3x31 en stats secundarios)`,
+      sprite: isGenderless || is100PercentMale ? 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/132.png' : breedSprite,
+      gender: isGenderless ? 'genderless' : 'male',
       ivs: { hp: 31, atk: 31, def: 31, spa: 15, spd: 31, spe: 15 },
       heldItem: BREEDING_ITEMS.destinyKnot,
-      eggGroups: targetPokemon.eggGroups,
+      eggGroups: breedEggGroups,
+      isDitto: isGenderless || is100PercentMale,
       source: 'bred'
     };
 
@@ -526,14 +580,14 @@ export function generateBreedingTree(
       parentB: parentB5,
       requiredItems: goal.useNature ? [BREEDING_ITEMS.everstone, BREEDING_ITEMS.destinyKnot] : [BREEDING_ITEMS.destinyKnot],
       targetChild: {
-        pokemonId: targetPokemon.id,
-        speciesName: targetPokemon.name,
-        spanishName: `🥚 CRÍA ${currentCriaNum} (${targetPokemon.spanishName} 4x31${goal.useNature ? ` - ${goal.targetNature}` : ''})`,
-        sprite: targetPokemon.sprite,
-        gender: 'female',
+        pokemonId: breedPokemonId,
+        speciesName: breedSpeciesName,
+        spanishName: `🥚 CRÍA ${currentCriaNum} (${breedSpanishName} 4x31${goal.useNature ? ` - ${goal.targetNature}` : ''})`,
+        sprite: breedSprite,
+        gender: isGenderless ? 'genderless' : 'female',
         ivs: { hp: 31, atk: goal.useZeroAtk ? 0 : 31, def: 31, spa: 31, spd: 31, spe: 15 },
         nature: goal.useNature ? goal.targetNature : undefined,
-        eggGroups: targetPokemon.eggGroups,
+        eggGroups: breedEggGroups,
         source: 'bred'
       },
       successChance: 16.6,
@@ -551,7 +605,7 @@ export function generateBreedingTree(
 
   const parentAFinal: ParentPokemon = {
     ...lastChild,
-    spanishName: `Madre A: CRÍA ${lastCriaNum} (${targetPokemon.spanishName} ${targetIvCount - 1}x31 ${goal.useNature ? `+ Naturaleza ${goal.targetNature}` : ''})`,
+    spanishName: `Madre A: CRÍA ${lastCriaNum} (${breedSpanishName} ${targetIvCount - 1}x31 ${goal.useNature ? `+ Naturaleza ${goal.targetNature}` : ''})`,
     heldItem: goal.useNature ? BREEDING_ITEMS.everstone : BREEDING_ITEMS.destinyKnot
   };
 
@@ -562,10 +616,10 @@ export function generateBreedingTree(
       ? `Padre B: ${bestDitto.spanishName} (Ditto 6x31 de tu Caja Maestra)`
       : `Padre B: Macho Fértil / Ditto Obtencion Final (4x31-5x31 IVs)`,
     sprite: bestDitto ? bestDitto.sprite : 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/132.png',
-    gender: 'male',
+    gender: isGenderless ? 'genderless' : 'male',
     ivs: { hp: 31, atk: goal.useZeroAtk ? 0 : 31, def: 31, spa: 31, spd: 31, spe: goal.useZeroSpe ? 0 : 31 },
     heldItem: BREEDING_ITEMS.destinyKnot,
-    eggGroups: targetPokemon.eggGroups,
+    eggGroups: breedEggGroups,
     isDitto: true,
     source: bestDitto ? 'box' : 'bred'
   };
@@ -581,21 +635,27 @@ export function generateBreedingTree(
     mirrorHerbTip = `💡 Tip Gen 9 (Escarlata y Púrpura): ¡No necesitas criar para este movimiento! Equipa una Hierba Copia (Mirror Herb) a tu ${targetPokemon.spanishName} con un espacio libre e inicia un Picnic con un Pokémon que conozca ${goal.eggMoves[0]}. ¡Lo aprenderá instantáneamente!`;
   }
 
+  const finalChildName = isNidoFemaleLine
+    ? `✨ CRÍA FINAL: Nidoran♀ Competitivo ${targetIvCount}x31 (${goal.targetNature || 'Perfecto'}) → Evolucionar a Nidoqueen con Piedra Lunar`
+    : isNidoMaleLine
+    ? `✨ CRÍA FINAL: Nidoran♂ Competitivo ${targetIvCount}x31 (${goal.targetNature || 'Perfecto'}) → Evolucionar a Nidoking con Piedra Lunar`
+    : `✨ CRÍA FINAL: ${targetPokemon.spanishName} Competitivo ${targetIvCount}x31 (${goal.targetNature || 'Perfecto'})`;
+
   steps.push({
     stepNumber: steps.length + 1,
     title: `🎯 Paso Final: Usar CRÍA ${lastCriaNum} para obtener la CRÍA FINAL (${targetIvCount}x31 IVs)`,
     description: goal.useNature
-      ? `Toma a tu **CRÍA ${lastCriaNum}** (con Naturaleza **${goal.targetNature}**), equípale la **Piedra Eterna** y crúzala con el Padre B con **Lazo Destino**. ¡El huevo resultante será tu **CRÍA FINAL** con ${targetIvCount}x31 IVs y Naturaleza ${goal.targetNature} garantizada!`
-      : `Toma a tu **CRÍA ${lastCriaNum}**, equípale el **Lazo Destino** y crúzala con el Padre B. ¡El huevo resultante será tu **CRÍA FINAL** con ${targetIvCount}x31 IVs perfectos!`,
+      ? `Toma a tu **CRÍA ${lastCriaNum}** (con Naturaleza **${goal.targetNature}**), equípale la **Piedra Eterna** y crúzala con el Padre B con **Lazo Destino**. ¡El huevo resultante será tu **CRÍA FINAL** con ${targetIvCount}x31 IVs y Naturaleza ${goal.targetNature} garantizada!${isNidoFemaleLine || isNidoMaleLine ? ' 🌙 Evolución final con Piedra Lunar.' : ''}`
+      : `Toma a tu **CRÍA ${lastCriaNum}**, equípale el **Lazo Destino** y crúzala con el Padre B. ¡El huevo resultante será tu **CRÍA FINAL** con ${targetIvCount}x31 IVs perfectos!${isNidoFemaleLine || isNidoMaleLine ? ' 🌙 Evolución final con Piedra Lunar.' : ''}`,
     parentA: parentAFinal,
     parentB: parentBFinal,
     requiredItems: goal.useNature ? [BREEDING_ITEMS.destinyKnot, BREEDING_ITEMS.everstone] : [BREEDING_ITEMS.destinyKnot],
     targetChild: {
-      pokemonId: targetPokemon.id,
-      speciesName: targetPokemon.name,
-      spanishName: `✨ CRÍA FINAL: ${targetPokemon.spanishName} Competitivo ${targetIvCount}x31 (${goal.targetNature || 'Perfecto'})`,
+      pokemonId: isNidoFemaleLine ? 29 : isNidoMaleLine ? 32 : targetPokemon.id,
+      speciesName: isNidoFemaleLine ? 'nidoran-f' : isNidoMaleLine ? 'nidoran-m' : targetPokemon.name,
+      spanishName: finalChildName,
       sprite: targetPokemon.officialArtwork || targetPokemon.sprite,
-      gender: goal.targetGender === 'female' ? 'female' : goal.targetGender === 'male' ? 'male' : 'female',
+      gender: isGenderless ? 'genderless' : isNidoFemaleLine ? 'female' : isNidoMaleLine ? 'male' : goal.targetGender === 'female' ? 'female' : goal.targetGender === 'male' ? 'male' : 'female',
       ivs: {
         hp: goal.targetIvs.hp,
         atk: goal.useZeroAtk ? 0 : goal.targetIvs.atk,
@@ -606,7 +666,7 @@ export function generateBreedingTree(
       },
       nature: goal.targetNature,
       ability: goal.targetAbility,
-      eggGroups: targetPokemon.eggGroups,
+      eggGroups: breedEggGroups,
       source: 'bred'
     },
     successChance: finalProb,
