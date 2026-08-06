@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "deploy": "curl -X POST http://72.62.81.68:3000/api/deploy/6d0cb5a1a9ec07fa53246d4cb88e09aaca56d106d18af871",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview --host",
     "start": "vite preview --host"
