@@ -386,9 +386,12 @@ export const App: React.FC = () => {
         onNewProject={handleNewProject}
       />
 
-      {/* Descargo Legal */}
+      {/* Descargo Legal con Logo Mudkill */}
       <footer className="app-footer">
         <div className="footer-content">
+          <div className="footer-brand-row">
+            <img src="/Mudkill.png" alt="Mudkill Logo" className="footer-brand-logo" />
+          </div>
           <p className="footer-disclaimer">
             Nota de uso libre e informativo: Pokelinker es una herramienta desarrollada sin fines de lucro para la comunidad. Construida utilizando APIs abiertas y librerías de código abierto (PokeAPI, Smogon). Pokémon y sus respectivas marcas registradas, nombres de especies y recursos son propiedad de Nintendo, Game Freak y The Pokémon Company. Esta aplicación no posee afiliación comercial ni oficial con los titulares de los derechos de autor.
           </p>
