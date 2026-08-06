@@ -11,6 +11,7 @@ import { PokemonBoxModal } from './components/PokemonBoxModal';
 import { MasudaCalculatorModal } from './components/MasudaCalculatorModal';
 import { MagicLoginModal } from './components/MagicLoginModal';
 import { ProjectsManagerModal } from './components/ProjectsManagerModal';
+import { PwaInstallPrompt } from './components/PwaInstallPrompt';
 
 import {
   PokemonSummary,
@@ -394,6 +395,8 @@ export const App: React.FC = () => {
         onEditProjectGoal={handleEditProjectGoal}
         onNewProject={handleNewProject}
       />
+
+      <PwaInstallPrompt />
 
       {/* Descargo Legal con Logo Mudkill */}
       <footer className="app-footer">
