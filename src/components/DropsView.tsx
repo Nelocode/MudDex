@@ -1,10 +1,13 @@
-import React, { useState } from 'react';
-import { Gem, Search, Sparkles, Filter, ShieldCheck, X } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { Gem, Search, Sparkles, Filter, ShieldCheck, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { COBBLEMON_DROPS } from '../data/cobblemonDrops';
+
+const ITEMS_PER_PAGE = 24;
 
 export const DropsView: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [lootingLevel, setLootingLevel] = useState<number>(0);
+  const [currentPage, setCurrentPage] = useState<number>(1);
 
   const popularItemFilters = [
     { label: '🔮 Vidaesfera (Life Orb)', query: 'Vidaesfera' },
@@ -17,16 +20,30 @@ export const DropsView: React.FC = () => {
     { label: '⚡ Piedras Evolutivas', query: 'Piedra' }
   ];
 
-  const filteredDrops = COBBLEMON_DROPS.filter(drop => {
-    if (searchQuery.trim() === '') return true;
+  const filteredDrops = useMemo(() => {
+    if (searchQuery.trim() === '') return COBBLEMON_DROPS;
     const q = searchQuery.toLowerCase();
-    const matchPokemon = drop.pokemonName.toLowerCase().includes(q);
-    const matchItem = drop.drops.some(item =>
-      item.name.toLowerCase().includes(q) ||
-      item.itemId.toLowerCase().includes(q)
-    );
-    return matchPokemon || matchItem;
-  });
+    return COBBLEMON_DROPS.filter(drop => {
+      const matchPokemon = drop.pokemonName.toLowerCase().includes(q) || drop.pokemonId.toLowerCase().includes(q);
+      const matchItem = drop.drops.some(item =>
+        item.name.toLowerCase().includes(q) ||
+        item.itemId.toLowerCase().includes(q)
+      );
+      return matchPokemon || matchItem;
+    });
+  }, [searchQuery]);
+
+  // Pagination calculation
+  const totalPages = Math.ceil(filteredDrops.length / ITEMS_PER_PAGE);
+  const paginatedDrops = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredDrops.slice(start, start + ITEMS_PER_PAGE);
+  }, [filteredDrops, currentPage]);
+
+  const handleSearchChange = (val: string) => {
+    setSearchQuery(val);
+    setCurrentPage(1);
+  };
 
   return (
     <div className="space-y-6">
@@ -37,13 +54,13 @@ export const DropsView: React.FC = () => {
         <div className="relative z-10 max-w-3xl space-y-3">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-semibold">
             <Gem className="w-3.5 h-3.5" />
-            <span>Loot Tables & Recompensas • Cobblemon</span>
+            <span>Loot Tables & Recompensas • 1,025 Pokémon</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
             Tabla de Drops y Objetos de Pokémon
           </h1>
           <p className="text-sm text-slate-300 leading-relaxed">
-            Consulta qué materiales, Vidaesfera, objetos competitivos y piedras de evolución obtienes al derrotar o capturar Pokémon en Diosesmon.
+            Explora los drops completos de los 1,025 Pokémon de Diosesmon. Filtra por Vidaesfera, Piedras de Evolución, Objetos Competitivos o por el nombre de cualquier especie.
           </p>
         </div>
       </div>
@@ -57,14 +74,14 @@ export const DropsView: React.FC = () => {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
             <input
               type="text"
-              placeholder="Buscar ítem u objeto en español/inglés (ej: Vidaesfera, Leftovers, Gafas Elegidas)..."
+              placeholder="Buscar por Pokémon u objeto (ej: Vidaesfera, Pikachu, Restos, Piedra Fuego)..."
               value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
+              onChange={e => handleSearchChange(e.target.value)}
               className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-9 py-2.5 text-xs sm:text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-500 transition-colors"
             />
             {searchQuery && (
               <button
-                onClick={() => setSearchQuery('')}
+                onClick={() => handleSearchChange('')}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300"
               >
                 <X className="w-4 h-4" />
@@ -98,7 +115,7 @@ export const DropsView: React.FC = () => {
             {popularItemFilters.map(filter => (
               <button
                 key={filter.query}
-                onClick={() => setSearchQuery(filter.query)}
+                onClick={() => handleSearchChange(filter.query)}
                 className={`px-3 py-1 rounded-xl text-xs font-semibold whitespace-nowrap transition-all border ${
                   searchQuery.toLowerCase() === filter.query.toLowerCase()
                     ? 'bg-amber-500 text-slate-950 font-extrabold border-amber-400 shadow-md shadow-amber-500/20'
@@ -113,30 +130,44 @@ export const DropsView: React.FC = () => {
 
       </div>
 
-      {/* Grid Results Header */}
-      {searchQuery && (
-        <div className="flex items-center justify-between px-1">
-          <span className="text-xs text-slate-400">
-            Mostrando <strong className="text-amber-400">{filteredDrops.length}</strong> resultado(s) para "{searchQuery}"
-          </span>
-          <button
-            onClick={() => setSearchQuery('')}
-            className="text-xs text-slate-400 hover:text-amber-400 underline font-medium"
-          >
-            Limpiar filtro
-          </button>
-        </div>
-      )}
+      {/* Results Bar & Pagination Header */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-1">
+        <span className="text-xs text-slate-400">
+          Encontrados <strong className="text-amber-400 font-bold">{filteredDrops.length}</strong> Pokémon con tabla de drops {searchQuery && `para "${searchQuery}"`}
+        </span>
+
+        {totalPages > 1 && (
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+              className="p-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            <span className="text-xs font-mono text-slate-400">
+              Página <strong className="text-white">{currentPage}</strong> de {totalPages}
+            </span>
+            <button
+              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+              className="p-1.5 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        )}
+      </div>
 
       {/* Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filteredDrops.length === 0 ? (
+        {paginatedDrops.length === 0 ? (
           <div className="col-span-full bg-slate-900/60 border border-slate-800 rounded-2xl p-8 text-center space-y-2">
             <p className="text-sm font-bold text-slate-300">No se encontraron Pokémon con ese objeto o nombre.</p>
-            <p className="text-xs text-slate-500">Intenta buscar "Vidaesfera", "Restos", "Gafas", "Piedra" o "Absol".</p>
+            <p className="text-xs text-slate-500">Intenta buscar "Vidaesfera", "Restos", "Piedra Trueno" o el nombre de cualquier Pokémon.</p>
           </div>
         ) : (
-          filteredDrops.map(entry => (
+          paginatedDrops.map(entry => (
             <div
               key={entry.pokemonId}
               className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 space-y-4 shadow-lg hover:border-amber-500/40 transition-all"
@@ -185,6 +216,31 @@ export const DropsView: React.FC = () => {
           ))
         )}
       </div>
+
+      {/* Bottom Pagination controls */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-3 pt-4 border-t border-slate-800/80">
+          <button
+            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+            disabled={currentPage === 1}
+            className="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-xs font-bold text-slate-300 hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1"
+          >
+            <ChevronLeft className="w-4 h-4" /> Anterior
+          </button>
+
+          <span className="text-xs font-mono text-slate-400">
+            Página <strong className="text-amber-400 font-bold">{currentPage}</strong> de {totalPages}
+          </span>
+
+          <button
+            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+            disabled={currentPage === totalPages}
+            className="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-xs font-bold text-slate-300 hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1"
+          >
+            Siguiente <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
+      )}
 
     </div>
   );
