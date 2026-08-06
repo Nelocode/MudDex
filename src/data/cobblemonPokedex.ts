@@ -1,6 +1,7 @@
 import { Pokemon } from '../types/diosesmon';
 
 export const COBBLEMON_POKEDEX: Pokemon[] = [
+  // Gen 1 Starters & Classics
   {
     id: 'bulbasaur',
     dexNumber: 1,
@@ -16,6 +17,38 @@ export const COBBLEMON_POKEDEX: Pokemon[] = [
     isAlphaAvailable: true,
     spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/1.gif',
     artworkUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/1.png'
+  },
+  {
+    id: 'ivysaur',
+    dexNumber: 2,
+    name: 'Ivysaur',
+    generation: 1,
+    types: ['grass', 'poison'],
+    catchRate: 45,
+    baseHp: 60,
+    weightKg: 13.0,
+    heightM: 1.0,
+    baseStats: { hp: 60, attack: 62, defense: 63, specialAttack: 80, specialDefense: 80, speed: 60 },
+    abilities: { normal: ['Overgrow'], hidden: 'Chlorophyll' },
+    isAlphaAvailable: true,
+    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/2.gif',
+    artworkUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/2.png'
+  },
+  {
+    id: 'venusaur',
+    dexNumber: 3,
+    name: 'Venusaur',
+    generation: 1,
+    types: ['grass', 'poison'],
+    catchRate: 45,
+    baseHp: 80,
+    weightKg: 100.0,
+    heightM: 2.0,
+    baseStats: { hp: 80, attack: 82, defense: 83, specialAttack: 100, specialDefense: 100, speed: 80 },
+    abilities: { normal: ['Overgrow'], hidden: 'Chlorophyll' },
+    isAlphaAvailable: true,
+    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/3.gif',
+    artworkUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/3.png'
   },
   {
     id: 'charmander',
@@ -34,6 +67,38 @@ export const COBBLEMON_POKEDEX: Pokemon[] = [
     artworkUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/4.png'
   },
   {
+    id: 'charmeleon',
+    dexNumber: 5,
+    name: 'Charmeleon',
+    generation: 1,
+    types: ['fire'],
+    catchRate: 45,
+    baseHp: 58,
+    weightKg: 19.0,
+    heightM: 1.1,
+    baseStats: { hp: 58, attack: 64, defense: 58, specialAttack: 80, specialDefense: 65, speed: 80 },
+    abilities: { normal: ['Blaze'], hidden: 'Solar Power' },
+    isAlphaAvailable: true,
+    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/5.gif',
+    artworkUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/5.png'
+  },
+  {
+    id: 'charizard',
+    dexNumber: 6,
+    name: 'Charizard',
+    generation: 1,
+    types: ['fire', 'flying'],
+    catchRate: 45,
+    baseHp: 78,
+    weightKg: 90.5,
+    heightM: 1.7,
+    baseStats: { hp: 78, attack: 84, defense: 78, specialAttack: 109, specialDefense: 85, speed: 100 },
+    abilities: { normal: ['Blaze'], hidden: 'Solar Power' },
+    isAlphaAvailable: true,
+    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/6.gif',
+    artworkUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/6.png'
+  },
+  {
     id: 'squirtle',
     dexNumber: 7,
     name: 'Squirtle',
@@ -50,6 +115,54 @@ export const COBBLEMON_POKEDEX: Pokemon[] = [
     artworkUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/7.png'
   },
   {
+    id: 'blastoise',
+    dexNumber: 9,
+    name: 'Blastoise',
+    generation: 1,
+    types: ['water'],
+    catchRate: 45,
+    baseHp: 79,
+    weightKg: 85.5,
+    heightM: 1.6,
+    baseStats: { hp: 79, attack: 83, defense: 100, specialAttack: 85, specialDefense: 105, speed: 78 },
+    abilities: { normal: ['Torrent'], hidden: 'Rain Dish' },
+    isAlphaAvailable: true,
+    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/9.gif',
+    artworkUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/9.png'
+  },
+  {
+    id: 'butterfree',
+    dexNumber: 12,
+    name: 'Butterfree',
+    generation: 1,
+    types: ['bug', 'flying'],
+    catchRate: 45,
+    baseHp: 60,
+    weightKg: 32.0,
+    heightM: 1.1,
+    baseStats: { hp: 60, attack: 45, defense: 50, specialAttack: 90, specialDefense: 80, speed: 70 },
+    abilities: { normal: ['Compound Eyes'], hidden: 'Tinted Lens' },
+    isAlphaAvailable: true,
+    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/12.gif',
+    artworkUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/12.png'
+  },
+  {
+    id: 'pidgeot',
+    dexNumber: 18,
+    name: 'Pidgeot',
+    generation: 1,
+    types: ['normal', 'flying'],
+    catchRate: 45,
+    baseHp: 83,
+    weightKg: 39.5,
+    heightM: 1.5,
+    baseStats: { hp: 83, attack: 80, defense: 75, specialAttack: 70, specialDefense: 70, speed: 101 },
+    abilities: { normal: ['Keen Eye', 'Tangled Feet'], hidden: 'Big Pecks' },
+    isAlphaAvailable: true,
+    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/18.gif',
+    artworkUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/18.png'
+  },
+  {
     id: 'pikachu',
     dexNumber: 25,
     name: 'Pikachu',
@@ -64,6 +177,86 @@ export const COBBLEMON_POKEDEX: Pokemon[] = [
     isAlphaAvailable: true,
     spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/25.gif',
     artworkUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png'
+  },
+  {
+    id: 'raichu',
+    dexNumber: 26,
+    name: 'Raichu',
+    generation: 1,
+    types: ['electric'],
+    catchRate: 75,
+    baseHp: 60,
+    weightKg: 30.0,
+    heightM: 0.8,
+    baseStats: { hp: 60, attack: 90, defense: 55, specialAttack: 90, specialDefense: 80, speed: 110 },
+    abilities: { normal: ['Static'], hidden: 'Lightning Rod' },
+    isAlphaAvailable: true,
+    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/26.gif',
+    artworkUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/26.png'
+  },
+  {
+    id: 'ninetales',
+    dexNumber: 38,
+    name: 'Ninetales',
+    generation: 1,
+    types: ['fire'],
+    catchRate: 75,
+    baseHp: 73,
+    weightKg: 19.9,
+    heightM: 1.1,
+    baseStats: { hp: 73, attack: 76, defense: 75, specialAttack: 81, specialDefense: 100, speed: 100 },
+    abilities: { normal: ['Flash Fire'], hidden: 'Drought' },
+    isAlphaAvailable: true,
+    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/38.gif',
+    artworkUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/38.png'
+  },
+  {
+    id: 'arcanine',
+    dexNumber: 59,
+    name: 'Arcanine',
+    generation: 1,
+    types: ['fire'],
+    catchRate: 75,
+    baseHp: 90,
+    weightKg: 155.0,
+    heightM: 1.9,
+    baseStats: { hp: 90, attack: 110, defense: 80, specialAttack: 100, specialDefense: 80, speed: 95 },
+    abilities: { normal: ['Intimidate', 'Flash Fire'], hidden: 'Justified' },
+    isAlphaAvailable: true,
+    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/59.gif',
+    artworkUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/59.png'
+  },
+  {
+    id: 'alakazam',
+    dexNumber: 65,
+    name: 'Alakazam',
+    generation: 1,
+    types: ['psychic'],
+    catchRate: 50,
+    baseHp: 55,
+    weightKg: 48.0,
+    heightM: 1.5,
+    baseStats: { hp: 55, attack: 50, defense: 45, specialAttack: 135, specialDefense: 95, speed: 120 },
+    abilities: { normal: ['Synchronize', 'Inner Focus'], hidden: 'Magic Guard' },
+    isAlphaAvailable: true,
+    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/65.gif',
+    artworkUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/65.png'
+  },
+  {
+    id: 'machamp',
+    dexNumber: 68,
+    name: 'Machamp',
+    generation: 1,
+    types: ['fighting'],
+    catchRate: 45,
+    baseHp: 90,
+    weightKg: 130.0,
+    heightM: 1.6,
+    baseStats: { hp: 90, attack: 130, defense: 80, specialAttack: 65, specialDefense: 85, speed: 55 },
+    abilities: { normal: ['Guts', 'No Guard'], hidden: 'Steadfast' },
+    isAlphaAvailable: true,
+    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/68.gif',
+    artworkUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/68.png'
   },
   {
     id: 'gengar',
@@ -96,6 +289,38 @@ export const COBBLEMON_POKEDEX: Pokemon[] = [
     isAlphaAvailable: true,
     spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/130.gif',
     artworkUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/130.png'
+  },
+  {
+    id: 'lapras',
+    dexNumber: 131,
+    name: 'Lapras',
+    generation: 1,
+    types: ['water', 'ice'],
+    catchRate: 45,
+    baseHp: 130,
+    weightKg: 220.0,
+    heightM: 2.5,
+    baseStats: { hp: 130, attack: 85, defense: 80, specialAttack: 85, specialDefense: 95, speed: 60 },
+    abilities: { normal: ['Water Absorb', 'Shell Armor'], hidden: 'Hydration' },
+    isAlphaAvailable: true,
+    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/131.gif',
+    artworkUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/131.png'
+  },
+  {
+    id: 'eevee',
+    dexNumber: 133,
+    name: 'Eevee',
+    generation: 1,
+    types: ['normal'],
+    catchRate: 45,
+    baseHp: 55,
+    weightKg: 6.5,
+    heightM: 0.3,
+    baseStats: { hp: 55, attack: 55, defense: 50, specialAttack: 45, specialDefense: 65, speed: 55 },
+    abilities: { normal: ['Run Away', 'Adaptability'], hidden: 'Anticipation' },
+    isAlphaAvailable: true,
+    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/133.gif',
+    artworkUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/133.png'
   },
   {
     id: 'snorlax',
@@ -145,6 +370,72 @@ export const COBBLEMON_POKEDEX: Pokemon[] = [
     spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/150.gif',
     artworkUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/150.png'
   },
+
+  // Gen 2
+  {
+    id: 'cyndaquil',
+    dexNumber: 155,
+    name: 'Cyndaquil',
+    generation: 2,
+    types: ['fire'],
+    catchRate: 45,
+    baseHp: 39,
+    weightKg: 7.9,
+    heightM: 0.5,
+    baseStats: { hp: 39, attack: 52, defense: 43, specialAttack: 60, specialDefense: 50, speed: 65 },
+    abilities: { normal: ['Blaze'], hidden: 'Flash Fire' },
+    isAlphaAvailable: true,
+    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/155.gif',
+    artworkUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/155.png'
+  },
+  {
+    id: 'typhlosion',
+    dexNumber: 157,
+    name: 'Typhlosion',
+    generation: 2,
+    types: ['fire'],
+    catchRate: 45,
+    baseHp: 78,
+    weightKg: 79.5,
+    heightM: 1.7,
+    baseStats: { hp: 78, attack: 84, defense: 78, specialAttack: 109, specialDefense: 85, speed: 100 },
+    abilities: { normal: ['Blaze'], hidden: 'Flash Fire' },
+    isAlphaAvailable: true,
+    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/157.gif',
+    artworkUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/157.png'
+  },
+  {
+    id: 'espeon',
+    dexNumber: 196,
+    name: 'Espeon',
+    generation: 2,
+    types: ['psychic'],
+    catchRate: 45,
+    baseHp: 65,
+    weightKg: 26.5,
+    heightM: 0.9,
+    baseStats: { hp: 65, attack: 65, defense: 60, specialAttack: 130, specialDefense: 95, speed: 110 },
+    abilities: { normal: ['Synchronize'], hidden: 'Magic Bounce' },
+    isAlphaAvailable: true,
+    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/196.gif',
+    artworkUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/196.png'
+  },
+  {
+    id: 'umbreon',
+    dexNumber: 197,
+    name: 'Umbreon',
+    generation: 2,
+    types: ['dark'],
+    catchRate: 45,
+    baseHp: 95,
+    weightKg: 27.0,
+    heightM: 1.0,
+    baseStats: { hp: 95, attack: 65, defense: 110, specialAttack: 60, specialDefense: 130, speed: 65 },
+    abilities: { normal: ['Synchronize'], hidden: 'Inner Focus' },
+    isAlphaAvailable: true,
+    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/197.gif',
+    artworkUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/197.png'
+  },
   {
     id: 'tyranitar',
     dexNumber: 248,
@@ -160,6 +451,40 @@ export const COBBLEMON_POKEDEX: Pokemon[] = [
     isAlphaAvailable: true,
     spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/248.gif',
     artworkUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/248.png'
+  },
+
+  // Gen 3
+  {
+    id: 'blaziken',
+    dexNumber: 257,
+    name: 'Blaziken',
+    generation: 3,
+    types: ['fire', 'fighting'],
+    catchRate: 45,
+    baseHp: 80,
+    weightKg: 52.0,
+    heightM: 1.9,
+    baseStats: { hp: 80, attack: 120, defense: 70, specialAttack: 110, specialDefense: 70, speed: 80 },
+    abilities: { normal: ['Blaze'], hidden: 'Speed Boost' },
+    isAlphaAvailable: true,
+    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/257.gif',
+    artworkUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/257.png'
+  },
+  {
+    id: 'swampert',
+    dexNumber: 260,
+    name: 'Swampert',
+    generation: 3,
+    types: ['water', 'ground'],
+    catchRate: 45,
+    baseHp: 100,
+    weightKg: 81.9,
+    heightM: 1.5,
+    baseStats: { hp: 100, attack: 110, defense: 90, specialAttack: 85, specialDefense: 90, speed: 60 },
+    abilities: { normal: ['Torrent'], hidden: 'Damp' },
+    isAlphaAvailable: true,
+    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/260.gif',
+    artworkUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/260.png'
   },
   {
     id: 'gardevoir',
@@ -178,21 +503,23 @@ export const COBBLEMON_POKEDEX: Pokemon[] = [
     artworkUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/282.png'
   },
   {
-    id: 'lucario',
-    dexNumber: 448,
-    name: 'Lucario',
-    generation: 4,
-    types: ['fighting', 'steel'],
-    catchRate: 45,
-    baseHp: 70,
-    weightKg: 54.0,
-    heightM: 1.2,
-    baseStats: { hp: 70, attack: 110, defense: 70, specialAttack: 115, specialDefense: 70, speed: 90 },
-    abilities: { normal: ['Steadfast', 'Inner Focus'], hidden: 'Justified' },
+    id: 'rayquaza',
+    dexNumber: 384,
+    name: 'Rayquaza',
+    generation: 3,
+    types: ['dragon', 'flying'],
+    catchRate: 3,
+    baseHp: 105,
+    weightKg: 206.5,
+    heightM: 7.0,
+    baseStats: { hp: 105, attack: 150, defense: 90, specialAttack: 150, specialDefense: 90, speed: 95 },
+    abilities: { normal: ['Air Lock'] },
     isAlphaAvailable: true,
-    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/448.gif',
-    artworkUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/448.png'
+    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/384.gif',
+    artworkUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/384.png'
   },
+
+  // Gen 4
   {
     id: 'garchomp',
     dexNumber: 445,
@@ -210,6 +537,24 @@ export const COBBLEMON_POKEDEX: Pokemon[] = [
     artworkUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/445.png'
   },
   {
+    id: 'lucario',
+    dexNumber: 448,
+    name: 'Lucario',
+    generation: 4,
+    types: ['fighting', 'steel'],
+    catchRate: 45,
+    baseHp: 70,
+    weightKg: 54.0,
+    heightM: 1.2,
+    baseStats: { hp: 70, attack: 110, defense: 70, specialAttack: 115, specialDefense: 70, speed: 90 },
+    abilities: { normal: ['Steadfast', 'Inner Focus'], hidden: 'Justified' },
+    isAlphaAvailable: true,
+    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/448.gif',
+    artworkUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/448.png'
+  },
+
+  // Gen 6
+  {
     id: 'greninja',
     dexNumber: 658,
     name: 'Greninja',
@@ -226,6 +571,24 @@ export const COBBLEMON_POKEDEX: Pokemon[] = [
     artworkUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/658.png'
   },
   {
+    id: 'sylveon',
+    dexNumber: 700,
+    name: 'Sylveon',
+    generation: 6,
+    types: ['fairy'],
+    catchRate: 45,
+    baseHp: 95,
+    weightKg: 23.5,
+    heightM: 1.0,
+    baseStats: { hp: 95, attack: 65, defense: 65, specialAttack: 110, specialDefense: 130, speed: 60 },
+    abilities: { normal: ['Cute Charm'], hidden: 'Pixilate' },
+    isAlphaAvailable: true,
+    spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/700.gif',
+    artworkUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/700.png'
+  },
+
+  // Gen 7
+  {
     id: 'mimikyu',
     dexNumber: 778,
     name: 'Mimikyu',
@@ -241,6 +604,8 @@ export const COBBLEMON_POKEDEX: Pokemon[] = [
     spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/778.gif',
     artworkUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/778.png'
   },
+
+  // Gen 8
   {
     id: 'dragapult',
     dexNumber: 887,
@@ -257,6 +622,8 @@ export const COBBLEMON_POKEDEX: Pokemon[] = [
     spriteUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown/887.gif',
     artworkUrl: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/887.png'
   },
+
+  // Gen 9
   {
     id: 'ceruledge',
     dexNumber: 937,

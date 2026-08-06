@@ -31,17 +31,19 @@ export const Header: React.FC<HeaderProps> = ({
           {/* Brand & Server IP Badge */}
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2 group cursor-pointer" onClick={() => setActiveTab('spawns')}>
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 via-blue-600 to-indigo-600 p-0.5 shadow-lg shadow-cyan-500/20 group-hover:scale-105 transition-transform duration-300">
-                <div className="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center">
-                  <Sparkles className="w-5 h-5 text-cyan-400 group-hover:rotate-12 transition-transform" />
-                </div>
+              {/* Pokelinker-style Pokeball Logo */}
+              <div className="w-10 h-10 rounded-full bg-slate-950 border-2 border-slate-900 shadow-lg shadow-rose-500/25 group-hover:scale-110 transition-transform duration-300 relative flex items-center justify-center overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-r from-rose-600 via-rose-500 to-rose-600 border-b-2 border-slate-950"></div>
+                <div className="absolute bottom-0 left-0 w-full h-1/2 bg-slate-100"></div>
+                <div className="w-3.5 h-3.5 rounded-full bg-slate-950 border-2 border-white z-10 shadow-sm group-hover:scale-125 transition-transform duration-300"></div>
               </div>
+
               <div>
                 <div className="flex items-center gap-1.5">
-                  <span className="font-extrabold text-lg tracking-tight bg-gradient-to-r from-cyan-400 via-sky-300 to-indigo-300 bg-clip-text text-transparent">
+                  <span className="font-extrabold text-lg tracking-tight bg-gradient-to-r from-white via-cyan-300 to-cyan-400 bg-clip-text text-transparent drop-shadow-sm">
                     Diosesmon
                   </span>
-                  <span className="px-1.5 py-0.5 text-[10px] font-bold rounded-md bg-cyan-500/10 text-cyan-400 border border-cyan-500/30">
+                  <span className="px-1.5 py-0.5 text-[10px] font-extrabold rounded-md bg-gradient-to-r from-cyan-500 to-indigo-500 text-white shadow-sm shadow-cyan-500/20">
                     DEX
                   </span>
                 </div>

@@ -76,7 +76,7 @@ export const SpawnRadarView: React.FC<SpawnRadarViewProps> = ({ onSelectPokemonF
       <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 sm:p-5 space-y-4 backdrop-blur-md">
         
         {/* Category Pills */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+        <div className="flex items-center gap-2 overflow-x-auto pb-3 custom-scrollbar-horizontal">
           <button
             onClick={() => setSelectedCategory('all')}
             className={`px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${

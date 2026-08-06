@@ -7,7 +7,7 @@ export interface SpawnFilter {
   categoryCategoryId?: string;
   timeOfDay?: TimeOfDay;
   weather?: WeatherCondition;
-  bucket?: SpawnBucket;
+  bucket?: string;
   searchQuery?: string;
 }
 
@@ -27,7 +27,7 @@ export function filterSpawns(filter: SpawnFilter): SpawnEntry[] {
       if (cat) {
         const catBiomes = cat.biomes.flatMap(b => [b.id, b.tag || '']);
         const matchCat = entry.condition.biomes.some(b =>
-          catBiomes.some(cb => cb && b.toLowerCase().includes(cb.toLowerCase()))
+          catBiomes.some(cb => cb && (b.toLowerCase().includes(cb.toLowerCase()) || b.toLowerCase().includes(cat.id)))
         );
         if (!matchCat) return false;
       }
@@ -48,7 +48,7 @@ export function filterSpawns(filter: SpawnFilter): SpawnEntry[] {
     }
 
     // Bucket rarity
-    if (filter.bucket && filter.bucket !== filter.bucket) {
+    if (filter.bucket && filter.bucket !== 'all') {
       if (entry.bucket !== filter.bucket) return false;
     }
 

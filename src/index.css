@@ -3266,6 +3266,34 @@ body {
   }
 }
 
+/* Custom sleek scrollbars for horizontal categories and modals */
+.custom-scrollbar-horizontal::-webkit-scrollbar {
+  height: 6px;
+}
+.custom-scrollbar-horizontal::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.8);
+  border-radius: 9999px;
+}
+.custom-scrollbar-horizontal::-webkit-scrollbar-thumb {
+  background: linear-gradient(90deg, rgba(6, 182, 212, 0.6), rgba(99, 102, 241, 0.6));
+  border-radius: 9999px;
+}
+.custom-scrollbar-horizontal::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(90deg, rgba(6, 182, 212, 1), rgba(99, 102, 241, 1));
+}
+
+/* Hide scrollbars utility */
+.no-scrollbar::-webkit-scrollbar,
+.scrollbar-none::-webkit-scrollbar {
+  display: none !important;
+}
+.no-scrollbar,
+.scrollbar-none {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
+}
+
+
 
 
 
