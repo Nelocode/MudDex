@@ -2882,6 +2882,239 @@ body {
   margin: 0 0 1rem 0;
 }
 
+/* ==========================================================================
+   MOBILE & TABLET RESPONSIVE SUITE
+   ========================================================================== */
+
+/* 1. TABLETS & SMALL LAPTOPS (<= 1024px) */
+@media (max-width: 1024px) {
+  .header-container {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.8rem;
+  }
+
+  .header-actions {
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .main-content-container {
+    padding: 1rem;
+  }
+}
+
+/* 2. MOBILE SCREENS (<= 768px) */
+@media (max-width: 768px) {
+  /* Header UI */
+  .pokelinker-header {
+    padding: 0.6rem 0.8rem;
+  }
+
+  .logo-section {
+    justify-content: center;
+  }
+
+  .logo-title {
+    font-size: 1.25rem;
+  }
+
+  .logo-subtitle {
+    font-size: 0.72rem;
+  }
+
+  .header-actions {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    gap: 0.4rem;
+  }
+
+  .project-dropdown-wrapper {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .project-select {
+    width: 100%;
+    max-width: none;
+  }
+
+  /* Make header action buttons compact on mobile */
+  .header-actions .btn-secondary,
+  .header-actions .btn-primary,
+  .header-actions .btn-magic-login {
+    padding: 0.45rem 0.7rem;
+    font-size: 0.78rem;
+    flex: 1;
+    justify-content: center;
+    min-width: fit-content;
+  }
+
+  /* Pokemon Catalog Grid */
+  .pokemon-grid {
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)) !important;
+    gap: 0.7rem !important;
+  }
+
+  .pokemon-card {
+    padding: 0.8rem 0.5rem !important;
+  }
+
+  .pokemon-card-sprite {
+    width: 70px !important;
+    height: 70px !important;
+  }
+
+  .pokemon-card-name {
+    font-size: 0.85rem !important;
+  }
+
+  /* Filter buttons horizontal scroll */
+  .filter-buttons-row {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding-bottom: 0.4rem;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .filter-btn {
+    white-space: nowrap;
+    font-size: 0.75rem;
+    padding: 0.3rem 0.7rem;
+  }
+
+  /* Breeding Tree & Step Cards */
+  .parents-grid {
+    grid-template-columns: 1fr !important;
+    gap: 0.8rem !important;
+  }
+
+  .step-node-card {
+    padding: 0.9rem !important;
+  }
+
+  .step-title-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.4rem;
+  }
+
+  .step-child-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.6rem;
+  }
+
+  /* Prerequisites Grid */
+  .prereq-sections-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Modals overall */
+  .modal-content {
+    width: 96% !important;
+    padding: 1rem !important;
+    max-height: 94vh !important;
+  }
+
+  .projects-filter-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.6rem;
+  }
+
+  .projects-filter-bar .search-bar-inline {
+    width: 100%;
+  }
+
+  .filter-pills-row {
+    overflow-x: auto;
+    padding-bottom: 0.3rem;
+  }
+
+  .project-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.6rem;
+  }
+
+  .project-card-actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .project-card-actions button {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .edit-form-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.3rem;
+  }
+
+  .edit-form-row select {
+    width: 100%;
+  }
+}
+
+/* 3. EXTRA SMALL PHONES (<= 480px) */
+@media (max-width: 480px) {
+  .logo-title {
+    font-size: 1.1rem;
+  }
+
+  /* On super narrow phones, hide non-essential button text in header, keeping icons visible */
+  .header-actions .btn-secondary span,
+  .header-actions .btn-magic-login span {
+    display: inline-block;
+    max-width: 110px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .pokemon-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.6rem !important;
+  }
+
+  .ivs-selector-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  .iv-toggle-btn {
+    padding: 0.4rem 0.5rem;
+    font-size: 0.78rem;
+  }
+
+  .goal-configurator-container {
+    padding: 0.9rem !important;
+  }
+
+  .stat-badge {
+    font-size: 0.7rem;
+    padding: 0.15rem 0.4rem;
+  }
+
+  .prereq-item-row {
+    padding: 0.5rem;
+  }
+
+  .prereq-item-icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  .footer-disclaimer {
+    font-size: 0.7rem;
+  }
+}
+
+
 
 
 
