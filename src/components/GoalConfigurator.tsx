@@ -36,9 +36,24 @@ export const GoalConfigurator: React.FC<GoalConfiguratorProps> = ({
   const [targetNature, setTargetNature] = useState<string>(
     defaultBuild ? defaultBuild.nature : 'Calm'
   );
+
+  // Match Smogon build ability with actual PokeAPI abilities for this Pokemon
+  const findMatchingAbility = (smogonAbilityName?: string) => {
+    if (!smogonAbilityName) return pokemon.abilities[0];
+    const cleanSmogon = smogonAbilityName.toLowerCase().replace(/[^a-z0-9]/g, '');
+    const found = pokemon.abilities.find(ab => {
+      const cleanName = ab.name.toLowerCase().replace(/[^a-z0-9]/g, '');
+      const cleanEs = ab.spanishName.toLowerCase().replace(/[^a-z0-9]/g, '');
+      return cleanName === cleanSmogon || cleanEs === cleanSmogon || cleanName.includes(cleanSmogon) || cleanSmogon.includes(cleanName);
+    });
+    return found || pokemon.abilities[0];
+  };
+
+  const initialRecAbility = findMatchingAbility(defaultBuild?.ability);
+
   const [useAbility, setUseAbility] = useState<boolean>(true);
   const [targetAbility, setTargetAbility] = useState<string>(
-    pokemon.abilities[0]?.spanishName || 'Estándar'
+    initialRecAbility?.spanishName || pokemon.abilities[0]?.spanishName || 'Estándar'
   );
   const [eggMoveInput, setEggMoveInput] = useState<string>('');
   const [eggMoves, setEggMoves] = useState<string[]>([]);
@@ -46,7 +61,6 @@ export const GoalConfigurator: React.FC<GoalConfiguratorProps> = ({
   const [targetGender, setTargetGender] = useState<'male' | 'female' | 'any'>('any');
 
   // Cálculo de proporción de sexo según genderRate
-  // genderRate: -1 = sin género; 0..8 = octavos de HEMBRA (rate/8)
   const genderless = pokemon.genderRate < 0;
   const femalePct = genderless ? 0 : Math.round((pokemon.genderRate / 8) * 100);
   const malePct = genderless ? 0 : 100 - femalePct;
@@ -59,8 +73,15 @@ export const GoalConfigurator: React.FC<GoalConfiguratorProps> = ({
     setUseNature(true);
     if (b.targetIvs.atk === 0) setUseZeroAtk(true);
     if (b.targetIvs.spe === 0) setUseZeroSpe(true);
+
+    const recAb = findMatchingAbility(b.ability);
+    if (recAb) {
+      setTargetAbility(recAb.spanishName);
+    }
     setTargetIvCount(5);
   };
+
+  const recommendedAbilityObj = findMatchingAbility(defaultBuild?.ability);
 
   const handleAddEggMove = () => {
     if (eggMoveInput.trim() && !eggMoves.includes(eggMoveInput.trim())) {
@@ -238,18 +259,37 @@ export const GoalConfigurator: React.FC<GoalConfiguratorProps> = ({
       <div className="config-section">
         <label className="config-label">4. Habilidad Objetivo:</label>
         <div className="ability-selector-row">
-          {pokemon.abilities.map((ab, idx) => (
-            <button
-              key={idx}
-              className={`ability-pill ${targetAbility === ab.spanishName ? 'active' : ''}`}
-              onClick={() => setTargetAbility(ab.spanishName)}
-            >
-              <span>{ab.spanishName}</span>
-              {ab.isHidden && <span className="ha-tag">Habilidad Oculta (HO)</span>}
-            </button>
-          ))}
+          {pokemon.abilities.map((ab, idx) => {
+            const isRec = recommendedAbilityObj?.spanishName.toLowerCase() === ab.spanishName.toLowerCase();
+            return (
+              <button
+                key={idx}
+                className={`ability-pill ${targetAbility === ab.spanishName ? 'active' : ''} ${isRec ? 'recommended' : ''}`}
+                onClick={() => setTargetAbility(ab.spanishName)}
+              >
+                <span>{ab.spanishName}</span>
+                {ab.isHidden && <span className="ha-tag">Habilidad Oculta (HO)</span>}
+                {isRec && <span className="rec-badge">★ Recomendada por Smogon</span>}
+              </button>
+            );
+          })}
         </div>
+
+        {recommendedAbilityObj && (
+          <div className="tip-box ability-rec-tip" style={{ marginTop: '0.8rem' }}>
+            <Sparkles size={18} color="#FFD700" />
+            <span>
+              <strong>Habilidad Recomendada por Smogon:</strong> Para <strong>{pokemon.spanishName}</strong>, se sugiere utilizar la habilidad <strong>{recommendedAbilityObj.spanishName}</strong>{defaultBuild ? ` en la build ${defaultBuild.name}` : ''}.
+              {recommendedAbilityObj.isHidden ? (
+                <> ⚠️ Es una <strong>Habilidad Oculta (HO)</strong>. No es imprescindible para todas las crianzas, pero si la deseas en Gen 9 necesitarás un <em>Parche Habilidad (*Ability Patch*)</em> o heredarla de una madre con HO.</>
+              ) : (
+                <> ✅ Es una <strong>Habilidad Estándar</strong>. Se transmite con un 80% de probabilidad al criar con una madre que la posea, sin necesitar objetos especiales.</>
+              )}
+            </span>
+          </div>
+        )}
       </div>
+
 
       {/* Movimientos de Huevo & Tip Gen 9 Mirror Herb */}
       <div className="config-section">

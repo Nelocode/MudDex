@@ -255,6 +255,7 @@ export function generateBreedingTree(
   const targetIvCount = goal.targetIvCount;
   const hatchBaseSteps = (targetPokemon.hatchCounter + 1) * 256;
 
+  // Order stats to build up: hp -> def -> spd -> spa/atk -> spe
   const selectedStats: StatName[] = [];
   if (goal.targetIvs.hp === 31) selectedStats.push('hp');
   if (goal.targetIvs.def === 31) selectedStats.push('def');
@@ -275,56 +276,57 @@ export function generateBreedingTree(
     (p.isDitto || p.eggGroups.some(eg => targetPokemon.eggGroups.includes(eg)))
   );
 
-  const bestDitto = userBox.find(p => p.isDitto);
+  const bestDitto = userBox.find(p => p.isDitto && Object.values(p.ivs).filter(v => v === 31).length >= 5);
 
-  // STEP 1: Cruza Base con Objetos Recio -> RESULTADO: CRÍA 1
   const stat1 = selectedStats[0] || 'hp';
   const stat2 = selectedStats[1] || 'def';
   const stat3 = selectedStats[2] || 'spd';
+  const stat4 = selectedStats[3] || 'spa';
 
+  // =========================================================================
+  // PASO 1: Cruza 1x31 + 1x31 -> CRÍA 1 (2x31)
+  // =========================================================================
   const parentA1: ParentPokemon = {
     pokemonId: targetPokemon.id,
     speciesName: targetPokemon.name,
-    spanishName: natureParentInBox ? `${natureParentInBox.spanishName} (Naturaleza ${goal.targetNature} + Piedra Eterna)` : `Padre A (Hembra 1x31 ${stat1.toUpperCase()})`,
-    sprite: natureParentInBox ? natureParentInBox.sprite : targetPokemon.sprite,
+    spanishName: `Padre A (Salvaje 1x31 ${stat1.toUpperCase()})`,
+    sprite: targetPokemon.sprite,
     gender: 'female',
     ivs: { hp: stat1 === 'hp' ? 31 : 10, atk: 10, def: stat1 === 'def' ? 31 : 10, spa: 10, spd: stat1 === 'spd' ? 31 : 10, spe: 10 },
-    nature: natureParentInBox ? goal.targetNature : 'Aleatoria',
-    heldItem: natureParentInBox ? BREEDING_ITEMS.everstone : getPowerItemForStat(stat1),
+    nature: 'Aleatoria',
+    heldItem: getPowerItemForStat(stat1),
     eggGroups: targetPokemon.eggGroups,
-    source: natureParentInBox ? 'box' : 'wild'
+    source: 'wild'
   };
 
   const parentB1: ParentPokemon = {
-    pokemonId: bestDitto ? bestDitto.pokemonId : 132,
-    speciesName: bestDitto ? bestDitto.speciesName : 'ditto',
-    spanishName: bestDitto ? `Ditto (${bestDitto.spanishName})` : `Padre B / Ditto (Macho 1x31 ${stat2.toUpperCase()})`,
-    sprite: bestDitto ? bestDitto.sprite : 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/132.png',
+    pokemonId: 132,
+    speciesName: 'ditto',
+    spanishName: `Padre B / Ditto (Salvaje 1x31 ${stat2.toUpperCase()})`,
+    sprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/132.png',
     gender: 'male',
     ivs: { hp: stat2 === 'hp' ? 31 : 10, atk: 10, def: stat2 === 'def' ? 31 : 10, spa: 10, spd: stat2 === 'spd' ? 31 : 10, spe: 10 },
     heldItem: getPowerItemForStat(stat2),
     eggGroups: targetPokemon.eggGroups,
     isDitto: true,
-    source: bestDitto ? 'box' : 'wild'
+    source: 'wild'
   };
 
   steps.push({
     stepNumber: 1,
-    title: `Obtener CRÍA 1 (2x31 ${stat1.toUpperCase()} + ${stat2.toUpperCase()})`,
-    description: natureParentInBox
-      ? `Cruza inicial. Tu cría resultante será etiquetada como **CRÍA 1** (2x31 IVs + Naturaleza heredada).`
-      : `Equipa a ambos padres con Objetos Recio (${parentA1.heldItem?.spanishName} y ${parentB1.heldItem?.spanishName}) para traspasar con 100% de certeza 31 IVs en ${stat1.toUpperCase()} y ${stat2.toUpperCase()}. La cría resultante será tu **CRÍA 1**.`,
+    title: `Paso 1: Obtener CRÍA 1 (2x31 ${stat1.toUpperCase()} + ${stat2.toUpperCase()})`,
+    description: `Captura dos Pokémon o Ditto salvajes con 1x31 IV cada uno. Equipa a Madre A con **${parentA1.heldItem?.spanishName}** y al Padre B con **${parentB1.heldItem?.spanishName}**. Heredarás con 100% de certeza ambos IVs, obteniendo tu **CRÍA 1** (2x31).`,
     parentA: parentA1,
     parentB: parentB1,
-    requiredItems: natureParentInBox ? [BREEDING_ITEMS.everstone, parentB1.heldItem!] : [parentA1.heldItem!, parentB1.heldItem!],
+    requiredItems: [parentA1.heldItem!, parentB1.heldItem!],
     targetChild: {
       pokemonId: targetPokemon.id,
       speciesName: targetPokemon.name,
-      spanishName: `🥚 CRÍA 1 (${targetPokemon.spanishName} 2x31)`,
+      spanishName: `🥚 CRÍA 1 (${targetPokemon.spanishName} 2x31 ${stat1.toUpperCase()}/${stat2.toUpperCase()})`,
       sprite: targetPokemon.sprite,
       gender: 'female',
       ivs: { hp: stat1 === 'hp' || stat2 === 'hp' ? 31 : 15, atk: 15, def: stat1 === 'def' || stat2 === 'def' ? 31 : 15, spa: 15, spd: stat1 === 'spd' || stat2 === 'spd' ? 31 : 15, spe: 15 },
-      nature: natureParentInBox ? goal.targetNature : undefined,
+      nature: undefined,
       eggGroups: targetPokemon.eggGroups,
       source: 'bred'
     },
@@ -334,35 +336,31 @@ export function generateBreedingTree(
     isCompleted: false
   });
 
-  // STEP 2: Usar CRÍA 1 para obtener CRÍA 2
-  if (goal.useNature) {
-    const child1 = steps[0].targetChild;
-
+  // =========================================================================
+  // PASO 2: Cruza 1x31 + 1x31 (segunda pareja) -> CRÍA 2 (2x31 en stats 3 y 4)
+  // =========================================================================
+  if (targetIvCount >= 3) {
     const parentA2: ParentPokemon = {
-      ...child1,
-      spanishName: `Madre A: CRÍA 1 (${targetPokemon.spanishName} 2x31 de Paso 1)`
+      pokemonId: targetPokemon.id,
+      speciesName: targetPokemon.name,
+      spanishName: `Padre C (Salvaje 1x31 ${stat3.toUpperCase()})`,
+      sprite: targetPokemon.sprite,
+      gender: 'female',
+      ivs: { hp: stat3 === 'hp' ? 31 : 10, atk: 10, def: stat3 === 'def' ? 31 : 10, spa: 10, spd: stat3 === 'spd' ? 31 : 10, spe: 10 },
+      nature: 'Aleatoria',
+      heldItem: getPowerItemForStat(stat3),
+      eggGroups: targetPokemon.eggGroups,
+      source: 'wild'
     };
-
-    if (natureParentInBox) {
-      parentA2.heldItem = BREEDING_ITEMS.everstone;
-      parentA2.nature = goal.targetNature;
-    } else {
-      // CRÍA 1 porta el Lazo Destino para herencia de 5 IVs
-      // El Ditto/Macho porta la Piedra Eterna con la Naturaleza objetivo
-      parentA2.heldItem = BREEDING_ITEMS.destinyKnot;
-    }
 
     const parentB2: ParentPokemon = {
       pokemonId: 132,
       speciesName: 'ditto',
-      spanishName: natureParentInBox
-        ? `Padre B: Ditto / Macho Fértil (2x31 + Lazo Destino)`
-        : `Padre B: Ditto / Macho con Naturaleza ${goal.targetNature} (Piedra Eterna)`,
+      spanishName: `Padre D / Ditto (Salvaje 1x31 ${stat4.toUpperCase()})`,
       sprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/132.png',
       gender: 'male',
-      ivs: { hp: 31, atk: 15, def: 31, spa: 15, spd: 31, spe: 15 },
-      nature: goal.targetNature,
-      heldItem: natureParentInBox ? BREEDING_ITEMS.destinyKnot : BREEDING_ITEMS.everstone,
+      ivs: { hp: stat4 === 'hp' ? 31 : 10, atk: 10, def: stat4 === 'def' ? 31 : 10, spa: 10, spd: stat4 === 'spd' ? 31 : 10, spe: 10 },
+      heldItem: getPowerItemForStat(stat4),
       eggGroups: targetPokemon.eggGroups,
       isDitto: true,
       source: 'wild'
@@ -370,18 +368,114 @@ export function generateBreedingTree(
 
     steps.push({
       stepNumber: 2,
-      title: `Usar CRÍA 1 para obtener CRÍA 2 (3x31 IVs + Naturaleza ${goal.targetNature})`,
-      description: natureParentInBox
-        ? `Tu **CRÍA 1** ya tiene la Naturaleza **${goal.targetNature}** heredada (vía Piedra Eterna del paso anterior). Equípale de nuevo la **Piedra Eterna** y crúzala con el Ditto de tu caja (Lazo Destino). El resultado será tu **CRÍA 2** con 3x31 IVs y Naturaleza ${goal.targetNature} garantizada al 100%.`
-        : `Equipa a tu **CRÍA 1** con el **Lazo Destino**. Necesitarás un Ditto o macho compatible que tenga la Naturaleza **${goal.targetNature}** — equípale la **Piedra Eterna** para que esa naturaleza se transfiera a la cría al 100%. Con ambos objetos equipados obtendrás tu **CRÍA 2** (3x31 IVs + Naturaleza ${goal.targetNature} fijada).`,
-
+      title: `Paso 2: Obtener CRÍA 2 (2x31 ${stat3.toUpperCase()} + ${stat4.toUpperCase()})`,
+      description: `Captura una segunda pareja de padres 1x31 salvajes. Equipa a la Madre C con **${parentA2.heldItem?.spanishName}** y al Padre D con **${parentB2.heldItem?.spanishName}**. Obtendrás tu **CRÍA 2** (2x31) con 100% de garantía.`,
       parentA: parentA2,
       parentB: parentB2,
-      requiredItems: [BREEDING_ITEMS.everstone, BREEDING_ITEMS.destinyKnot],
+      requiredItems: [parentA2.heldItem!, parentB2.heldItem!],
       targetChild: {
         pokemonId: targetPokemon.id,
         speciesName: targetPokemon.name,
-        spanishName: `🥚 CRÍA 2 (${targetPokemon.spanishName} 3x31 - ${goal.targetNature})`,
+        spanishName: `🥚 CRÍA 2 (${targetPokemon.spanishName} 2x31 ${stat3.toUpperCase()}/${stat4.toUpperCase()})`,
+        sprite: targetPokemon.sprite,
+        gender: 'male',
+        ivs: { hp: stat3 === 'hp' || stat4 === 'hp' ? 31 : 15, atk: 15, def: stat3 === 'def' || stat4 === 'def' ? 31 : 15, spa: 15, spd: stat3 === 'spd' || stat4 === 'spd' ? 31 : 15, spe: 15 },
+        nature: undefined,
+        eggGroups: targetPokemon.eggGroups,
+        source: 'bred'
+      },
+      successChance: 100,
+      expectedEggs: 1,
+      hatchSteps: hatchBaseSteps,
+      isCompleted: false
+    });
+  }
+
+  // =========================================================================
+  // PASO 3: Combinar CRÍA 1 (2x31) + CRÍA 2 (2x31) -> CRÍA 3 (3x31)
+  // =========================================================================
+  if (targetIvCount >= 3) {
+    const child1 = steps[0].targetChild;
+    const child2 = steps[1].targetChild;
+
+    const parentA3: ParentPokemon = {
+      ...child1,
+      spanishName: `Madre A: CRÍA 1 (${targetPokemon.spanishName} 2x31 de Paso 1)`,
+      heldItem: BREEDING_ITEMS.destinyKnot
+    };
+
+    const parentB3: ParentPokemon = {
+      ...child2,
+      spanishName: `Padre B: CRÍA 2 (${targetPokemon.spanishName} 2x31 de Paso 2)`,
+      heldItem: getPowerItemForStat(stat3)
+    };
+
+    steps.push({
+      stepNumber: 3,
+      title: `Paso 3: Cruza de CRÍA 1 + CRÍA 2 para obtener CRÍA 3 (3x31 IVs)`,
+      description: `Equipa a tu **CRÍA 1** con el **Lazo Destino** y a tu **CRÍA 2** con **${parentB3.heldItem?.spanishName}**. Al combinar los IVs de ambas crías de 2x31, obtendrás tu **CRÍA 3** con 3x31 IVs (~25% de probabilidad).`,
+      parentA: parentA3,
+      parentB: parentB3,
+      requiredItems: [BREEDING_ITEMS.destinyKnot, parentB3.heldItem!],
+      targetChild: {
+        pokemonId: targetPokemon.id,
+        speciesName: targetPokemon.name,
+        spanishName: `🥚 CRÍA 3 (${targetPokemon.spanishName} 3x31)`,
+        sprite: targetPokemon.sprite,
+        gender: 'female',
+        ivs: { hp: 31, atk: 15, def: 31, spa: 15, spd: 31, spe: 15 },
+        nature: undefined,
+        eggGroups: targetPokemon.eggGroups,
+        source: 'bred'
+      },
+      successChance: 25,
+      expectedEggs: 4,
+      hatchSteps: hatchBaseSteps,
+      isCompleted: false
+    });
+  }
+
+  // =========================================================================
+  // PASO 4: Transferir y Fijar Naturaleza (si useNature = true)
+  // =========================================================================
+  if (goal.useNature) {
+    const lastChild = steps[steps.length - 1].targetChild;
+    const prevCriaNum = steps.length;
+    const currentCriaNum = steps.length + 1;
+
+    const parentA4: ParentPokemon = {
+      ...lastChild,
+      spanishName: `Madre A: CRÍA ${prevCriaNum} (${targetPokemon.spanishName} 3x31 de Paso ${prevCriaNum})`,
+      heldItem: BREEDING_ITEMS.destinyKnot
+    };
+
+    const parentB4: ParentPokemon = {
+      pokemonId: natureParentInBox ? natureParentInBox.pokemonId : 132,
+      speciesName: natureParentInBox ? natureParentInBox.speciesName : 'ditto',
+      spanishName: natureParentInBox
+        ? `Padre B: ${natureParentInBox.spanishName} (Caja - Naturaleza ${goal.targetNature})`
+        : `Padre B: Ditto / Macho Salvaje (Naturaleza ${goal.targetNature})`,
+      sprite: natureParentInBox ? natureParentInBox.sprite : 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/132.png',
+      gender: 'male',
+      ivs: { hp: 31, atk: 15, def: 31, spa: 15, spd: 31, spe: 15 },
+      nature: goal.targetNature,
+      heldItem: BREEDING_ITEMS.everstone,
+      eggGroups: targetPokemon.eggGroups,
+      isDitto: true,
+      source: natureParentInBox ? 'box' : 'wild'
+    };
+
+    steps.push({
+      stepNumber: steps.length + 1,
+      title: `Paso ${currentCriaNum}: Fijar Naturaleza ${goal.targetNature} -> CRÍA ${currentCriaNum}`,
+      description: `Equipa a tu **CRÍA ${prevCriaNum}** con el **Lazo Destino** y al Padre con la Naturaleza **${goal.targetNature}** con la **Piedra Eterna**. La cría resultante será tu **CRÍA ${currentCriaNum}** con 3x31 IVs y Naturaleza ${goal.targetNature} fija al 100%.`,
+      parentA: parentA4,
+      parentB: parentB4,
+      requiredItems: [BREEDING_ITEMS.destinyKnot, BREEDING_ITEMS.everstone],
+      targetChild: {
+        pokemonId: targetPokemon.id,
+        speciesName: targetPokemon.name,
+        spanishName: `🥚 CRÍA ${currentCriaNum} (${targetPokemon.spanishName} 3x31 - ${goal.targetNature})`,
         sprite: targetPokemon.sprite,
         gender: 'female',
         ivs: { hp: 31, atk: 15, def: 31, spa: 15, spd: 31, spe: 15 },
@@ -396,22 +490,24 @@ export function generateBreedingTree(
     });
   }
 
-  // STEP 3: Usar última CRÍA para obtener siguiente CRÍA con más IVs
+  // =========================================================================
+  // PASO 5: Elevar de 3x31 a 4x31
+  // =========================================================================
   if (targetIvCount >= 4) {
-    const child2 = steps[steps.length - 1].targetChild;
-    const criaNumIn = steps.length;   // número de la CRÍA que entra como madre
-    const criaNumOut = steps.length + 1; // número de la CRÍA que sale
+    const lastChild = steps[steps.length - 1].targetChild;
+    const prevCriaNum = steps.length;
+    const currentCriaNum = steps.length + 1;
 
-    const parentA3: ParentPokemon = {
-      ...child2,
-      spanishName: `Madre A: CRÍA ${criaNumIn} (${targetPokemon.spanishName} ${goal.useNature ? `3x31 con Naturaleza ${goal.targetNature}` : '2x31 IVs'})`,
+    const parentA5: ParentPokemon = {
+      ...lastChild,
+      spanishName: `Madre A: CRÍA ${prevCriaNum} (${targetPokemon.spanishName} 3x31 con Naturaleza ${goal.targetNature || ''})`,
       heldItem: goal.useNature ? BREEDING_ITEMS.everstone : BREEDING_ITEMS.destinyKnot
     };
 
-    const parentB3: ParentPokemon = {
+    const parentB5: ParentPokemon = {
       pokemonId: targetPokemon.id,
       speciesName: targetPokemon.name,
-      spanishName: `Padre B: Macho Fértil Grupo ${targetPokemon.eggGroups[0] || 'Campo'} (4x31 IVs)`,
+      spanishName: `Padre B: CRÍA 2 / Macho Fértil (2x31/3x31 en stats secundarios)`,
       sprite: targetPokemon.sprite,
       gender: 'male',
       ivs: { hp: 31, atk: 31, def: 31, spa: 15, spd: 31, spe: 15 },
@@ -420,20 +516,19 @@ export function generateBreedingTree(
       source: 'bred'
     };
 
-
     steps.push({
       stepNumber: steps.length + 1,
-      title: `Usar CRÍA ${criaNumIn} para obtener CRÍA ${criaNumOut} (4x31 / 5x31 IVs)`,
+      title: `Paso ${currentCriaNum}: Elevar a 4x31 IVs -> CRÍA ${currentCriaNum}`,
       description: goal.useNature
-        ? `Equipa a tu **CRÍA ${criaNumIn}** con la **Piedra Eterna** (mantiene la Naturaleza ${goal.targetNature} al 100%) y crúzala con un padre o Ditto de 4x31 IVs con **Lazo Destino**. La cría resultante será tu **CRÍA ${criaNumOut}** con 4x31-5x31 IVs.`
-        : `Equipa a tu **CRÍA ${criaNumIn}** con el **Lazo Destino** y crúzala con un padre o Ditto de 4x31 IVs. La cría resultante será tu **CRÍA ${criaNumOut}** con 4x31 IVs.`,
-      parentA: parentA3,
-      parentB: parentB3,
-      requiredItems: [BREEDING_ITEMS.everstone, BREEDING_ITEMS.destinyKnot],
+        ? `Equipa a tu **CRÍA ${prevCriaNum}** con la **Piedra Eterna** y al Padre B con el **Lazo Destino**. La cría resultante será tu **CRÍA ${currentCriaNum}** con 4x31 IVs y Naturaleza ${goal.targetNature} al 100%.`
+        : `Equipa a tu **CRÍA ${prevCriaNum}** con el **Lazo Destino** y al Padre B con **${parentB5.heldItem?.spanishName}**. Obtendrás tu **CRÍA ${currentCriaNum}** con 4x31 IVs.`,
+      parentA: parentA5,
+      parentB: parentB5,
+      requiredItems: goal.useNature ? [BREEDING_ITEMS.everstone, BREEDING_ITEMS.destinyKnot] : [BREEDING_ITEMS.destinyKnot],
       targetChild: {
         pokemonId: targetPokemon.id,
         speciesName: targetPokemon.name,
-        spanishName: `🥚 CRÍA ${criaNumOut} (${targetPokemon.spanishName} 4x31/5x31${goal.useNature ? ` - ${goal.targetNature}` : ''})`,
+        spanishName: `🥚 CRÍA ${currentCriaNum} (${targetPokemon.spanishName} 4x31${goal.useNature ? ` - ${goal.targetNature}` : ''})`,
         sprite: targetPokemon.sprite,
         gender: 'female',
         ivs: { hp: 31, atk: goal.useZeroAtk ? 0 : 31, def: 31, spa: 31, spd: 31, spe: 15 },
@@ -448,27 +543,31 @@ export function generateBreedingTree(
     });
   }
 
-  // STEP FINAL: Usar última CRÍA para obtener la CRÍA FINAL PERFECTA
+  // =========================================================================
+  // PASO FINAL: Elevar a 5x31 / 6x31 -> CRÍA FINAL PERFECTA
+  // =========================================================================
   const lastChild = steps[steps.length - 1].targetChild;
   const lastCriaNum = steps.length;
 
   const parentAFinal: ParentPokemon = {
     ...lastChild,
-    spanishName: `Madre A: CRÍA ${lastCriaNum} (${targetPokemon.spanishName} ${goal.useNature ? `${targetIvCount - 1}x31 + Naturaleza ${goal.targetNature}` : `${targetIvCount - 1}x31 IVs`})`,
+    spanishName: `Madre A: CRÍA ${lastCriaNum} (${targetPokemon.spanishName} ${targetIvCount - 1}x31 ${goal.useNature ? `+ Naturaleza ${goal.targetNature}` : ''})`,
     heldItem: goal.useNature ? BREEDING_ITEMS.everstone : BREEDING_ITEMS.destinyKnot
   };
 
   const parentBFinal: ParentPokemon = {
-    pokemonId: 132,
-    speciesName: 'ditto',
-    spanishName: `Padre B: Ditto 5x31 - 6x31 (Lazo Destino)`,
-    sprite: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/132.png',
+    pokemonId: bestDitto ? bestDitto.pokemonId : 132,
+    speciesName: bestDitto ? bestDitto.speciesName : 'ditto',
+    spanishName: bestDitto
+      ? `Padre B: ${bestDitto.spanishName} (Ditto 6x31 de tu Caja Maestra)`
+      : `Padre B: Macho Fértil / Ditto Obtencion Final (4x31-5x31 IVs)`,
+    sprite: bestDitto ? bestDitto.sprite : 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/132.png',
     gender: 'male',
-    ivs: { hp: 31, atk: goal.useZeroAtk ? 0 : 31, def: 31, spa: 31, spd: 31, spe: 31 },
+    ivs: { hp: 31, atk: goal.useZeroAtk ? 0 : 31, def: 31, spa: 31, spd: 31, spe: goal.useZeroSpe ? 0 : 31 },
     heldItem: BREEDING_ITEMS.destinyKnot,
     eggGroups: targetPokemon.eggGroups,
     isDitto: true,
-    source: 'bred'
+    source: bestDitto ? 'box' : 'bred'
   };
 
   const finalProb = targetIvCount === 6 ? 3.125 : (goal.useZeroAtk ? 16.6 : 16.6);
@@ -486,17 +585,17 @@ export function generateBreedingTree(
     stepNumber: steps.length + 1,
     title: `🎯 Paso Final: Usar CRÍA ${lastCriaNum} para obtener la CRÍA FINAL (${targetIvCount}x31 IVs)`,
     description: goal.useNature
-      ? `Toma a tu **CRÍA ${lastCriaNum}** (con Naturaleza **${goal.targetNature}**), equípale la **Piedra Eterna** y crúzala con un Ditto de 5x31-6x31 con **Lazo Destino**. ¡El huevo resultante será tu **CRÍA FINAL** con ${targetIvCount}x31 IVs y Naturaleza ${goal.targetNature} garantizada!`
-      : `Toma a tu **CRÍA ${lastCriaNum}**, equípale el **Lazo Destino** y crúzala con un Ditto de 5x31-6x31. ¡El huevo resultante será tu **CRÍA FINAL** con ${targetIvCount}x31 IVs perfectos!`,
+      ? `Toma a tu **CRÍA ${lastCriaNum}** (con Naturaleza **${goal.targetNature}**), equípale la **Piedra Eterna** y crúzala con el Padre B con **Lazo Destino**. ¡El huevo resultante será tu **CRÍA FINAL** con ${targetIvCount}x31 IVs y Naturaleza ${goal.targetNature} garantizada!`
+      : `Toma a tu **CRÍA ${lastCriaNum}**, equípale el **Lazo Destino** y crúzala con el Padre B. ¡El huevo resultante será tu **CRÍA FINAL** con ${targetIvCount}x31 IVs perfectos!`,
     parentA: parentAFinal,
     parentB: parentBFinal,
     requiredItems: goal.useNature ? [BREEDING_ITEMS.destinyKnot, BREEDING_ITEMS.everstone] : [BREEDING_ITEMS.destinyKnot],
     targetChild: {
       pokemonId: targetPokemon.id,
       speciesName: targetPokemon.name,
-      spanishName: `✨ CRÍA FINAL: ${targetPokemon.spanishName} Competitivo ${targetIvCount}x31 (${goal.targetNature})`,
+      spanishName: `✨ CRÍA FINAL: ${targetPokemon.spanishName} Competitivo ${targetIvCount}x31 (${goal.targetNature || 'Perfecto'})`,
       sprite: targetPokemon.officialArtwork || targetPokemon.sprite,
-      gender: 'female',
+      gender: goal.targetGender === 'female' ? 'female' : goal.targetGender === 'male' ? 'male' : 'female',
       ivs: {
         hp: goal.targetIvs.hp,
         atk: goal.useZeroAtk ? 0 : goal.targetIvs.atk,
@@ -520,3 +619,4 @@ export function generateBreedingTree(
 
   return steps;
 }
+
