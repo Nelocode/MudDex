@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sparkles, Box, PlusCircle, BookmarkCheck, Flame, Wand2 } from 'lucide-react';
+import { Sparkles, Box, PlusCircle, BookmarkCheck, Flame, Wand2, FolderKanban } from 'lucide-react';
 import { BreedingProject, MagicUserSession } from '../types/pokemon';
 
 interface HeaderProps {
@@ -11,6 +11,7 @@ interface HeaderProps {
   onOpenBox: () => void;
   onOpenMasuda: () => void;
   onOpenMagicLogin: () => void;
+  onOpenProjectsManager: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -21,7 +22,8 @@ export const Header: React.FC<HeaderProps> = ({
   onNewProject,
   onOpenBox,
   onOpenMasuda,
-  onOpenMagicLogin
+  onOpenMagicLogin,
+  onOpenProjectsManager
 }) => {
   return (
     <header className="pokelinker-header">
@@ -48,7 +50,13 @@ export const Header: React.FC<HeaderProps> = ({
                 id="project-select"
                 className="project-select"
                 value={activeProject?.id || ''}
-                onChange={e => onSelectProject(e.target.value)}
+                onChange={e => {
+                  if (e.target.value === '__manage__') {
+                    onOpenProjectsManager();
+                  } else {
+                    onSelectProject(e.target.value);
+                  }
+                }}
               >
                 <option value="" disabled>Seleccionar Proyecto Guardado...</option>
                 {savedProjects.map(p => (
@@ -56,8 +64,20 @@ export const Header: React.FC<HeaderProps> = ({
                     {p.targetPokemon.spanishName} ({p.goal.targetIvCount}x31) - {p.isFinished ? '✅ Completado' : '⏳ En Crianza'}
                   </option>
                 ))}
+                <option value="__manage__">⚙️ Gestionar todos los proyectos...</option>
               </select>
             </div>
+          )}
+
+          {savedProjects.length > 0 && (
+            <button
+              className="btn-secondary"
+              onClick={onOpenProjectsManager}
+              title="Ver, editar y administrar todos tus proyectos de crianza"
+            >
+              <FolderKanban size={18} color="#00D2FF" />
+              <span>Mis Proyectos ({savedProjects.length})</span>
+            </button>
           )}
 
           <button

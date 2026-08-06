@@ -10,6 +10,7 @@ import { SmogonBuildCard } from './components/SmogonBuildCard';
 import { PokemonBoxModal } from './components/PokemonBoxModal';
 import { MasudaCalculatorModal } from './components/MasudaCalculatorModal';
 import { MagicLoginModal } from './components/MagicLoginModal';
+import { ProjectsManagerModal } from './components/ProjectsManagerModal';
 
 import {
   PokemonSummary,
@@ -188,18 +189,51 @@ export const App: React.FC = () => {
     setView('selector');
   };
 
-  const handleDeleteActiveProject = () => {
-    if (!activeProject) return;
-    deleteProject(activeProject.id);
+  const [isProjectsManagerOpen, setIsProjectsManagerOpen] = useState(false);
+
+  const handleDeleteProjectById = (id: string) => {
+    deleteProject(id);
     const remaining = getSavedProjects();
     setSavedProjects(remaining);
-    if (remaining.length > 0) {
-      setActiveProject(remaining[0]);
-      setActiveProjectId(remaining[0].id);
-      setView('project');
-    } else {
-      setActiveProject(null);
-      setView('selector');
+    if (activeProject?.id === id) {
+      if (remaining.length > 0) {
+        setActiveProject(remaining[0]);
+        setActiveProjectId(remaining[0].id);
+        setView('project');
+      } else {
+        setActiveProject(null);
+        setView('selector');
+      }
+    }
+  };
+
+  const handleEditProjectGoal = (id: string, updatedGoal: GoalConfig) => {
+    const target = savedProjects.find(p => p.id === id);
+    if (!target) return;
+
+    const box = getUserBox();
+    const newSteps = generateBreedingTree(target.targetPokemon, updatedGoal, box);
+
+    // Merge completed status for matching step numbers
+    const mergedSteps = newSteps.map((ns, idx) => ({
+      ...ns,
+      isCompleted: target.steps[idx]?.isCompleted || false
+    }));
+
+    const updatedProject: BreedingProject = {
+      ...target,
+      goal: updatedGoal,
+      title: `Crianza de ${target.targetPokemon.spanishName} (${updatedGoal.targetIvCount}x31)`,
+      steps: mergedSteps,
+      updatedAt: new Date().toISOString()
+    };
+
+    saveProject(updatedProject);
+    const updatedProjects = getSavedProjects();
+    setSavedProjects(updatedProjects);
+
+    if (activeProject?.id === id) {
+      setActiveProject(updatedProject);
     }
   };
 
@@ -229,6 +263,7 @@ export const App: React.FC = () => {
         onOpenBox={() => setIsBoxOpen(true)}
         onOpenMasuda={() => setIsMasudaOpen(true)}
         onOpenMagicLogin={() => setIsMagicLoginOpen(true)}
+        onOpenProjectsManager={() => setIsProjectsManagerOpen(true)}
       />
 
       <main className="main-content-container">
@@ -285,7 +320,7 @@ export const App: React.FC = () => {
               </div>
 
               <div className="banner-actions">
-                <button className="btn-danger" onClick={handleDeleteActiveProject}>
+                <button className="btn-danger" onClick={() => handleDeleteProjectById(activeProject.id)}>
                   Eliminar Proyecto
                 </button>
               </div>
@@ -338,6 +373,17 @@ export const App: React.FC = () => {
         isOpen={isMagicLoginOpen}
         onClose={() => setIsMagicLoginOpen(false)}
         onSessionChanged={handleSessionChanged}
+      />
+
+      <ProjectsManagerModal
+        isOpen={isProjectsManagerOpen}
+        onClose={() => setIsProjectsManagerOpen(false)}
+        projects={savedProjects}
+        activeProjectId={activeProject?.id}
+        onSelectProject={handleSelectSavedProject}
+        onDeleteProject={handleDeleteProjectById}
+        onEditProjectGoal={handleEditProjectGoal}
+        onNewProject={handleNewProject}
       />
 
       {/* Descargo Legal */}
