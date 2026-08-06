@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { Target, Sparkles, Heart, Activity, CheckCircle2, ChevronRight, ShieldAlert, Award, Hammer } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Target, Sparkles, Heart, Activity, Search, X, Check, ArrowRight } from 'lucide-react';
 import { COBBLEMON_POKEDEX } from '../data/cobblemonPokedex';
 import { calculateCatchRate } from '../services/catchCalculator';
-import { StatusCondition, CatchContext } from '../types/diosesmon';
+import { StatusCondition, CatchContext, Pokemon } from '../types/diosesmon';
 
 interface CatchCalculatorViewProps {
   initialPokemonId?: string;
@@ -10,13 +10,48 @@ interface CatchCalculatorViewProps {
 
 export const CatchCalculatorView: React.FC<CatchCalculatorViewProps> = ({ initialPokemonId }) => {
   const [selectedPokemonId, setSelectedPokemonId] = useState<string>(initialPokemonId || 'snorlax');
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
   const [hpPercent, setHpPercent] = useState<number>(20);
   const [status, setStatus] = useState<StatusCondition>('sleep');
   const [isNightOrCave, setIsNightOrCave] = useState<boolean>(true);
   const [isTurnOne, setIsTurnOne] = useState<boolean>(false);
   const [hasCaughtBefore, setHasCaughtBefore] = useState<boolean>(true);
 
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
   const currentPokemon = COBBLEMON_POKEDEX.find(p => p.id === selectedPokemonId) || COBBLEMON_POKEDEX[0];
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Filtered Pokémon list for instant autocomplete
+  const filteredOptions = searchQuery.trim() === ''
+    ? COBBLEMON_POKEDEX.slice(0, 8)
+    : COBBLEMON_POKEDEX.filter(p =>
+        p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        String(p.dexNumber).includes(searchQuery)
+      ).slice(0, 8);
+
+  const popularPresets = [
+    { id: 'snorlax', name: 'Snorlax', icon: '🍎' },
+    { id: 'charizard', name: 'Charizard', icon: '🔥' },
+    { id: 'pikachu', name: 'Pikachu', icon: '⚡' },
+    { id: 'garchomp', name: 'Garchomp', icon: '🐲' },
+    { id: 'dragonite', name: 'Dragonite', icon: '🐉' },
+    { id: 'mewtwo', name: 'Mewtwo', icon: '🔮' },
+    { id: 'gengar', name: 'Gengar', icon: '👻' },
+    { id: 'lucario', name: 'Lucario', icon: '🥋' },
+    { id: 'ceruledge', name: 'Ceruledge', icon: '✨' }
+  ];
 
   const catchContext: CatchContext = {
     pokemonId: currentPokemon.id,
@@ -31,6 +66,12 @@ export const CatchCalculatorView: React.FC<CatchCalculatorViewProps> = ({ initia
 
   const ballRankings = calculateCatchRate(currentPokemon, catchContext);
   const bestBall = ballRankings[0];
+
+  const handleSelectPokemon = (pokemon: Pokemon) => {
+    setSelectedPokemonId(pokemon.id);
+    setSearchQuery('');
+    setIsDropdownOpen(false);
+  };
 
   return (
     <div className="space-y-6">
@@ -58,36 +99,128 @@ export const CatchCalculatorView: React.FC<CatchCalculatorViewProps> = ({ initia
         <div className="lg:col-span-5 space-y-5">
           
           {/* Target Pokemon Selector */}
-          <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 space-y-4 backdrop-blur-md">
+          <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 space-y-4 backdrop-blur-md relative" ref={dropdownRef}>
             <label className="block text-xs font-extrabold uppercase tracking-wider text-slate-400">
               1. Selecciona el Pokémon Objetivo
             </label>
 
-            <div className="flex items-center gap-3 bg-slate-950 border border-slate-800 rounded-xl p-3">
+            {/* Selected Active Pokemon Card Header */}
+            <div className="flex items-center gap-3 bg-slate-950 border border-slate-800/80 rounded-xl p-3.5 shadow-inner">
               <img
                 src={currentPokemon.spriteUrl || currentPokemon.artworkUrl}
                 alt={currentPokemon.name}
-                className="w-14 h-14 object-contain filter drop-shadow-md animate-pulse"
+                className="w-14 h-14 object-contain filter drop-shadow-md animate-pulse shrink-0"
               />
               <div className="flex-1 min-w-0">
-                <select
-                  value={selectedPokemonId}
-                  onChange={e => setSelectedPokemonId(e.target.value)}
-                  className="w-full bg-transparent text-sm font-bold text-white focus:outline-none cursor-pointer"
-                >
-                  {COBBLEMON_POKEDEX.map(p => (
-                    <option key={p.id} value={p.id} className="bg-slate-900 text-slate-200">
-                      #{String(p.dexNumber).padStart(3, '0')} - {p.name} (Rate: {p.catchRate})
-                    </option>
-                  ))}
-                </select>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-mono font-bold text-slate-500">#{String(currentPokemon.dexNumber).padStart(3, '0')}</span>
+                  <h3 className="text-base font-extrabold text-white truncate">{currentPokemon.name}</h3>
+                </div>
                 <div className="flex items-center gap-2 mt-1">
-                  <span className="text-[11px] text-slate-400 font-mono">Catch Rate: {currentPokemon.catchRate}</span>
-                  <span className="text-[11px] text-slate-500">•</span>
-                  <span className="text-[11px] text-slate-400">Peso: {currentPokemon.weightKg} kg</span>
+                  <span className="text-[11px] text-indigo-400 font-mono font-bold bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/20">
+                    Catch Rate: {currentPokemon.catchRate}
+                  </span>
+                  <span className="text-[11px] text-slate-400 font-mono">
+                    Peso: {currentPokemon.weightKg} kg
+                  </span>
                 </div>
               </div>
             </div>
+
+            {/* Quick Popular Presets Pills */}
+            <div className="space-y-1.5">
+              <span className="text-[10px] font-bold uppercase text-slate-500 tracking-wider">Acceso Rápido:</span>
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
+                {popularPresets.map(preset => (
+                  <button
+                    key={preset.id}
+                    onClick={() => {
+                      const found = COBBLEMON_POKEDEX.find(p => p.id === preset.id);
+                      if (found) handleSelectPokemon(found);
+                    }}
+                    className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
+                      selectedPokemonId === preset.id
+                        ? 'bg-indigo-500 text-white font-bold shadow-md shadow-indigo-500/20'
+                        : 'bg-slate-950 text-slate-400 hover:text-slate-200 border border-slate-800'
+                    }`}
+                  >
+                    <span>{preset.icon}</span>
+                    <span>{preset.name}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Autocomplete Input */}
+            <div className="relative pt-1">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                <input
+                  type="text"
+                  placeholder="Escribe para buscar cualquier Pokémon (ej: Pikachu, 150)..."
+                  value={searchQuery}
+                  onFocus={() => setIsDropdownOpen(true)}
+                  onChange={e => {
+                    setSearchQuery(e.target.value);
+                    setIsDropdownOpen(true);
+                  }}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-9 py-2.5 text-xs sm:text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors"
+                />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+
+              {/* Floating Results Popover */}
+              {isDropdownOpen && (
+                <div className="absolute top-full left-0 right-0 mt-2 bg-slate-900 border border-slate-700/80 rounded-2xl shadow-2xl z-50 max-h-64 overflow-y-auto divide-y divide-slate-800/60 animate-in fade-in duration-150">
+                  {filteredOptions.length === 0 ? (
+                    <div className="p-4 text-center text-xs text-slate-400">
+                      No se encontraron Pokémon con ese nombre o número.
+                    </div>
+                  ) : (
+                    filteredOptions.map(p => (
+                      <div
+                        key={p.id}
+                        onClick={() => handleSelectPokemon(p)}
+                        className={`flex items-center justify-between p-3 cursor-pointer transition-colors ${
+                          p.id === selectedPokemonId
+                            ? 'bg-indigo-500/20 text-white font-bold'
+                            : 'hover:bg-slate-800/80 text-slate-300'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <img src={p.spriteUrl || p.artworkUrl} alt={p.name} className="w-8 h-8 object-contain" />
+                          <div>
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-[11px] font-mono text-slate-500">#{String(p.dexNumber).padStart(3, '0')}</span>
+                              <span className="text-xs font-bold">{p.name}</span>
+                            </div>
+                            <div className="flex items-center gap-1 mt-0.5">
+                              {p.types.map(t => (
+                                <span key={t} className="text-[9px] uppercase px-1.5 py-0.2 rounded bg-slate-800 text-slate-300">
+                                  {t}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="text-right">
+                          <span className="text-[11px] font-mono font-bold text-indigo-400">Rate: {p.catchRate}</span>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              )}
+            </div>
+
           </div>
 
           {/* HP & Status Sliders */}
@@ -239,7 +372,7 @@ export const CatchCalculatorView: React.FC<CatchCalculatorViewProps> = ({ initia
           {/* Full Ranked Table */}
           <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 space-y-4 backdrop-blur-md">
             <h3 className="text-sm font-bold text-slate-200 flex items-center justify-between">
-              <span>Ranking Completo de Pokébolas</span>
+              <span>Ranking Completo de Pokébolas para {currentPokemon.name}</span>
               <span className="text-xs text-slate-500 font-normal">Gen 8/9 Formula</span>
             </h3>
 
