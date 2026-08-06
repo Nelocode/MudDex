@@ -1,4 +1,5 @@
-import { SpawnEntry, BiomeCategory } from '../types/diosesmon';
+import { SpawnEntry, BiomeCategory, SpawnBucket, TimeOfDay, SpawnContext } from '../types/diosesmon';
+import { COBBLEMON_POKEDEX } from './cobblemonPokedex';
 
 export const BIOME_CATEGORIES: BiomeCategory[] = [
   {
@@ -71,420 +72,88 @@ export const BIOME_CATEGORIES: BiomeCategory[] = [
   }
 ];
 
-export const COBBLEMON_SPAWNS: SpawnEntry[] = [
-  // Bulbasaur line
-  {
-    id: 'bulbasaur-jungle',
-    pokemonId: 'bulbasaur',
-    bucket: 'rare',
-    weight: 8.5,
-    context: 'grounded',
-    minLevel: 5,
-    maxLevel: 25,
-    condition: { biomes: ['#cobblemon:is_jungle', 'minecraft:jungle', 'minecraft:sparse_jungle'], timeOfDay: 'day', canSeeSky: true }
-  },
-  {
-    id: 'ivysaur-jungle',
-    pokemonId: 'ivysaur',
-    bucket: 'rare',
-    weight: 4.0,
-    context: 'grounded',
-    minLevel: 16,
-    maxLevel: 32,
-    condition: { biomes: ['#cobblemon:is_jungle', 'minecraft:jungle'], timeOfDay: 'day', canSeeSky: true }
-  },
-  {
-    id: 'venusaur-jungle',
-    pokemonId: 'venusaur',
-    bucket: 'ultra-rare',
-    weight: 1.5,
-    context: 'grounded',
-    minLevel: 32,
-    maxLevel: 55,
-    condition: { biomes: ['#cobblemon:is_jungle', 'minecraft:jungle'], timeOfDay: 'day', canSeeSky: true }
-  },
+// Generate Spawns for ALL Pokémon species
+export function generateFullSpawns(): SpawnEntry[] {
+  return COBBLEMON_POKEDEX.map(pokemon => {
+    const mainType = pokemon.types[0] || 'normal';
+    let biomes: string[] = ['minecraft:plains', '#cobblemon:is_forest'];
+    let bucket: SpawnBucket = 'common';
+    let context: SpawnContext = 'grounded';
+    let timeOfDay: TimeOfDay = 'any';
+    let minY: number | undefined = undefined;
+    let maxY: number | undefined = undefined;
 
-  // Charmander line
-  {
-    id: 'charmander-badlands',
-    pokemonId: 'charmander',
-    bucket: 'rare',
-    weight: 8.0,
-    context: 'grounded',
-    minLevel: 5,
-    maxLevel: 25,
-    condition: { biomes: ['#cobblemon:is_badlands', 'minecraft:badlands', 'minecraft:desert'], timeOfDay: 'day', weather: 'clear', canSeeSky: true }
-  },
-  {
-    id: 'charmeleon-badlands',
-    pokemonId: 'charmeleon',
-    bucket: 'rare',
-    weight: 4.0,
-    context: 'grounded',
-    minLevel: 16,
-    maxLevel: 36,
-    condition: { biomes: ['#cobblemon:is_badlands', 'minecraft:desert'], timeOfDay: 'day' }
-  },
-  {
-    id: 'charizard-peaks',
-    pokemonId: 'charizard',
-    bucket: 'ultra-rare',
-    weight: 1.2,
-    context: 'grounded',
-    minLevel: 36,
-    maxLevel: 60,
-    condition: { biomes: ['#cobblemon:is_badlands', '#cobblemon:is_mountain'], minY: 90, canSeeSky: true }
-  },
+    // Bucket calculation
+    if (pokemon.catchRate <= 5) bucket = 'ultra-rare';
+    else if (pokemon.catchRate <= 45) bucket = 'rare';
+    else if (pokemon.catchRate <= 120) bucket = 'uncommon';
+    else bucket = 'common';
 
-  // Squirtle line
-  {
-    id: 'squirtle-river',
-    pokemonId: 'squirtle',
-    bucket: 'rare',
-    weight: 8.5,
-    context: 'submerged',
-    minLevel: 5,
-    maxLevel: 25,
-    condition: { biomes: ['#cobblemon:is_river', 'minecraft:river', '#cobblemon:is_ocean'] }
-  },
-  {
-    id: 'blastoise-ocean',
-    pokemonId: 'blastoise',
-    bucket: 'ultra-rare',
-    weight: 1.5,
-    context: 'submerged',
-    minLevel: 36,
-    maxLevel: 60,
-    condition: { biomes: ['#cobblemon:is_ocean', 'minecraft:deep_ocean'] }
-  },
+    // Type-based biome & environment assignment
+    switch (mainType) {
+      case 'grass':
+      case 'bug':
+        biomes = ['#cobblemon:is_jungle', 'minecraft:jungle', 'minecraft:sparse_jungle', 'minecraft:forest'];
+        timeOfDay = 'day';
+        break;
 
-  // Bugs & Birds
-  {
-    id: 'butterfree-forest',
-    pokemonId: 'butterfree',
-    bucket: 'uncommon',
-    weight: 15.0,
-    context: 'grounded',
-    minLevel: 10,
-    maxLevel: 30,
-    condition: { biomes: ['#cobblemon:is_forest', 'minecraft:forest'], timeOfDay: 'day' }
-  },
-  {
-    id: 'pidgeot-forest',
-    pokemonId: 'pidgeot',
-    bucket: 'uncommon',
-    weight: 12.0,
-    context: 'grounded',
-    minLevel: 18,
-    maxLevel: 40,
-    condition: { biomes: ['#cobblemon:is_forest', 'minecraft:plains'], timeOfDay: 'day', canSeeSky: true }
-  },
+      case 'fire':
+      case 'ground':
+      case 'rock':
+        biomes = ['#cobblemon:is_badlands', 'minecraft:badlands', 'minecraft:desert'];
+        timeOfDay = 'day';
+        break;
 
-  // Pikachu line
-  {
-    id: 'pikachu-forest',
-    pokemonId: 'pikachu',
-    bucket: 'uncommon',
-    weight: 25.0,
-    context: 'grounded',
-    minLevel: 10,
-    maxLevel: 30,
-    condition: { biomes: ['#cobblemon:is_forest', 'minecraft:forest', 'minecraft:birch_forest'], timeOfDay: 'day' }
-  },
-  {
-    id: 'raichu-forest',
-    pokemonId: 'raichu',
-    bucket: 'rare',
-    weight: 5.0,
-    context: 'grounded',
-    minLevel: 30,
-    maxLevel: 50,
-    condition: { biomes: ['#cobblemon:is_forest', 'minecraft:forest'], timeOfDay: 'day' }
-  },
+      case 'water':
+      case 'ice':
+        biomes = ['#cobblemon:is_ocean', 'minecraft:ocean', 'minecraft:river', 'minecraft:deep_ocean'];
+        context = 'submerged';
+        break;
 
-  // Fire / Psychic / Fighting
-  {
-    id: 'ninetales-forest',
-    pokemonId: 'ninetales',
-    bucket: 'rare',
-    weight: 6.0,
-    context: 'grounded',
-    minLevel: 25,
-    maxLevel: 50,
-    condition: { biomes: ['#cobblemon:is_forest', 'minecraft:dark_forest'], timeOfDay: 'night' }
-  },
-  {
-    id: 'arcanine-badlands',
-    pokemonId: 'arcanine',
-    bucket: 'rare',
-    weight: 5.0,
-    context: 'grounded',
-    minLevel: 30,
-    maxLevel: 55,
-    condition: { biomes: ['#cobblemon:is_badlands', 'minecraft:desert'], timeOfDay: 'day' }
-  },
-  {
-    id: 'alakazam-mountain',
-    pokemonId: 'alakazam',
-    bucket: 'rare',
-    weight: 4.0,
-    context: 'grounded',
-    minLevel: 36,
-    maxLevel: 55,
-    condition: { biomes: ['#cobblemon:is_mountain', 'minecraft:stony_peaks'], timeOfDay: 'night' }
-  },
-  {
-    id: 'machamp-mountain',
-    pokemonId: 'machamp',
-    bucket: 'rare',
-    weight: 5.0,
-    context: 'grounded',
-    minLevel: 36,
-    maxLevel: 55,
-    condition: { biomes: ['#cobblemon:is_mountain', 'minecraft:jagged_peaks'], timeOfDay: 'day' }
-  },
+      case 'electric':
+      case 'dragon':
+      case 'flying':
+        biomes = ['#cobblemon:is_mountain', 'minecraft:jagged_peaks', 'minecraft:stony_peaks'];
+        minY = 75;
+        timeOfDay = 'day';
+        break;
 
-  // Ghosts / Water
-  {
-    id: 'gengar-dark-forest',
-    pokemonId: 'gengar',
-    bucket: 'ultra-rare',
-    weight: 2.0,
-    context: 'grounded',
-    minLevel: 36,
-    maxLevel: 55,
-    condition: { biomes: ['minecraft:dark_forest', '#cobblemon:is_cave', 'minecraft:deep_dark'], timeOfDay: 'night', canSeeSky: false }
-  },
-  {
-    id: 'gyarados-ocean',
-    pokemonId: 'gyarados',
-    bucket: 'rare',
-    weight: 5.0,
-    context: 'submerged',
-    minLevel: 20,
-    maxLevel: 50,
-    condition: { biomes: ['#cobblemon:is_ocean', 'minecraft:deep_ocean'], weather: 'rain' }
-  },
-  {
-    id: 'lapras-ocean',
-    pokemonId: 'lapras',
-    bucket: 'rare',
-    weight: 6.0,
-    context: 'submerged',
-    minLevel: 25,
-    maxLevel: 50,
-    condition: { biomes: ['#cobblemon:is_ocean', 'minecraft:warm_ocean', 'minecraft:deep_ocean'] }
-  },
-  {
-    id: 'eevee-plains',
-    pokemonId: 'eevee',
-    bucket: 'uncommon',
-    weight: 20.0,
-    context: 'grounded',
-    minLevel: 5,
-    maxLevel: 25,
-    condition: { biomes: ['#cobblemon:is_forest', 'minecraft:plains', 'minecraft:birch_forest'], timeOfDay: 'day' }
-  },
-  {
-    id: 'snorlax-forest',
-    pokemonId: 'snorlax',
-    bucket: 'ultra-rare',
-    weight: 1.5,
-    context: 'grounded',
-    minLevel: 30,
-    maxLevel: 50,
-    condition: { biomes: ['#cobblemon:is_forest', 'minecraft:plains'], timeOfDay: 'day', canSeeSky: true }
-  },
-  {
-    id: 'dragonite-peaks',
-    pokemonId: 'dragonite',
-    bucket: 'ultra-rare',
-    weight: 1.0,
-    context: 'grounded',
-    minLevel: 55,
-    maxLevel: 70,
-    condition: { biomes: ['#cobblemon:is_mountain', 'minecraft:jagged_peaks'], minY: 120, canSeeSky: true }
-  },
-  {
-    id: 'mewtwo-cave',
-    pokemonId: 'mewtwo',
-    bucket: 'ultra-rare',
-    weight: 0.3,
-    context: 'grounded',
-    minLevel: 70,
-    maxLevel: 100,
-    condition: { biomes: ['minecraft:deep_dark', 'minecraft:dripstone_caves'], maxY: 0, canSeeSky: false }
-  },
+      case 'ghost':
+      case 'dark':
+      case 'poison':
+        biomes = ['minecraft:dark_forest', '#cobblemon:is_cave', 'minecraft:deep_dark'];
+        timeOfDay = 'night';
+        break;
 
-  // Gen 2-9
-  {
-    id: 'cyndaquil-badlands',
-    pokemonId: 'cyndaquil',
-    bucket: 'rare',
-    weight: 8.0,
-    context: 'grounded',
-    minLevel: 5,
-    maxLevel: 25,
-    condition: { biomes: ['#cobblemon:is_badlands', 'minecraft:desert'], timeOfDay: 'day' }
-  },
-  {
-    id: 'typhlosion-badlands',
-    pokemonId: 'typhlosion',
-    bucket: 'ultra-rare',
-    weight: 1.5,
-    context: 'grounded',
-    minLevel: 36,
-    maxLevel: 55,
-    condition: { biomes: ['#cobblemon:is_badlands', 'minecraft:eroded_badlands'], timeOfDay: 'day' }
-  },
-  {
-    id: 'espeon-meadow',
-    pokemonId: 'espeon',
-    bucket: 'rare',
-    weight: 4.5,
-    context: 'grounded',
-    minLevel: 25,
-    maxLevel: 45,
-    condition: { biomes: ['minecraft:meadow', '#cobblemon:is_forest'], timeOfDay: 'day' }
-  },
-  {
-    id: 'umbreon-dark-forest',
-    pokemonId: 'umbreon',
-    bucket: 'rare',
-    weight: 4.5,
-    context: 'grounded',
-    minLevel: 25,
-    maxLevel: 45,
-    condition: { biomes: ['minecraft:dark_forest', '#cobblemon:is_cave'], timeOfDay: 'night' }
-  },
-  {
-    id: 'tyranitar-badlands',
-    pokemonId: 'tyranitar',
-    bucket: 'ultra-rare',
-    weight: 1.2,
-    context: 'grounded',
-    minLevel: 55,
-    maxLevel: 70,
-    condition: { biomes: ['#cobblemon:is_badlands', 'minecraft:eroded_badlands'], canSeeSky: true }
-  },
-  {
-    id: 'blaziken-badlands',
-    pokemonId: 'blaziken',
-    bucket: 'ultra-rare',
-    weight: 1.5,
-    context: 'grounded',
-    minLevel: 36,
-    maxLevel: 55,
-    condition: { biomes: ['#cobblemon:is_badlands', 'minecraft:desert'], timeOfDay: 'day' }
-  },
-  {
-    id: 'swampert-river',
-    pokemonId: 'swampert',
-    bucket: 'ultra-rare',
-    weight: 1.5,
-    context: 'submerged',
-    minLevel: 36,
-    maxLevel: 55,
-    condition: { biomes: ['#cobblemon:is_river', '#cobblemon:is_ocean'] }
-  },
-  {
-    id: 'gardevoir-meadow',
-    pokemonId: 'gardevoir',
-    bucket: 'rare',
-    weight: 4.0,
-    context: 'grounded',
-    minLevel: 30,
-    maxLevel: 50,
-    condition: { biomes: ['minecraft:meadow', '#cobblemon:is_forest'], timeOfDay: 'day' }
-  },
-  {
-    id: 'rayquaza-peaks',
-    pokemonId: 'rayquaza',
-    bucket: 'ultra-rare',
-    weight: 0.2,
-    context: 'grounded',
-    minLevel: 70,
-    maxLevel: 100,
-    condition: { biomes: ['minecraft:jagged_peaks', '#cobblemon:is_mountain'], minY: 150, canSeeSky: true }
-  },
-  {
-    id: 'garchomp-badlands',
-    pokemonId: 'garchomp',
-    bucket: 'ultra-rare',
-    weight: 1.0,
-    context: 'grounded',
-    minLevel: 48,
-    maxLevel: 65,
-    condition: { biomes: ['#cobblemon:is_badlands', '#cobblemon:is_desert'], timeOfDay: 'dusk' }
-  },
-  {
-    id: 'lucario-peaks',
-    pokemonId: 'lucario',
-    bucket: 'rare',
-    weight: 3.5,
-    context: 'grounded',
-    minLevel: 32,
-    maxLevel: 52,
-    condition: { biomes: ['#cobblemon:is_mountain', 'minecraft:stony_peaks'], timeOfDay: 'day', minY: 80 }
-  },
-  {
-    id: 'greninja-swamp',
-    pokemonId: 'greninja',
-    bucket: 'ultra-rare',
-    weight: 1.5,
-    context: 'grounded',
-    minLevel: 36,
-    maxLevel: 55,
-    condition: { biomes: ['minecraft:swamp', 'minecraft:mangrove_swamp'], timeOfDay: 'night' }
-  },
-  {
-    id: 'sylveon-meadow',
-    pokemonId: 'sylveon',
-    bucket: 'rare',
-    weight: 4.0,
-    context: 'grounded',
-    minLevel: 25,
-    maxLevel: 45,
-    condition: { biomes: ['minecraft:meadow', '#cobblemon:is_forest'], timeOfDay: 'day' }
-  },
-  {
-    id: 'mimikyu-dark-forest',
-    pokemonId: 'mimikyu',
-    bucket: 'rare',
-    weight: 3.0,
-    context: 'grounded',
-    minLevel: 25,
-    maxLevel: 45,
-    condition: { biomes: ['minecraft:dark_forest', '#cobblemon:is_cave'], timeOfDay: 'night', maxLight: 5 }
-  },
-  {
-    id: 'dragapult-deep-dark',
-    pokemonId: 'dragapult',
-    bucket: 'ultra-rare',
-    weight: 0.8,
-    context: 'grounded',
-    minLevel: 60,
-    maxLevel: 75,
-    condition: { biomes: ['minecraft:deep_dark', 'minecraft:dripstone_caves'], maxY: 0, canSeeSky: false }
-  },
-  {
-    id: 'ceruledge-dark-forest',
-    pokemonId: 'ceruledge',
-    bucket: 'rare',
-    weight: 3.0,
-    context: 'grounded',
-    minLevel: 35,
-    maxLevel: 55,
-    condition: { biomes: ['minecraft:dark_forest', '#cobblemon:is_badlands'], timeOfDay: 'night' }
-  },
-  {
-    id: 'tinkaton-stony-peaks',
-    pokemonId: 'tinkaton',
-    bucket: 'rare',
-    weight: 4.0,
-    context: 'grounded',
-    minLevel: 38,
-    maxLevel: 55,
-    condition: { biomes: ['minecraft:stony_peaks', '#cobblemon:is_mountain'], timeOfDay: 'day' }
-  }
-];
+      case 'psychic':
+      case 'fairy':
+      case 'steel':
+      case 'fighting':
+      case 'normal':
+      default:
+        biomes = ['minecraft:plains', 'minecraft:meadow', '#cobblemon:is_forest'];
+        break;
+    }
+
+    const weight = bucket === 'ultra-rare' ? 1.0 : bucket === 'rare' ? 5.0 : bucket === 'uncommon' ? 15.0 : 35.0;
+
+    return {
+      id: `${pokemon.id}-spawn`,
+      pokemonId: pokemon.id,
+      bucket,
+      weight,
+      context,
+      minLevel: Math.max(5, Math.min(50, pokemon.dexNumber % 50 + 5)),
+      maxLevel: Math.max(25, Math.min(75, pokemon.dexNumber % 50 + 30)),
+      condition: {
+        biomes,
+        timeOfDay,
+        minY,
+        maxY,
+        canSeeSky: context === 'grounded' && minY !== undefined
+      }
+    };
+  });
+}
+
+export const COBBLEMON_SPAWNS: SpawnEntry[] = generateFullSpawns();
