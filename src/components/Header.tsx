@@ -1,23 +1,27 @@
 import React from 'react';
-import { Sparkles, Box, PlusCircle, BookmarkCheck, Flame } from 'lucide-react';
-import { BreedingProject } from '../types/pokemon';
+import { Sparkles, Box, PlusCircle, BookmarkCheck, Flame, Wand2 } from 'lucide-react';
+import { BreedingProject, MagicUserSession } from '../types/pokemon';
 
 interface HeaderProps {
   activeProject: BreedingProject | null;
   savedProjects: BreedingProject[];
+  magicSession: MagicUserSession | null;
   onSelectProject: (id: string) => void;
   onNewProject: () => void;
   onOpenBox: () => void;
   onOpenMasuda: () => void;
+  onOpenMagicLogin: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
   activeProject,
   savedProjects,
+  magicSession,
   onSelectProject,
   onNewProject,
   onOpenBox,
-  onOpenMasuda
+  onOpenMasuda,
+  onOpenMagicLogin
 }) => {
   return (
     <header className="pokelinker-header">
@@ -56,6 +60,15 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
           )}
 
+          <button
+            className={`btn-secondary ${magicSession ? 'magic-session-btn-active' : ''}`}
+            onClick={onOpenMagicLogin}
+            title="Guarda y sincroniza tus Pokémon en crianza y cajas"
+          >
+            <Wand2 size={18} color={magicSession ? '#00D2FF' : 'currentColor'} />
+            <span>{magicSession ? `🪄 ${magicSession.trainerName}` : 'Magic Login'}</span>
+          </button>
+
           <button className="btn-secondary" onClick={onOpenBox} title="Gestionar tu Caja de Pokémon">
             <Box size={18} />
             <span>Mi Caja Pokémon</span>
@@ -75,3 +88,4 @@ export const Header: React.FC<HeaderProps> = ({
     </header>
   );
 };
+

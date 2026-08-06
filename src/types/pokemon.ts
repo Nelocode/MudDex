@@ -164,3 +164,12 @@ export interface BoxPokemon {
   isDitto: boolean;
   notes?: string;
 }
+
+export interface MagicUserSession {
+  userKey: string;
+  trainerName: string;
+  email: string;
+  loggedInAt: string;
+  magicLinkUrl: string;
+}
+

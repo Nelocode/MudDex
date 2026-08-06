@@ -1,9 +1,10 @@
-import { BreedingProject, BoxPokemon, GoalConfig } from '../types/pokemon';
+import { BreedingProject, BoxPokemon, GoalConfig, MagicUserSession } from '../types/pokemon';
 
 const STORAGE_KEYS = {
   PROJECTS: 'pokelinker_projects_v1',
   ACTIVE_PROJECT_ID: 'pokelinker_active_project_id_v1',
-  BOX: 'pokelinker_user_box_v1'
+  BOX: 'pokelinker_user_box_v1',
+  MAGIC_SESSION: 'pokelinker_magic_session_v1'
 };
 
 // Normaliza proyectos guardados de versiones anteriores (añade campos nuevos con defaults)
@@ -48,7 +49,9 @@ const DEFAULT_BOX: BoxPokemon[] = [
 
 export function getSavedProjects(): BreedingProject[] {
   try {
-    const raw = localStorage.getItem(STORAGE_KEYS.PROJECTS);
+    const session = getMagicSession();
+    const key = session ? `${STORAGE_KEYS.PROJECTS}_${session.userKey}` : STORAGE_KEYS.PROJECTS;
+    const raw = localStorage.getItem(key) || localStorage.getItem(STORAGE_KEYS.PROJECTS);
     if (!raw) return [];
     const parsed: BreedingProject[] = JSON.parse(raw);
     return parsed.map(p => normalizeProject(p));
@@ -66,12 +69,19 @@ export function saveProject(project: BreedingProject): void {
   } else {
     projects.unshift({ ...project, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() });
   }
+  
+  const session = getMagicSession();
+  const key = session ? `${STORAGE_KEYS.PROJECTS}_${session.userKey}` : STORAGE_KEYS.PROJECTS;
+  localStorage.setItem(key, JSON.stringify(projects));
   localStorage.setItem(STORAGE_KEYS.PROJECTS, JSON.stringify(projects));
   setActiveProjectId(project.id);
 }
 
 export function deleteProject(id: string): void {
   const projects = getSavedProjects().filter(p => p.id !== id);
+  const session = getMagicSession();
+  const key = session ? `${STORAGE_KEYS.PROJECTS}_${session.userKey}` : STORAGE_KEYS.PROJECTS;
+  localStorage.setItem(key, JSON.stringify(projects));
   localStorage.setItem(STORAGE_KEYS.PROJECTS, JSON.stringify(projects));
   if (getActiveProjectId() === id) {
     localStorage.removeItem(STORAGE_KEYS.ACTIVE_PROJECT_ID);
@@ -88,7 +98,9 @@ export function setActiveProjectId(id: string): void {
 
 export function getUserBox(): BoxPokemon[] {
   try {
-    const raw = localStorage.getItem(STORAGE_KEYS.BOX);
+    const session = getMagicSession();
+    const key = session ? `${STORAGE_KEYS.BOX}_${session.userKey}` : STORAGE_KEYS.BOX;
+    const raw = localStorage.getItem(key) || localStorage.getItem(STORAGE_KEYS.BOX);
     if (!raw) {
       localStorage.setItem(STORAGE_KEYS.BOX, JSON.stringify(DEFAULT_BOX));
       return DEFAULT_BOX;
@@ -107,10 +119,90 @@ export function saveBoxPokemon(pokemon: BoxPokemon): void {
   } else {
     box.unshift(pokemon);
   }
+  const session = getMagicSession();
+  const key = session ? `${STORAGE_KEYS.BOX}_${session.userKey}` : STORAGE_KEYS.BOX;
+  localStorage.setItem(key, JSON.stringify(box));
   localStorage.setItem(STORAGE_KEYS.BOX, JSON.stringify(box));
 }
 
 export function deleteBoxPokemon(id: string): void {
   const box = getUserBox().filter(b => b.id !== id);
+  const session = getMagicSession();
+  const key = session ? `${STORAGE_KEYS.BOX}_${session.userKey}` : STORAGE_KEYS.BOX;
+  localStorage.setItem(key, JSON.stringify(box));
   localStorage.setItem(STORAGE_KEYS.BOX, JSON.stringify(box));
 }
+
+/* ===============================================================
+   MAGIC LOGIN SESSION HELPERS
+   =============================================================== */
+
+export function getMagicSession(): MagicUserSession | null {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEYS.MAGIC_SESSION);
+    return raw ? JSON.parse(raw) : null;
+  } catch (e) {
+    return null;
+  }
+}
+
+export function saveMagicSession(trainerNameOrEmail: string): MagicUserSession {
+  const cleanInput = trainerNameOrEmail.trim();
+  const userKey = btoa(cleanInput.toLowerCase()).replace(/[^a-zA-Z0-9]/g, '').substring(0, 16);
+  const origin = window.location.origin + window.location.pathname;
+  const magicLinkUrl = `${origin}?magicKey=${encodeURIComponent(userKey)}&trainer=${encodeURIComponent(cleanInput)}`;
+
+  const session: MagicUserSession = {
+    userKey,
+    trainerName: cleanInput.includes('@') ? cleanInput.split('@')[0] : cleanInput,
+    email: cleanInput,
+    loggedInAt: new Date().toISOString(),
+    magicLinkUrl
+  };
+
+  localStorage.setItem(STORAGE_KEYS.MAGIC_SESSION, JSON.stringify(session));
+  return session;
+}
+
+export function logoutMagicSession(): void {
+  localStorage.removeItem(STORAGE_KEYS.MAGIC_SESSION);
+}
+
+export function exportMagicStateBundle(): string {
+  const session = getMagicSession();
+  const bundle = {
+    version: '1.0',
+    exportedAt: new Date().toISOString(),
+    session,
+    projects: getSavedProjects(),
+    box: getUserBox()
+  };
+  return btoa(unescape(encodeURIComponent(JSON.stringify(bundle))));
+}
+
+export function importMagicStateBundle(base64Bundle: string): boolean {
+  try {
+    const jsonStr = decodeURIComponent(escape(atob(base64Bundle.trim())));
+    const data = JSON.parse(jsonStr);
+    if (data.session && data.session.email) {
+      saveMagicSession(data.session.email);
+    }
+    if (Array.isArray(data.projects)) {
+      const session = getMagicSession();
+      const key = session ? `${STORAGE_KEYS.PROJECTS}_${session.userKey}` : STORAGE_KEYS.PROJECTS;
+      localStorage.setItem(key, JSON.stringify(data.projects));
+      localStorage.setItem(STORAGE_KEYS.PROJECTS, JSON.stringify(data.projects));
+    }
+    if (Array.isArray(data.box)) {
+      const session = getMagicSession();
+      const key = session ? `${STORAGE_KEYS.BOX}_${session.userKey}` : STORAGE_KEYS.BOX;
+      localStorage.setItem(key, JSON.stringify(data.box));
+      localStorage.setItem(STORAGE_KEYS.BOX, JSON.stringify(data.box));
+    }
+    return true;
+  } catch (e) {
+    console.error('Error importing Magic bundle:', e);
+    return false;
+  }
+}
+

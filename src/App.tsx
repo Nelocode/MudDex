@@ -9,12 +9,14 @@ import { PrerequisitesList } from './components/PrerequisitesList';
 import { SmogonBuildCard } from './components/SmogonBuildCard';
 import { PokemonBoxModal } from './components/PokemonBoxModal';
 import { MasudaCalculatorModal } from './components/MasudaCalculatorModal';
+import { MagicLoginModal } from './components/MagicLoginModal';
 
 import {
   PokemonSummary,
   GoalConfig,
   BreedingProject,
-  ParentPokemon
+  ParentPokemon,
+  MagicUserSession
 } from './types/pokemon';
 import { generateBreedingTree } from './services/breedingEngine';
 import { getSmogonBuilds } from './services/smogonData';
@@ -24,7 +26,9 @@ import {
   getActiveProjectId,
   setActiveProjectId,
   getUserBox,
-  deleteProject
+  deleteProject,
+  getMagicSession,
+  saveMagicSession
 } from './services/storage';
 
 export const App: React.FC = () => {
@@ -33,14 +37,24 @@ export const App: React.FC = () => {
   const [selectedPokemon, setSelectedPokemon] = useState<PokemonSummary | null>(null);
   const [activeProject, setActiveProject] = useState<BreedingProject | null>(null);
   const [savedProjects, setSavedProjects] = useState<BreedingProject[]>([]);
+  const [magicSession, setMagicSession] = useState<MagicUserSession | null>(getMagicSession());
 
   const [selectedBuildIndex, setSelectedBuildIndex] = useState(0);
 
   // Modals
   const [isBoxOpen, setIsBoxOpen] = useState(false);
   const [isMasudaOpen, setIsMasudaOpen] = useState(false);
+  const [isMagicLoginOpen, setIsMagicLoginOpen] = useState(false);
 
   useEffect(() => {
+    // Check URL parameters for magic key (e.g. ?magicKey=...&trainer=...)
+    const params = new URLSearchParams(window.location.search);
+    const trainerParam = params.get('trainer') || params.get('magicKey');
+    if (trainerParam) {
+      const newSess = saveMagicSession(trainerParam);
+      setMagicSession(newSess);
+    }
+
     const projects = getSavedProjects();
     setSavedProjects(projects);
 
@@ -56,6 +70,20 @@ export const App: React.FC = () => {
       setView('project');
     }
   }, []);
+
+  const handleSessionChanged = () => {
+    setMagicSession(getMagicSession());
+    const projects = getSavedProjects();
+    setSavedProjects(projects);
+    if (projects.length > 0) {
+      setActiveProject(projects[0]);
+      setActiveProjectId(projects[0].id);
+      setView('project');
+    } else {
+      setActiveProject(null);
+      setView('selector');
+    }
+  };
 
   const handleSelectPokemon = (pokemon: PokemonSummary) => {
     setSelectedPokemon(pokemon);
@@ -195,10 +223,12 @@ export const App: React.FC = () => {
       <Header
         activeProject={activeProject}
         savedProjects={savedProjects}
+        magicSession={magicSession}
         onSelectProject={handleSelectSavedProject}
         onNewProject={handleNewProject}
         onOpenBox={() => setIsBoxOpen(true)}
         onOpenMasuda={() => setIsMasudaOpen(true)}
+        onOpenMagicLogin={() => setIsMagicLoginOpen(true)}
       />
 
       <main className="main-content-container">
@@ -261,7 +291,7 @@ export const App: React.FC = () => {
               </div>
             </div>
 
-            {/* LISTA DE PREPARATIVOS Y MATERIALES (NUEVO) */}
+            {/* LISTA DE PREPARATIVOS Y MATERIALES */}
             <PrerequisitesList
               targetPokemon={activeProject.targetPokemon}
               goal={activeProject.goal}
@@ -274,7 +304,7 @@ export const App: React.FC = () => {
               onToggleStep={handleToggleStep}
             />
 
-            {/* Árbol Genealógico Interactivo con Edición y Validación de Grupo Huevo */}
+            {/* Árbol Genealógico Interactivo */}
             <BreedingTree
               steps={activeProject.steps}
               onToggleStep={handleToggleStep}
@@ -304,13 +334,25 @@ export const App: React.FC = () => {
         onClose={() => setIsMasudaOpen(false)}
       />
 
+      <MagicLoginModal
+        isOpen={isMagicLoginOpen}
+        onClose={() => setIsMagicLoginOpen(false)}
+        onSessionChanged={handleSessionChanged}
+      />
+
       {/* Créditos y Descargo Legal */}
       <footer className="app-footer">
-        <span className="footer-disclaimer">
-          Pokémon y todos los sprites/arte son propiedad de Nintendo, Game Freak y The Pokémon Company. Esta herramienta es solo un asistente informativo de uso visual: no está afiliada ni respaldada por los titulares de los derechos y no representa afiliación alguna con ellos.
-        </span>
-        <span className="footer-brand-tag">El mejor Pokémon marica!!!</span>
+        <div className="footer-content">
+          <p className="footer-disclaimer">
+            Nota de uso libre e informativo: Pokelinker es una herramienta desarrollada sin fines de lucro para la comunidad. Construida utilizando APIs abiertas y librerías de código abierto (PokeAPI, Smogon). Pokémon y sus respectivas marcas registradas, nombres de especies y recursos son propiedad de Nintendo, Game Freak y The Pokémon Company. Esta aplicación no posee afiliación comercial ni oficial con los titulares de los derechos de autor.
+          </p>
+          <div className="footer-credits-row">
+            <span className="footer-brand-tag">El mejor pokémon mk</span>
+            <span className="footer-credits-dedication">Esto es para mi Gabo, no para la mugrosa de Valentina</span>
+          </div>
+        </div>
       </footer>
     </div>
   );
 };
+
