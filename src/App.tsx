@@ -340,19 +340,16 @@ export const App: React.FC = () => {
         onSessionChanged={handleSessionChanged}
       />
 
-      {/* Créditos y Descargo Legal */}
+      {/* Descargo Legal */}
       <footer className="app-footer">
         <div className="footer-content">
           <p className="footer-disclaimer">
             Nota de uso libre e informativo: Pokelinker es una herramienta desarrollada sin fines de lucro para la comunidad. Construida utilizando APIs abiertas y librerías de código abierto (PokeAPI, Smogon). Pokémon y sus respectivas marcas registradas, nombres de especies y recursos son propiedad de Nintendo, Game Freak y The Pokémon Company. Esta aplicación no posee afiliación comercial ni oficial con los titulares de los derechos de autor.
           </p>
-          <div className="footer-credits-row">
-            <span className="footer-brand-tag">El mejor pokémon mk</span>
-            <span className="footer-credits-dedication">Esto es para mi Gabo, no para la mugrosa de Valentina</span>
-          </div>
         </div>
       </footer>
     </div>
+
   );
 };
 
