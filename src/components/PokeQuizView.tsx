@@ -9,9 +9,26 @@ export const PokeQuizView: React.FC = () => {
   const [options, setOptions] = useState<Pokemon[]>([]);
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
-  const [score, setScore] = useState<number>(0);
+
+  const [score, setScore] = useState<number>(() => {
+    const saved = localStorage.getItem('diosesmon_quiz_score');
+    return saved ? Number(saved) : 0;
+  });
+
   const [streak, setStreak] = useState<number>(0);
-  const [maxStreak, setMaxStreak] = useState<number>(0);
+
+  const [maxStreak, setMaxStreak] = useState<number>(() => {
+    const saved = localStorage.getItem('diosesmon_quiz_max_streak');
+    return saved ? Number(saved) : 0;
+  });
+
+  useEffect(() => {
+    localStorage.setItem('diosesmon_quiz_score', String(score));
+  }, [score]);
+
+  useEffect(() => {
+    localStorage.setItem('diosesmon_quiz_max_streak', String(maxStreak));
+  }, [maxStreak]);
 
   // Generate a random question from COBBLEMON_POKEDEX
   const generateQuestion = () => {
@@ -78,18 +95,18 @@ export const PokeQuizView: React.FC = () => {
     <div className="space-y-6">
       
       {/* Banner */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-zinc-900 via-zinc-900/90 to-red-950/40 border border-zinc-800 p-6 sm:p-8">
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-zinc-900 via-zinc-900/90 to-red-950/40 border border-zinc-800 p-4 sm:p-6 md:p-8">
         <div className="absolute top-0 right-0 -translate-y-12 translate-x-12 w-64 h-64 bg-red-600/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="relative z-10 max-w-3xl space-y-3">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-600/10 border border-red-500/30 text-red-400 text-xs font-semibold">
-            <Gamepad2 className="w-3.5 h-3.5" />
-            <span>Minijuego Interactivo • Diosesmon Dex</span>
+        <div className="relative z-10 max-w-3xl space-y-2 sm:space-y-3">
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-600/10 border border-red-500/30 text-red-400 text-[11px] sm:text-xs font-semibold max-w-full truncate">
+            <Gamepad2 className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">Minijuego Interactivo • Diosesmon Dex</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-white tracking-tight leading-snug">
             ¿Quién es este Pokémon? (PokéQuiz)
           </h1>
-          <p className="text-sm text-zinc-300 leading-relaxed">
-            Pon a prueba tus conocimientos sobre los 1,025 Pokémon adivinando la silueta oculta o identificando su rugido de audio.
+          <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed">
+            Pon a prueba tus conocimientos sobre los 1,025 Pokémon adivinando la silueta oculta o identificando su rugido de audio. Tu puntuación y racha máxima se guardan en tu navegador.
           </p>
         </div>
       </div>
