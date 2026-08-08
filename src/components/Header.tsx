@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Compass, Target, BookOpen, Gem, Search, Info, Copy, Check, ShieldCheck, Map, Sparkles, Scroll, Swords, Activity } from 'lucide-react';
+import { Compass, Target, BookOpen, Gem, Search, Info, Copy, Check, ShieldCheck, Map, Sparkles, Scroll, Swords, Activity, Package, Trophy, Gamepad2 } from 'lucide-react';
 import { WorldClockWidget } from './WorldClockWidget';
 
 interface HeaderProps {
@@ -30,6 +30,10 @@ export const Header: React.FC<HeaderProps> = ({
     { id: 'calculator', label: 'Calculador Captura', icon: Target, color: 'indigo' },
     { id: 'pokedex', label: 'Pokédex', icon: BookOpen, color: 'sky' },
     { id: 'drops', label: 'Drops', icon: Gem, color: 'amber' },
+    { id: 'helditems', label: 'Objetos & Bayas', icon: Package, color: 'amber' },
+    { id: 'typematrix', label: 'Matriz de Tipos', icon: Target, color: 'cyan' },
+    { id: 'tierlist', label: 'Tier List PvP', icon: Trophy, color: 'purple' },
+    { id: 'quiz', label: 'PokéQuiz', icon: Gamepad2, color: 'amber' },
     { id: 'biomes', label: 'Biomas 1.21.1', icon: Map, color: 'emerald' },
     { id: 'shinies', label: 'Shiny Hunting', icon: Sparkles, color: 'amber' },
     { id: 'moves', label: 'MTs & Movs', icon: Scroll, color: 'purple' },

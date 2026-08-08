@@ -9,6 +9,10 @@ import { ShinyHunterView } from './components/ShinyHunterView';
 import { MovesCompendiumView } from './components/MovesCompendiumView';
 import { BossCountersView } from './components/BossCountersView';
 import { EvTrainingView } from './components/EvTrainingView';
+import { HeldItemsView } from './components/HeldItemsView';
+import { TypeMatrixView } from './components/TypeMatrixView';
+import { TierListView } from './components/TierListView';
+import { PokeQuizView } from './components/PokeQuizView';
 import { DiosesmonInfoModal } from './components/DiosesmonInfoModal';
 import { CommandPaletteModal } from './components/CommandPaletteModal';
 import { PwaInstallPrompt } from './components/PwaInstallPrompt';
@@ -93,6 +97,22 @@ export function App() {
 
           {activeTab === 'drops' && (
             <DropsView />
+          )}
+
+          {activeTab === 'helditems' && (
+            <HeldItemsView />
+          )}
+
+          {activeTab === 'typematrix' && (
+            <TypeMatrixView />
+          )}
+
+          {activeTab === 'tierlist' && (
+            <TierListView />
+          )}
+
+          {activeTab === 'quiz' && (
+            <PokeQuizView />
           )}
 
           {activeTab === 'biomes' && (

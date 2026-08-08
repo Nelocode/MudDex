@@ -225,3 +225,46 @@ export interface EvSpot {
   }[];
   powerItemName: string;
 }
+
+// 7. Held Items & Berries Interface
+export interface HeldItemInfo {
+  id: string;
+  name: string;
+  category: 'competitive' | 'berry' | 'evolution' | 'utility';
+  icon: string;
+  description: string;
+  battleEffect: string;
+  howToObtain: string;
+}
+
+// 9. Type Effectiveness Result
+export interface TypeEffectivenessResult {
+  weaknesses4x: PokemonType[];
+  weaknesses2x: PokemonType[];
+  normal1x: PokemonType[];
+  resistances05x: PokemonType[];
+  resistances025x: PokemonType[];
+  immunities0x: PokemonType[];
+}
+
+// 11. Competitive Tier List Item
+export interface CompetitiveTierItem {
+  pokemonId: string;
+  pokemonName: string;
+  tier: 'S+' | 'S' | 'A' | 'B';
+  role: 'Physical Sweeper' | 'Special Sweeper' | 'Physical Wall' | 'Special Wall' | 'Lead Hazard' | 'Support';
+  types: PokemonType[];
+  recommendedItem: string;
+  recommendedNature: string;
+  keyMoves: string[];
+  description: string;
+}
+
+// 12. PokéQuiz Question
+export interface PokeQuizQuestion {
+  pokemonId: string;
+  pokemonName: string;
+  spriteUrl: string;
+  audioCryUrl: string;
+  options: string[]; // 4 names
+}
