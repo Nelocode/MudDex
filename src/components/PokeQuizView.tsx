@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Gamepad2, Sparkles, Volume2, Trophy, RefreshCw, CheckCircle, XCircle } from 'lucide-react';
+import { Gamepad2, Volume2, RefreshCw, CheckCircle, XCircle } from 'lucide-react';
 import { COBBLEMON_POKEDEX } from '../data/cobblemonPokedex';
 import { Pokemon } from '../types/diosesmon';
 
@@ -78,31 +78,31 @@ export const PokeQuizView: React.FC = () => {
     <div className="space-y-6">
       
       {/* Banner */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 via-slate-900/90 to-amber-950/40 border border-slate-800 p-6 sm:p-8">
-        <div className="absolute top-0 right-0 -translate-y-12 translate-x-12 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-zinc-900 via-zinc-900/90 to-red-950/40 border border-zinc-800 p-6 sm:p-8">
+        <div className="absolute top-0 right-0 -translate-y-12 translate-x-12 w-64 h-64 bg-red-600/10 rounded-full blur-3xl pointer-events-none" />
         <div className="relative z-10 max-w-3xl space-y-3">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-semibold">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-600/10 border border-red-500/30 text-red-400 text-xs font-semibold">
             <Gamepad2 className="w-3.5 h-3.5" />
             <span>Minijuego Interactivo • Diosesmon Dex</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
             ¿Quién es este Pokémon? (PokéQuiz)
           </h1>
-          <p className="text-sm text-slate-300 leading-relaxed">
+          <p className="text-sm text-zinc-300 leading-relaxed">
             Pon a prueba tus conocimientos sobre los 1,025 Pokémon adivinando la silueta oculta o identificando su rugido de audio.
           </p>
         </div>
       </div>
 
       {/* Mode Selector & Score Dashboard */}
-      <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div className="bg-zinc-900/90 border border-zinc-800 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="flex items-center gap-2">
           <button
             onClick={() => setMode('silhouette')}
             className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border ${
               mode === 'silhouette'
-                ? 'bg-amber-500 text-slate-950 border-amber-400 font-extrabold shadow-md shadow-amber-500/20'
-                : 'bg-slate-950 text-slate-400 border-slate-800 hover:text-white'
+                ? 'bg-red-600 text-white border-red-500 font-extrabold shadow-md shadow-red-600/20'
+                : 'bg-zinc-950 text-zinc-400 border-zinc-800 hover:text-white'
             }`}
           >
             🕶️ Modo Silueta
@@ -111,8 +111,8 @@ export const PokeQuizView: React.FC = () => {
             onClick={() => setMode('cry')}
             className={`px-4 py-2 rounded-xl text-xs font-bold transition-all border ${
               mode === 'cry'
-                ? 'bg-amber-500 text-slate-950 border-amber-400 font-extrabold shadow-md shadow-amber-500/20'
-                : 'bg-slate-950 text-slate-400 border-slate-800 hover:text-white'
+                ? 'bg-red-600 text-white border-red-500 font-extrabold shadow-md shadow-red-600/20'
+                : 'bg-zinc-950 text-zinc-400 border-zinc-800 hover:text-white'
             }`}
           >
             🔊 Modo Grito de Audio
@@ -121,31 +121,31 @@ export const PokeQuizView: React.FC = () => {
 
         {/* Score & Streak Counters */}
         <div className="flex items-center gap-4 font-mono text-xs">
-          <div className="bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800">
-            <span className="text-slate-500">Puntos:</span> <strong className="text-amber-400 text-sm font-bold">{score}</strong>
+          <div className="bg-zinc-950 px-3 py-1.5 rounded-xl border border-zinc-800">
+            <span className="text-zinc-500">Puntos:</span> <strong className="text-amber-400 text-sm font-bold">{score}</strong>
           </div>
-          <div className="bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800">
-            <span className="text-slate-500">Racha:</span> <strong className="text-emerald-400 text-sm font-bold">🔥 {streak}</strong>
+          <div className="bg-zinc-950 px-3 py-1.5 rounded-xl border border-zinc-800">
+            <span className="text-zinc-500">Racha:</span> <strong className="text-emerald-400 text-sm font-bold">🔥 {streak}</strong>
           </div>
-          <div className="bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800 hidden sm:block">
-            <span className="text-slate-500">Máx Racha:</span> <strong className="text-sky-400 text-sm font-bold">{maxStreak}</strong>
+          <div className="bg-zinc-950 px-3 py-1.5 rounded-xl border border-zinc-800 hidden sm:block">
+            <span className="text-zinc-500">Máx Racha:</span> <strong className="text-amber-400 text-sm font-bold">{maxStreak}</strong>
           </div>
         </div>
       </div>
 
       {/* Quiz Card Box */}
       {targetPokemon && (
-        <div className="bg-slate-900/80 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6 shadow-2xl relative overflow-hidden max-w-2xl mx-auto text-center">
+        <div className="bg-zinc-900/80 border border-zinc-800 rounded-3xl p-6 sm:p-8 space-y-6 shadow-2xl relative overflow-hidden max-w-2xl mx-auto text-center">
           
           {/* Target Display Canvas */}
-          <div className="w-full h-52 bg-slate-950 rounded-2xl border border-slate-800/80 flex flex-col items-center justify-center p-4 relative group">
+          <div className="w-full h-52 bg-zinc-950 rounded-2xl border border-zinc-800/80 flex flex-col items-center justify-center p-4 relative group">
             
             {mode === 'cry' && selectedAnswer === null ? (
               <button
                 onClick={() => playAudio(targetPokemon.audioCryUrl)}
-                className="flex flex-col items-center gap-3 text-cyan-400 hover:text-cyan-300 transition-colors p-4"
+                className="flex flex-col items-center gap-3 text-red-400 hover:text-red-300 transition-colors p-4"
               >
-                <div className="w-16 h-16 rounded-full bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center animate-bounce">
+                <div className="w-16 h-16 rounded-full bg-red-600/10 border border-red-500/30 flex items-center justify-center animate-bounce">
                   <Volume2 className="w-8 h-8" />
                 </div>
                 <span className="text-xs font-bold font-mono">Pulsa para reproducir el rugido 🔊</span>
@@ -163,7 +163,7 @@ export const PokeQuizView: React.FC = () => {
             )}
 
             {selectedAnswer !== null && (
-              <span className="absolute bottom-3 text-xs font-mono font-bold text-slate-400">
+              <span className="absolute bottom-3 text-xs font-mono font-bold text-zinc-400">
                 #{String(targetPokemon.dexNumber).padStart(3, '0')} - {targetPokemon.name}
               </span>
             )}
@@ -175,7 +175,7 @@ export const PokeQuizView: React.FC = () => {
               const isSelected = selectedAnswer === option.id;
               const isCorrectTarget = option.id === targetPokemon.id;
 
-              let btnStyle = 'bg-slate-950 text-slate-200 border-slate-800 hover:border-amber-500/50 hover:bg-slate-900';
+              let btnStyle = 'bg-zinc-950 text-zinc-200 border-zinc-800 hover:border-red-500/50 hover:bg-zinc-900';
 
               if (selectedAnswer !== null) {
                 if (isCorrectTarget) {
@@ -183,7 +183,7 @@ export const PokeQuizView: React.FC = () => {
                 } else if (isSelected && !isCorrectTarget) {
                   btnStyle = 'bg-rose-500/20 text-rose-300 border-rose-500 font-bold';
                 } else {
-                  btnStyle = 'bg-slate-950/40 text-slate-600 border-slate-900 opacity-50';
+                  btnStyle = 'bg-zinc-950/40 text-zinc-600 border-zinc-900 opacity-50';
                 }
               }
 
@@ -207,7 +207,7 @@ export const PokeQuizView: React.FC = () => {
             <div className="pt-2 animate-in fade-in duration-200">
               <button
                 onClick={generateQuestion}
-                className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold text-sm shadow-lg shadow-amber-500/20 transition-all flex items-center justify-center gap-2"
+                className="w-full py-3 rounded-xl bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-extrabold text-sm shadow-lg shadow-red-600/20 transition-all flex items-center justify-center gap-2"
               >
                 <span>Siguiente Pokémon</span>
                 <RefreshCw className="w-4 h-4" />

@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { ShieldCheck, Copy, Check, ExternalLink, Terminal, Cpu, Sparkles } from 'lucide-react';
+import React from 'react';
+import { X, Server, ShieldCheck, Copy, Check, ExternalLink, Cpu, HardDrive } from 'lucide-react';
+import { SERVER_IP } from './Header';
 
 interface DiosesmonInfoModalProps {
   isOpen: boolean;
@@ -7,8 +8,7 @@ interface DiosesmonInfoModalProps {
 }
 
 export const DiosesmonInfoModal: React.FC<DiosesmonInfoModalProps> = ({ isOpen, onClose }) => {
-  const [copied, setCopied] = useState(false);
-  const SERVER_IP = 'mc.diosesmon.net';
+  const [copied, setCopied] = React.useState(false);
 
   if (!isOpen) return null;
 
@@ -19,38 +19,38 @@ export const DiosesmonInfoModal: React.FC<DiosesmonInfoModalProps> = ({ isOpen, 
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="w-full max-w-xl bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-6 shadow-2xl relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-48 h-48 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/85 backdrop-blur-md animate-in fade-in duration-200">
+      <div className="w-full max-w-xl bg-zinc-900 border border-zinc-800 rounded-3xl p-6 sm:p-8 space-y-6 shadow-2xl relative overflow-hidden">
+        
+        <div className="absolute top-0 right-0 w-48 h-48 bg-red-600/10 rounded-full blur-3xl pointer-events-none" />
 
-        {/* Header */}
-        <div className="flex items-start justify-between">
+        <div className="flex items-center justify-between border-b border-zinc-800 pb-4 relative z-10">
           <div className="flex items-center gap-3">
-            <div className="p-3 rounded-2xl bg-cyan-500/15 border border-cyan-500/30 text-cyan-400">
-              <Sparkles className="w-6 h-6" />
+            <div className="p-3 rounded-2xl bg-red-600/15 border border-red-500/30 text-red-400">
+              <Server className="w-6 h-6" />
             </div>
             <div>
-              <h2 className="text-xl font-extrabold text-white">Servidor Diosesmon PRO</h2>
-              <p className="text-xs text-slate-400">Cobblemon 1.7.3 • Minecraft 1.21.1 Fabric</p>
+              <h3 className="text-xl font-bold text-white">Servidor Diosesmon</h3>
+              <p className="text-xs text-zinc-400 font-mono">Fabric 1.21.1 • Cobblemon 1.7.3</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="text-slate-500 hover:text-slate-300 text-sm font-bold p-1"
+            className="p-2 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-400 hover:text-white transition-colors"
           >
-            ✕
+            <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* IP Copy Section */}
-        <div className="bg-slate-950 border border-slate-800 rounded-2xl p-4 flex items-center justify-between gap-4">
-          <div>
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Dirección IP de Conexión</span>
-            <span className="text-base font-extrabold text-cyan-300 font-mono">{SERVER_IP}</span>
+        {/* Server IP Card */}
+        <div className="bg-zinc-950 border border-zinc-800 rounded-2xl p-4 flex items-center justify-between gap-4">
+          <div className="space-y-0.5">
+            <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider block">Dirección IP Oficial:</span>
+            <span className="text-base font-extrabold text-red-400 font-mono">{SERVER_IP}</span>
           </div>
           <button
             onClick={handleCopyIp}
-            className="px-4 py-2 rounded-xl bg-cyan-500 text-slate-950 font-extrabold text-xs flex items-center gap-2 hover:bg-cyan-400 transition-colors shadow-lg shadow-cyan-500/20 active:scale-95"
+            className="px-4 py-2 rounded-xl bg-red-600 text-white font-extrabold text-xs flex items-center gap-2 hover:bg-red-500 transition-colors shadow-lg shadow-red-600/20 active:scale-95"
           >
             {copied ? (
               <>
@@ -66,50 +66,28 @@ export const DiosesmonInfoModal: React.FC<DiosesmonInfoModalProps> = ({ isOpen, 
           </button>
         </div>
 
-        {/* Server Features */}
-        <div className="space-y-3 text-xs">
-          <h3 className="font-extrabold text-slate-300 uppercase text-[11px] tracking-wider">
-            Mecánicas y Funciones de Diosesmon
-          </h3>
-          <div className="grid grid-cols-2 gap-2.5">
-            <div className="bg-slate-950/80 p-3 rounded-xl border border-slate-800/80 space-y-1">
-              <span className="font-bold text-cyan-400 block">⚔️ Torneos & Gimnasios</span>
-              <span className="text-slate-400 text-[11px]">Sistema de medallas, líderes y eventos semanales.</span>
-            </div>
-            <div className="bg-slate-950/80 p-3 rounded-xl border border-slate-800/80 space-y-1">
-              <span className="font-bold text-indigo-400 block">🧬 Crianza & IVs</span>
-              <span className="text-slate-400 text-[11px]">Mecánica de pastel y compatibilidad de grupos huevo.</span>
-            </div>
-            <div className="bg-slate-950/80 p-3 rounded-xl border border-slate-800/80 space-y-1">
-              <span className="font-bold text-emerald-400 block">💰 Economía & Tiendas</span>
-              <span className="text-slate-400 text-[11px]">Mercado entre jugadores y trabajos del servidor.</span>
-            </div>
-            <div className="bg-slate-950/80 p-3 rounded-xl border border-slate-800/80 space-y-1">
-              <span className="font-bold text-amber-400 block">👑 Pokémon Alphas</span>
-              <span className="text-slate-400 text-[11px]">Apariciones especiales de tamaño gigante y stats mejorados.</span>
-            </div>
+        {/* Features List */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+          <div className="bg-zinc-950/60 border border-zinc-800/80 rounded-xl p-3.5 space-y-1">
+            <span className="font-bold text-red-400 block">⚔️ Torneos & Gimnasios</span>
+            <p className="text-zinc-400 leading-relaxed">Sistema de Líderes de Gimnasio activos y torneos semanales con recompensas.</p>
+          </div>
+          <div className="bg-zinc-950/60 border border-zinc-800/80 rounded-xl p-3.5 space-y-1">
+            <span className="font-bold text-amber-400 block">🧬 Crianza & IVs</span>
+            <p className="text-zinc-400 leading-relaxed">Mecánicas de crianza activas con herencia de IVs mediante Lazo Destino.</p>
           </div>
         </div>
 
-        {/* Commands Reference */}
-        <div className="bg-slate-950 border border-slate-800 rounded-2xl p-4 space-y-2 text-xs font-mono">
-          <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block font-sans">
-            Comandos Útiles en el Servidor
-          </span>
-          <div className="space-y-1 text-slate-300">
-            <div><strong className="text-cyan-400">/spawn</strong> - Regresa al Spawn principal</div>
-            <div><strong className="text-cyan-400">/pokedex</strong> - Abre tu Pokédex en el juego</div>
-            <div><strong className="text-cyan-400">/pc</strong> - Abre tu PC de almacenamiento remoto</div>
+        {/* Essential Commands */}
+        <div className="space-y-2 bg-zinc-950 p-4 rounded-2xl border border-zinc-800 text-xs font-mono">
+          <span className="text-[10px] font-bold uppercase text-zinc-500 tracking-wider block">Comandos Esenciales en el Servidor:</span>
+          <div className="space-y-1 text-zinc-300">
+            <div><strong className="text-red-400">/spawn</strong> - Regresa al Spawn principal</div>
+            <div><strong className="text-red-400">/pokedex</strong> - Abre tu Pokédex en el juego</div>
+            <div><strong className="text-red-400">/pc</strong> - Abre tu PC de almacenamiento remoto</div>
+            <div><strong className="text-red-400">/checkspawns</strong> - Consulta probabilidades de aparición actuales</div>
           </div>
         </div>
-
-        {/* Close Button */}
-        <button
-          onClick={onClose}
-          className="w-full py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs transition-colors"
-        >
-          Cerrar
-        </button>
 
       </div>
     </div>

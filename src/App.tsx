@@ -55,7 +55,7 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-cyan-500 selection:text-slate-950 flex flex-col justify-between">
+    <div className="min-h-screen bg-zinc-950 text-zinc-100 font-sans selection:bg-red-600 selection:text-white flex flex-col justify-between">
       
       {/* Background Decorative Pure Neutral Ambient Glows */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
@@ -149,19 +149,19 @@ export function App() {
               className="h-16 w-auto object-contain drop-shadow-xl hover:scale-105 transition-transform duration-300"
             />
             <div className="flex items-center gap-2">
-              <span className="font-extrabold text-lg tracking-tight bg-gradient-to-r from-cyan-400 via-sky-300 to-indigo-300 bg-clip-text text-transparent">
-                Diosesmon Dex
+              <span className="font-extrabold text-lg tracking-tight text-white">
+                Diosesmon <span className="text-red-500">Dex</span>
               </span>
-              <span className="px-2 py-0.5 text-[10px] font-bold rounded-md bg-cyan-500/10 text-cyan-400 border border-cyan-500/30">
+              <span className="px-2 py-0.5 text-[10px] font-bold rounded-md bg-red-600 text-white border border-red-500">
                 PRO 1.7.3
               </span>
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-slate-400">
+          <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-zinc-400">
             <button
               onClick={() => setIsInfoModalOpen(true)}
-              className="hover:text-cyan-300 transition-colors flex items-center gap-1 font-semibold"
+              className="hover:text-red-400 transition-colors flex items-center gap-1 font-semibold"
             >
               <ShieldCheck className="w-4 h-4 text-emerald-400" /> Servidor Oficial: mc.diosesmon.net
             </button>

@@ -13,28 +13,28 @@ export const TypeMatrixView: React.FC = () => {
     <div className="space-y-6">
       
       {/* Banner */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 via-slate-900/90 to-cyan-950/40 border border-slate-800 p-6 sm:p-8">
-        <div className="absolute top-0 right-0 -translate-y-12 translate-x-12 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-zinc-900 via-zinc-900/90 to-red-950/40 border border-zinc-800 p-6 sm:p-8">
+        <div className="absolute top-0 right-0 -translate-y-12 translate-x-12 w-64 h-64 bg-red-600/10 rounded-full blur-3xl pointer-events-none" />
         <div className="relative z-10 max-w-3xl space-y-3">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-semibold">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-600/10 border border-red-500/30 text-red-400 text-xs font-semibold">
             <Target className="w-3.5 h-3.5" />
             <span>Matriz de Tipos 18x18 • Diosesmon</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
             Calculadora de Debilidades & Resistencias de Tipos
           </h1>
-          <p className="text-sm text-slate-300 leading-relaxed">
+          <p className="text-sm text-zinc-300 leading-relaxed">
             Selecciona el tipo individual o combinación de doble tipo de tu Pokémon para calcular al instante sus debilidades (4x, 2x), resistencias (0.5x, 0.25x) e inmunidades (0x).
           </p>
         </div>
       </div>
 
       {/* Selectors */}
-      <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 space-y-4 backdrop-blur-md">
+      <div className="bg-zinc-900/90 border border-zinc-800 rounded-2xl p-5 space-y-4 backdrop-blur-md">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {/* Primary Type */}
           <div className="space-y-1.5">
-            <label className="block text-xs font-bold uppercase text-slate-400">Tipo Primario:</label>
+            <label className="block text-xs font-bold uppercase text-zinc-400">Tipo Primario:</label>
             <div className="grid grid-cols-3 sm:grid-cols-6 gap-1.5">
               {ALL_TYPES.map(t => (
                 <button
@@ -42,8 +42,8 @@ export const TypeMatrixView: React.FC = () => {
                   onClick={() => setType1(t)}
                   className={`py-1.5 text-xs font-bold uppercase rounded-lg border transition-all ${
                     type1 === t
-                      ? 'bg-cyan-500 text-slate-950 border-cyan-400 font-extrabold shadow-md shadow-cyan-500/20'
-                      : 'bg-slate-950 text-slate-400 border-slate-800 hover:text-white'
+                      ? 'bg-red-600 text-white border-red-500 font-extrabold shadow-md shadow-red-600/20'
+                      : 'bg-zinc-950 text-zinc-400 border-zinc-800 hover:text-white'
                   }`}
                 >
                   {t}
@@ -54,14 +54,14 @@ export const TypeMatrixView: React.FC = () => {
 
           {/* Secondary Type */}
           <div className="space-y-1.5">
-            <label className="block text-xs font-bold uppercase text-slate-400">Tipo Secundario (Opcional):</label>
+            <label className="block text-xs font-bold uppercase text-zinc-400">Tipo Secundario (Opcional):</label>
             <div className="grid grid-cols-3 sm:grid-cols-6 gap-1.5">
               <button
                 onClick={() => setType2('none')}
                 className={`py-1.5 text-xs font-bold uppercase rounded-lg border transition-all ${
                   type2 === 'none'
-                    ? 'bg-slate-800 text-white border-slate-600'
-                    : 'bg-slate-950 text-slate-500 border-slate-800'
+                    ? 'bg-zinc-800 text-white border-zinc-600'
+                    : 'bg-zinc-950 text-zinc-500 border-zinc-800'
                 }`}
               >
                 Ninguno
@@ -72,8 +72,8 @@ export const TypeMatrixView: React.FC = () => {
                   onClick={() => setType2(t)}
                   className={`py-1.5 text-xs font-bold uppercase rounded-lg border transition-all ${
                     type2 === t
-                      ? 'bg-indigo-500 text-white border-indigo-400 font-extrabold shadow-md shadow-indigo-500/20'
-                      : 'bg-slate-950 text-slate-400 border-slate-800 hover:text-white'
+                      ? 'bg-red-600 text-white border-red-500 font-extrabold shadow-md shadow-red-600/20'
+                      : 'bg-zinc-950 text-zinc-400 border-zinc-800 hover:text-white'
                   }`}
                 >
                   {t}
@@ -85,14 +85,14 @@ export const TypeMatrixView: React.FC = () => {
       </div>
 
       {/* Target Combination Display */}
-      <div className="flex items-center gap-3 bg-slate-900 border border-slate-800 rounded-2xl p-4">
-        <span className="text-xs font-bold text-slate-400 uppercase">Combinación Evaluada:</span>
+      <div className="flex items-center gap-3 bg-zinc-900 border border-zinc-800 rounded-2xl p-4">
+        <span className="text-xs font-bold text-zinc-400 uppercase">Combinación Evaluada:</span>
         <div className="flex items-center gap-2">
-          <span className="px-3 py-1 text-xs font-extrabold uppercase rounded-lg bg-cyan-500/20 text-cyan-300 border border-cyan-500/40">
+          <span className="px-3 py-1 text-xs font-extrabold uppercase rounded-lg bg-red-600/20 text-red-300 border border-red-500/40">
             {type1}
           </span>
           {type2 !== 'none' && type2 !== type1 && (
-            <span className="px-3 py-1 text-xs font-extrabold uppercase rounded-lg bg-indigo-500/20 text-indigo-300 border border-indigo-500/40">
+            <span className="px-3 py-1 text-xs font-extrabold uppercase rounded-lg bg-red-600/20 text-red-300 border border-red-500/40">
               {type2}
             </span>
           )}
@@ -103,7 +103,7 @@ export const TypeMatrixView: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         
         {/* 4x & 2x Weaknesses */}
-        <div className="bg-slate-900/80 border border-rose-500/30 rounded-2xl p-5 space-y-3">
+        <div className="bg-zinc-900/80 border border-rose-500/30 rounded-2xl p-5 space-y-3">
           <h3 className="text-xs font-extrabold uppercase text-rose-400 tracking-wider flex items-center gap-1.5">
             🚨 Debilidades (Daño Recibido 4x y 2x):
           </h3>
@@ -133,13 +133,13 @@ export const TypeMatrixView: React.FC = () => {
               </div>
             )}
             {result.weaknesses4x.length === 0 && result.weaknesses2x.length === 0 && (
-              <p className="text-xs text-slate-500 font-mono">¡Sin debilidades!</p>
+              <p className="text-xs text-zinc-500 font-mono">¡Sin debilidades!</p>
             )}
           </div>
         </div>
 
         {/* Resistances 0.5x & 0.25x */}
-        <div className="bg-slate-900/80 border border-emerald-500/30 rounded-2xl p-5 space-y-3">
+        <div className="bg-zinc-900/80 border border-emerald-500/30 rounded-2xl p-5 space-y-3">
           <h3 className="text-xs font-extrabold uppercase text-emerald-400 tracking-wider flex items-center gap-1.5">
             🛡️ Resistencias (Daño Recibido 0.5x y 0.25x):
           </h3>
@@ -169,25 +169,25 @@ export const TypeMatrixView: React.FC = () => {
               </div>
             )}
             {result.resistances05x.length === 0 && result.resistances025x.length === 0 && (
-              <p className="text-xs text-slate-500 font-mono">Sin resistencias especiales.</p>
+              <p className="text-xs text-zinc-500 font-mono">Sin resistencias especiales.</p>
             )}
           </div>
         </div>
 
         {/* Immunities 0x */}
-        <div className="bg-slate-900/80 border border-sky-500/30 rounded-2xl p-5 space-y-3">
-          <h3 className="text-xs font-extrabold uppercase text-sky-400 tracking-wider flex items-center gap-1.5">
+        <div className="bg-zinc-900/80 border border-amber-500/30 rounded-2xl p-5 space-y-3">
+          <h3 className="text-xs font-extrabold uppercase text-amber-400 tracking-wider flex items-center gap-1.5">
             ✨ Inmunidades (Daño Recibido 0x):
           </h3>
           <div className="flex flex-wrap gap-1.5">
             {result.immunities0x.length > 0 ? (
               result.immunities0x.map(t => (
-                <span key={t} className="px-2.5 py-1 text-xs font-extrabold uppercase rounded-lg bg-sky-500/20 text-sky-300 border border-sky-500/50">
+                <span key={t} className="px-2.5 py-1 text-xs font-extrabold uppercase rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/50">
                   {t} 0x (Inmune)
                 </span>
               ))
             ) : (
-              <p className="text-xs text-slate-500 font-mono">Sin inmunidades de tipo.</p>
+              <p className="text-xs text-zinc-500 font-mono">Sin inmunidades de tipo.</p>
             )}
           </div>
         </div>

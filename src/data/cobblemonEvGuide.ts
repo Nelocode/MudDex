@@ -53,7 +53,7 @@ export const COBBLEMON_EV_SPOTS: EvSpot[] = [
     stat: 'defense',
     statNameEs: 'Defensa Física (DEF)',
     icon: '🛡️',
-    color: 'from-sky-500/20 border-sky-500/40 text-sky-400',
+    color: 'from-emerald-500/20 border-emerald-500/40 text-emerald-400',
     powerItemName: 'Cinto Recio (+8 DEF por victoria)',
     bestTargets: [
       { pokemonId: 'tinkaton', pokemonName: 'Tinkaton', evYield: 2, biome: 'Stony Peaks', spawnTime: 'Día' },
@@ -65,7 +65,7 @@ export const COBBLEMON_EV_SPOTS: EvSpot[] = [
     stat: 'specialDefense',
     statNameEs: 'Defensa Especial (SPD)',
     icon: '✨',
-    color: 'from-indigo-500/20 border-indigo-500/40 text-indigo-400',
+    color: 'from-purple-500/20 border-purple-500/40 text-purple-400',
     powerItemName: 'Banda Recia (+8 SPD por victoria)',
     bestTargets: [
       { pokemonId: 'sylveon', pokemonName: 'Sylveon', evYield: 2, biome: 'Meadow', spawnTime: 'Día' },

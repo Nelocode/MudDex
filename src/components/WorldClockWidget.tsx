@@ -20,18 +20,18 @@ export const WorldClockWidget: React.FC = () => {
   const formattedTime = `${String(mcHour).padStart(2, '0')}:${String(mcMinute).padStart(2, '0')}`;
 
   return (
-    <div className="flex items-center gap-2 bg-slate-950/80 border border-slate-800 rounded-xl px-3 py-1.5 text-xs font-mono shadow-inner">
+    <div className="flex items-center gap-2 bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-1.5 text-xs font-mono shadow-inner">
       <div className="flex items-center gap-1.5">
         {isNight ? (
-          <Moon className="w-3.5 h-3.5 text-indigo-400 animate-pulse" />
+          <Moon className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
         ) : (
           <Sun className="w-3.5 h-3.5 text-amber-400 animate-spin-slow" />
         )}
-        <span className="font-bold text-slate-200">{formattedTime}</span>
-        <span className="text-[10px] text-slate-500 hidden sm:inline">({isNight ? 'Noche' : 'Día'})</span>
+        <span className="font-bold text-zinc-200">{formattedTime}</span>
+        <span className="text-[10px] text-zinc-500 hidden sm:inline">({isNight ? 'Noche' : 'Día'})</span>
       </div>
 
-      <div className="h-3 w-px bg-slate-800" />
+      <div className="h-3 w-px bg-zinc-800" />
 
       <button
         onClick={() => {
@@ -39,11 +39,11 @@ export const WorldClockWidget: React.FC = () => {
           else if (weather === 'rain') setWeather('thunder');
           else setWeather('clear');
         }}
-        className="flex items-center gap-1 text-[11px] font-bold text-slate-300 hover:text-cyan-300 transition-colors"
+        className="flex items-center gap-1 text-[11px] font-bold text-zinc-300 hover:text-white transition-colors"
         title="Haz clic para simular el clima"
       >
         {weather === 'clear' && <span className="text-amber-400">☀️ Despejado</span>}
-        {weather === 'rain' && <span className="text-sky-400">🌧️ Lluvia</span>}
+        {weather === 'rain' && <span className="text-emerald-400">🌧️ Lluvia</span>}
         {weather === 'thunder' && <span className="text-purple-400">⚡ Tormenta</span>}
       </button>
     </div>

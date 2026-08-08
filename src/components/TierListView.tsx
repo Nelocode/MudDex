@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Trophy, Award, Shield, Zap, Search } from 'lucide-react';
+import { Trophy, Search } from 'lucide-react';
 import { COBBLEMON_TIER_LIST } from '../data/cobblemonTierList';
 
 export const TierListView: React.FC = () => {
@@ -20,13 +20,13 @@ export const TierListView: React.FC = () => {
   const getTierBadge = (tier: string) => {
     switch (tier) {
       case 'S+':
-        return <span className="px-3 py-1 text-xs font-black uppercase rounded-xl bg-amber-500 text-slate-950 shadow-md shadow-amber-500/30">S+ Tier</span>;
+        return <span className="px-3 py-1 text-xs font-black uppercase rounded-xl bg-amber-500 text-zinc-950 shadow-md shadow-amber-500/30">S+ Tier</span>;
       case 'S':
         return <span className="px-3 py-1 text-xs font-bold uppercase rounded-xl bg-purple-500/20 text-purple-300 border border-purple-500/40">S Tier</span>;
       case 'A':
-        return <span className="px-3 py-1 text-xs font-bold uppercase rounded-xl bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">A Tier</span>;
+        return <span className="px-3 py-1 text-xs font-bold uppercase rounded-xl bg-red-500/20 text-red-300 border border-red-500/30">A Tier</span>;
       default:
-        return <span className="px-3 py-1 text-xs font-bold uppercase rounded-xl bg-slate-800 text-slate-400">B Tier</span>;
+        return <span className="px-3 py-1 text-xs font-bold uppercase rounded-xl bg-zinc-800 text-zinc-400">B Tier</span>;
     }
   };
 
@@ -34,7 +34,7 @@ export const TierListView: React.FC = () => {
     <div className="space-y-6">
       
       {/* Banner */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 via-slate-900/90 to-purple-950/40 border border-slate-800 p-6 sm:p-8">
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-zinc-900 via-zinc-900/90 to-purple-950/40 border border-zinc-800 p-6 sm:p-8">
         <div className="absolute top-0 right-0 -translate-y-12 translate-x-12 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="relative z-10 max-w-3xl space-y-3">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/30 text-purple-400 text-xs font-semibold">
@@ -44,22 +44,22 @@ export const TierListView: React.FC = () => {
           <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
             Tier List & Roles de Batalla Competitivos
           </h1>
-          <p className="text-sm text-slate-300 leading-relaxed">
+          <p className="text-sm text-zinc-300 leading-relaxed">
             Clasificación oficial de los mejores Pokémon para PvP/PvE en Diosesmon: movsets recomendados, naturalezas e ítems de equipamiento.
           </p>
         </div>
       </div>
 
       {/* Filter Bar */}
-      <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 space-y-3">
+      <div className="bg-zinc-900/90 border border-zinc-800 rounded-2xl p-4 space-y-3">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
           <input
             type="text"
             placeholder="Buscar por Pokémon o rol (ej: Mewtwo, Garchomp, Sweeper, Tank)..."
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
-            className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-4 py-2.5 text-xs sm:text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-purple-500 transition-colors"
+            className="w-full bg-zinc-950 border border-zinc-800 rounded-xl pl-9 pr-4 py-2.5 text-xs sm:text-sm text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-purple-500 transition-colors"
           />
         </div>
 
@@ -71,7 +71,7 @@ export const TierListView: React.FC = () => {
               className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
                 selectedTier === tier
                   ? 'bg-purple-500 text-white font-bold shadow-md shadow-purple-500/30'
-                  : 'bg-slate-950 text-slate-400 hover:text-slate-200 border border-slate-800'
+                  : 'bg-zinc-950 text-zinc-400 hover:text-zinc-200 border border-zinc-800'
               }`}
             >
               {tier === 'all' ? 'Todas las Tiers' : `Tier ${tier}`}
@@ -85,10 +85,10 @@ export const TierListView: React.FC = () => {
         {filteredTiers.map(item => (
           <div
             key={item.pokemonId}
-            className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 space-y-3 shadow-lg hover:border-purple-500/40 transition-all flex flex-col justify-between"
+            className="bg-zinc-900/80 border border-zinc-800 rounded-2xl p-5 space-y-3 shadow-lg hover:border-purple-500/40 transition-all flex flex-col justify-between"
           >
             <div className="space-y-3">
-              <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
                 <div>
                   <h3 className="text-base font-extrabold text-white">{item.pokemonName}</h3>
                   <span className="text-xs text-purple-400 font-mono font-bold block">{item.role}</span>
@@ -96,18 +96,18 @@ export const TierListView: React.FC = () => {
                 {getTierBadge(item.tier)}
               </div>
 
-              <p className="text-xs text-slate-300 leading-relaxed">
+              <p className="text-xs text-zinc-300 leading-relaxed">
                 {item.description}
               </p>
 
-              <div className="bg-slate-950 border border-slate-800 rounded-xl p-3 space-y-1.5 text-xs">
-                <div><span className="text-slate-500">Naturaleza:</span> <strong className="text-slate-200">{item.recommendedNature}</strong></div>
-                <div><span className="text-slate-500">Objeto:</span> <strong className="text-amber-400">{item.recommendedItem}</strong></div>
+              <div className="bg-zinc-950 border border-zinc-800 rounded-xl p-3 space-y-1.5 text-xs">
+                <div><span className="text-zinc-500">Naturaleza:</span> <strong className="text-zinc-200">{item.recommendedNature}</strong></div>
+                <div><span className="text-zinc-500">Objeto:</span> <strong className="text-amber-400">{item.recommendedItem}</strong></div>
                 <div>
-                  <span className="text-slate-500 block mb-1">Movimientos Recomendados:</span>
+                  <span className="text-zinc-500 block mb-1">Movimientos Recomendados:</span>
                   <div className="flex flex-wrap gap-1">
                     {item.keyMoves.map(m => (
-                      <span key={m} className="px-2 py-0.5 rounded bg-slate-900 border border-slate-800 text-[11px] text-cyan-300">
+                      <span key={m} className="px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-[11px] text-zinc-300">
                         {m}
                       </span>
                     ))}
