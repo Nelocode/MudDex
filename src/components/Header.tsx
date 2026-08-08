@@ -26,31 +26,44 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   const tabs = [
-    { id: 'spawns', label: 'Radar & Spawns', icon: Compass, color: 'cyan' },
-    { id: 'calculator', label: 'Calculador Captura', icon: Target, color: 'indigo' },
-    { id: 'pokedex', label: 'Pokédex', icon: BookOpen, color: 'sky' },
-    { id: 'drops', label: 'Drops', icon: Gem, color: 'amber' },
-    { id: 'helditems', label: 'Objetos & Bayas', icon: Package, color: 'amber' },
-    { id: 'typematrix', label: 'Matriz de Tipos', icon: Target, color: 'cyan' },
-    { id: 'tierlist', label: 'Tier List PvP', icon: Trophy, color: 'purple' },
-    { id: 'quiz', label: 'PokéQuiz', icon: Gamepad2, color: 'amber' },
-    { id: 'biomes', label: 'Biomas 1.21.1', icon: Map, color: 'emerald' },
-    { id: 'shinies', label: 'Shiny Hunting', icon: Sparkles, color: 'amber' },
-    { id: 'moves', label: 'MTs & Movs', icon: Scroll, color: 'purple' },
-    { id: 'bosses', label: 'Boss Counters', icon: Swords, color: 'rose' },
-    { id: 'evs', label: 'EV Training', icon: Activity, color: 'blue' }
+    { id: 'spawns', label: 'Radar & Spawns', icon: Compass },
+    { id: 'calculator', label: 'Calculador Captura', icon: Target },
+    { id: 'pokedex', label: 'Pokédex', icon: BookOpen },
+    { id: 'drops', label: 'Drops', icon: Gem },
+    { id: 'helditems', label: 'Objetos & Bayas', icon: Package },
+    { id: 'typematrix', label: 'Matriz de Tipos', icon: Target },
+    { id: 'tierlist', label: 'Tier List PvP', icon: Trophy },
+    { id: 'quiz', label: 'PokéQuiz', icon: Gamepad2 },
+    { id: 'biomes', label: 'Biomas 1.21.1', icon: Map },
+    { id: 'shinies', label: 'Shiny Hunting', icon: Sparkles },
+    { id: 'moves', label: 'MTs & Movs', icon: Scroll },
+    { id: 'bosses', label: 'Boss Counters', icon: Swords },
+    { id: 'evs', label: 'EV Training', icon: Activity }
   ];
 
   return (
-    <header className="sticky top-0 z-40 w-full backdrop-blur-xl bg-slate-950/80 border-b border-slate-800/80 transition-all duration-300">
+    <header className="sticky top-0 z-40 w-full backdrop-blur-xl bg-slate-950/85 border-b border-rose-950/40 shadow-xl transition-all duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 gap-4">
           
-          {/* Brand & Server IP Badge */}
-          <div className="flex items-center gap-3">
+          {/* Pokédex Header & Brand */}
+          <div className="flex items-center gap-4">
+            
+            {/* Authentic Pokédex Sensor Eye & Mini LEDs */}
+            <div className="hidden sm:flex items-center gap-1.5 shrink-0 pr-2 border-r border-slate-800/80">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-cyan-600 via-sky-400 to-cyan-200 border-2 border-white/90 shadow-md shadow-cyan-500/40 relative flex items-center justify-center animate-pulse">
+                <div className="w-3 h-3 rounded-full bg-white/80"></div>
+              </div>
+              <div className="flex items-center gap-1">
+                <div className="w-2.5 h-2.5 rounded-full bg-rose-500 border border-rose-700 shadow-sm shadow-rose-500/50"></div>
+                <div className="w-2.5 h-2.5 rounded-full bg-amber-400 border border-amber-600 shadow-sm shadow-amber-400/50"></div>
+                <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 border border-emerald-700 shadow-sm shadow-emerald-500/50"></div>
+              </div>
+            </div>
+
             <div className="flex items-center gap-2 group cursor-pointer" onClick={() => setActiveTab('spawns')}>
               {/* Pokelinker-style Pokeball Logo */}
-              <div className="w-10 h-10 rounded-full bg-slate-950 border-2 border-slate-900 shadow-lg shadow-rose-500/25 group-hover:scale-110 transition-transform duration-300 relative flex items-center justify-center overflow-hidden">
+              <div className="w-10 h-10 rounded-full bg-slate-950 border-2 border-slate-900 shadow-lg shadow-rose-500/30 group-hover:scale-110 transition-transform duration-300 relative flex items-center justify-center overflow-hidden">
                 <div className="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-r from-rose-600 via-rose-500 to-rose-600 border-b-2 border-slate-950"></div>
                 <div className="absolute bottom-0 left-0 w-full h-1/2 bg-slate-100"></div>
                 <div className="w-3.5 h-3.5 rounded-full bg-slate-950 border-2 border-white z-10 shadow-sm group-hover:scale-125 transition-transform duration-300"></div>
@@ -58,10 +71,10 @@ export const Header: React.FC<HeaderProps> = ({
 
               <div>
                 <div className="flex items-center gap-1.5">
-                  <span className="font-extrabold text-lg tracking-tight bg-gradient-to-r from-white via-cyan-300 to-cyan-400 bg-clip-text text-transparent drop-shadow-sm">
+                  <span className="font-extrabold text-lg tracking-tight bg-gradient-to-r from-white via-rose-300 to-rose-400 bg-clip-text text-transparent drop-shadow-sm">
                     Diosesmon
                   </span>
-                  <span className="px-1.5 py-0.5 text-[10px] font-extrabold rounded-md bg-gradient-to-r from-cyan-500 to-indigo-500 text-white shadow-sm shadow-cyan-500/20">
+                  <span className="px-1.5 py-0.5 text-[10px] font-extrabold rounded-md bg-gradient-to-r from-rose-500 via-rose-600 to-cyan-500 text-white shadow-sm shadow-rose-500/30">
                     DEX
                   </span>
                 </div>
@@ -82,7 +95,7 @@ export const Header: React.FC<HeaderProps> = ({
               {copied ? (
                 <Check className="w-3.5 h-3.5 text-emerald-400 animate-in zoom-in" />
               ) : (
-                <Copy className="w-3.5 h-3.5 text-slate-400 group-hover:text-cyan-400 transition-colors" />
+                <Copy className="w-3.5 h-3.5 text-slate-400 group-hover:text-rose-400 transition-colors" />
               )}
               {copied && (
                 <span className="absolute inset-0 bg-emerald-500/20 border border-emerald-500/40 rounded-lg flex items-center justify-center text-[10px] font-bold text-emerald-300 animate-in fade-in duration-200">
@@ -112,7 +125,7 @@ export const Header: React.FC<HeaderProps> = ({
 
             <button
               onClick={onOpenInfoModal}
-              className="p-2 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-800 text-slate-400 hover:text-cyan-400 transition-all duration-200"
+              className="p-2 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-800 text-slate-400 hover:text-rose-400 transition-all duration-200"
               title="Información del Servidor Diosesmon"
             >
               <Info className="w-4 h-4" />
@@ -121,7 +134,7 @@ export const Header: React.FC<HeaderProps> = ({
 
         </div>
 
-        {/* Navigation Tabs Bar */}
+        {/* Pokédex Menu Tabs Bar */}
         <nav className="flex items-center gap-1.5 overflow-x-auto pb-2.5 pt-1 custom-scrollbar-horizontal border-t border-slate-800/60">
           {tabs.map(tab => {
             const Icon = tab.icon;
@@ -130,13 +143,13 @@ export const Header: React.FC<HeaderProps> = ({
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all duration-200 ${
+                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all duration-200 ${
                   isActive
-                    ? 'bg-cyan-500/15 text-cyan-300 border border-cyan-500/40 shadow-sm shadow-cyan-500/10'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/60 border border-transparent'
+                    ? 'bg-gradient-to-r from-rose-500/20 to-cyan-500/20 text-white border border-rose-500/50 shadow-md shadow-rose-500/10'
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/80 border border-transparent'
                 }`}
               >
-                <Icon className="w-3.5 h-3.5" />
+                <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-rose-400' : ''}`} />
                 <span>{tab.label}</span>
               </button>
             );
