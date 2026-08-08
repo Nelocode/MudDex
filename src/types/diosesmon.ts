@@ -52,6 +52,17 @@ export interface Pokemon {
   forms?: string[];
 }
 
+export interface UserProfile {
+  username: string;
+  shinyEncounters: number;
+  shinyCharm: boolean;
+  sparklingLevel: number;
+  quizScore: number;
+  quizMaxStreak: number;
+  favorites: string[];
+  lastUpdated?: string;
+}
+
 export type SpawnBucket = 'common' | 'uncommon' | 'rare' | 'ultra-rare';
 
 export type SpawnContext = 'grounded' | 'submerged' | 'surface';

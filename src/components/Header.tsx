@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Compass, Target, BookOpen, Gem, Search, Info, Copy, Check, ShieldCheck, Map, Sparkles, Scroll, Swords, Activity, Package, Trophy, Gamepad2 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Compass, Target, BookOpen, Gem, Search, Info, Copy, Check, ShieldCheck, Map, Sparkles, Scroll, Swords, Activity, Package, Trophy, Gamepad2, User } from 'lucide-react';
 import { WorldClockWidget } from './WorldClockWidget';
 
 interface HeaderProps {
@@ -7,6 +7,7 @@ interface HeaderProps {
   setActiveTab: (tab: string) => void;
   onOpenInfoModal: () => void;
   onOpenCommandPalette: () => void;
+  onOpenProfileModal: () => void;
 }
 
 export const SERVER_IP = 'mc.diosesmon.net';
@@ -15,15 +16,31 @@ export const Header: React.FC<HeaderProps> = ({
   activeTab,
   setActiveTab,
   onOpenInfoModal,
-  onOpenCommandPalette
+  onOpenCommandPalette,
+  onOpenProfileModal
 }) => {
   const [copied, setCopied] = useState(false);
+  const [username, setUsername] = useState<string>(() => {
+    return localStorage.getItem('diosesmon_username') || '';
+  });
+
+  useEffect(() => {
+    const handleStorage = () => {
+      setUsername(localStorage.getItem('diosesmon_username') || '');
+    };
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
+  }, []);
 
   const handleCopyIp = () => {
     navigator.clipboard.writeText(SERVER_IP);
     setCopied(true);
     setTimeout(() => setCopied(false), 2200);
   };
+
+  const avatarUrl = username
+    ? `https://minotar.net/avatar/${encodeURIComponent(username)}/32`
+    : null;
 
   const tabs = [
     { id: 'spawns', label: 'Radar & Spawns', icon: Compass },
@@ -97,19 +114,38 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
           </div>
 
-          {/* Search Trigger Button & Info */}
+          {/* Right Action Controls: Search, Profile & Info */}
           <div className="flex items-center gap-1.5 sm:gap-2">
+            
+            {/* User Profile Minecraft Badge Button */}
+            <button
+              onClick={onOpenProfileModal}
+              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-xs font-bold text-zinc-200 transition-all active:scale-95"
+              title="Perfil de Jugador Minecraft"
+            >
+              {avatarUrl ? (
+                <img src={avatarUrl} alt={username} className="w-5 h-5 rounded-md object-contain shrink-0" />
+              ) : (
+                <User className="w-4 h-4 text-red-500 shrink-0" />
+              )}
+              <span className="max-w-[70px] sm:max-w-[100px] truncate font-mono">
+                {username || 'Perfil'}
+              </span>
+            </button>
+
+            {/* Search Palette Button */}
             <button
               onClick={onOpenCommandPalette}
               className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-xs font-medium text-zinc-300 transition-all active:scale-95"
             >
               <Search className="w-4 h-4 text-red-500" />
-              <span className="text-xs">Buscar...</span>
+              <span className="text-xs hidden sm:inline">Buscar...</span>
               <kbd className="hidden sm:inline px-1.5 py-0.5 text-[10px] font-mono bg-zinc-950 rounded border border-zinc-800 text-zinc-400">
                 ⌘K
               </kbd>
             </button>
 
+            {/* Info Modal Button */}
             <button
               onClick={onOpenInfoModal}
               className="p-2 sm:p-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-400 hover:text-white transition-all active:scale-95"

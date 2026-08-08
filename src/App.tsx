@@ -1,28 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import { Header } from './components/Header';
+import { PokedexView } from './components/PokedexView';
 import { SpawnRadarView } from './components/SpawnRadarView';
 import { CatchCalculatorView } from './components/CatchCalculatorView';
-import { PokedexView } from './components/PokedexView';
 import { DropsView } from './components/DropsView';
+import { HeldItemsView } from './components/HeldItemsView';
+import { TypeMatrixView } from './components/TypeMatrixView';
+import { TierListView } from './components/TierListView';
+import { PokeQuizView } from './components/PokeQuizView';
 import { BiomeGuideView } from './components/BiomeGuideView';
 import { ShinyHunterView } from './components/ShinyHunterView';
 import { MovesCompendiumView } from './components/MovesCompendiumView';
 import { BossCountersView } from './components/BossCountersView';
 import { EvTrainingView } from './components/EvTrainingView';
-import { HeldItemsView } from './components/HeldItemsView';
-import { TypeMatrixView } from './components/TypeMatrixView';
-import { TierListView } from './components/TierListView';
-import { PokeQuizView } from './components/PokeQuizView';
 import { DiosesmonInfoModal } from './components/DiosesmonInfoModal';
 import { CommandPaletteModal } from './components/CommandPaletteModal';
-import { PwaInstallPrompt } from './components/PwaInstallPrompt';
-import { Sparkles, ShieldCheck, Heart } from 'lucide-react';
+import { UserProfileModal } from './components/UserProfileModal';
 
 export function App() {
   const [activeTab, setActiveTab] = useState<string>('spawns');
   const [selectedPokemonId, setSelectedPokemonId] = useState<string>('snorlax');
   const [isInfoModalOpen, setIsInfoModalOpen] = useState<boolean>(false);
   const [isSearchModalOpen, setIsSearchModalOpen] = useState<boolean>(false);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState<boolean>(false);
 
   // Keyboard shortcut for Command Palette
   useEffect(() => {
@@ -48,30 +48,23 @@ export function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handlePaletteSelectPokemon = (id: string, view: 'spawns' | 'calculator' | 'pokedex') => {
-    setSelectedPokemonId(id);
-    setActiveTab(view);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100 font-sans selection:bg-red-600 selection:text-white flex flex-col justify-between">
       
       {/* Background Decorative Pure Neutral Ambient Glows */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-        <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-red-600/5 rounded-full blur-[160px]" />
-        <div className="absolute top-1/3 right-1/4 w-[500px] h-[500px] bg-zinc-600/5 rounded-full blur-[160px]" />
+        <div className="absolute -top-40 -left-40 w-96 h-96 bg-red-600/5 rounded-full blur-3xl" />
+        <div className="absolute top-1/3 -right-40 w-96 h-96 bg-zinc-500/5 rounded-full blur-3xl" />
       </div>
 
-      {/* Main Content Area */}
       <div className="relative z-10">
-        
-        {/* Navigation Header */}
+        {/* Navigation Bar */}
         <Header
           activeTab={activeTab}
           setActiveTab={setActiveTab}
-          onOpenCommandPalette={() => setIsSearchModalOpen(true)}
           onOpenInfoModal={() => setIsInfoModalOpen(true)}
+          onOpenCommandPalette={() => setIsSearchModalOpen(true)}
+          onOpenProfileModal={() => setIsProfileModalOpen(true)}
         />
 
         {/* View Router */}
@@ -90,95 +83,44 @@ export function App() {
 
           {activeTab === 'pokedex' && (
             <PokedexView
-              onSelectPokemonForCalculator={handleSelectPokemonForCalculator}
               onSelectPokemonForSpawns={handleSelectPokemonForSpawns}
+              onSelectPokemonForCalculator={handleSelectPokemonForCalculator}
             />
           )}
 
-          {activeTab === 'drops' && (
-            <DropsView />
-          )}
+          {activeTab === 'drops' && <DropsView />}
 
-          {activeTab === 'helditems' && (
-            <HeldItemsView />
-          )}
+          {activeTab === 'helditems' && <HeldItemsView />}
 
-          {activeTab === 'typematrix' && (
-            <TypeMatrixView />
-          )}
+          {activeTab === 'typematrix' && <TypeMatrixView />}
 
-          {activeTab === 'tierlist' && (
-            <TierListView />
-          )}
+          {activeTab === 'tierlist' && <TierListView />}
 
-          {activeTab === 'quiz' && (
-            <PokeQuizView />
-          )}
+          {activeTab === 'quiz' && <PokeQuizView />}
 
-          {activeTab === 'biomes' && (
-            <BiomeGuideView />
-          )}
+          {activeTab === 'biomes' && <BiomeGuideView />}
 
-          {activeTab === 'shinies' && (
-            <ShinyHunterView />
-          )}
+          {activeTab === 'shinies' && <ShinyHunterView />}
 
-          {activeTab === 'moves' && (
-            <MovesCompendiumView />
-          )}
+          {activeTab === 'moves' && <MovesCompendiumView />}
 
-          {activeTab === 'bosses' && (
-            <BossCountersView />
-          )}
+          {activeTab === 'bosses' && <BossCountersView />}
 
-          {activeTab === 'evs' && (
-            <EvTrainingView />
-          )}
+          {activeTab === 'evs' && <EvTrainingView />}
         </main>
       </div>
 
       {/* Footer */}
-      <footer className="relative z-10 border-t border-slate-800/80 bg-slate-950/90 py-10 px-4 mt-12">
-        <div className="max-w-7xl mx-auto flex flex-col items-center justify-center space-y-6 text-center">
-          
-          {/* Mudkill Logo & Brand */}
-          <div className="flex flex-col items-center gap-3">
-            <img
-              src="/Mudkill.png"
-              alt="Mudkill Logo"
-              className="h-16 w-auto object-contain drop-shadow-xl hover:scale-105 transition-transform duration-300"
-            />
-            <div className="flex items-center gap-2">
-              <span className="font-extrabold text-lg tracking-tight text-white">
-                Diosesmon <span className="text-red-500">Dex</span>
-              </span>
-              <span className="px-2 py-0.5 text-[10px] font-bold rounded-md bg-red-600 text-white border border-red-500">
-                PRO 1.7.3
-              </span>
-            </div>
-          </div>
-
-          <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-zinc-400">
-            <button
-              onClick={() => setIsInfoModalOpen(true)}
-              className="hover:text-red-400 transition-colors flex items-center gap-1 font-semibold"
-            >
-              <ShieldCheck className="w-4 h-4 text-emerald-400" /> Servidor Oficial: mc.diosesmon.net
-            </button>
-            <span>•</span>
-            <span className="text-slate-500 max-w-lg leading-relaxed">
-              No oficial. Diosesmon Dex es un proyecto independiente y no está afiliado, avalado ni patrocinado por Pokémon, Nintendo, Game Freak ni Mojang.
-            </span>
-          </div>
-
-          <div className="text-xs text-slate-500 flex items-center gap-1.5 pt-2 border-t border-slate-900 w-full justify-center">
-            <span>Desarrollado con</span> <Heart className="w-4 h-4 text-rose-500 inline fill-rose-500 animate-pulse" /> <span>para la comunidad de Diosesmon & Cobblemon</span>
-          </div>
-
-        </div>
+      <footer className="relative z-10 border-t border-zinc-800 bg-zinc-950/90 py-6 px-3 sm:py-10 text-center text-xs text-zinc-400 space-y-2">
+        <p className="font-medium text-zinc-300">
+          Diosesmon Dex • Modpack Oficial de Cobblemon Minecraft 1.21.1 (Fabric)
+        </p>
+        <p className="text-zinc-400">
+          Desarrollado para el servidor Diosesmon. Pokémon y sus nombres son marcas registradas de Nintendo / Creatures Inc. / GAME FREAK inc.
+        </p>
       </footer>
 
-      {/* Modals & Prompts */}
+      {/* Modals */}
       <DiosesmonInfoModal
         isOpen={isInfoModalOpen}
         onClose={() => setIsInfoModalOpen(false)}
@@ -187,13 +129,18 @@ export function App() {
       <CommandPaletteModal
         isOpen={isSearchModalOpen}
         onClose={() => setIsSearchModalOpen(false)}
-        onSelectPokemon={handlePaletteSelectPokemon}
+        onSelectPokemon={(pokemonId, targetTab) => {
+          setSelectedPokemonId(pokemonId);
+          setActiveTab(targetTab);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }}
       />
 
-      <PwaInstallPrompt />
+      <UserProfileModal
+        isOpen={isProfileModalOpen}
+        onClose={() => setIsProfileModalOpen(false)}
+      />
 
     </div>
   );
 }
-
-export default App;
