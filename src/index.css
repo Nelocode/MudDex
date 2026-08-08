@@ -3,22 +3,22 @@
    ========================================================================== */
 
 :root {
-  --bg-dark: #0B0E17;
-  --bg-card: rgba(17, 24, 39, 0.85);
-  --bg-card-hover: rgba(31, 41, 55, 0.95);
-  --border-color: rgba(255, 255, 255, 0.08);
-  --border-pokedex: rgba(239, 68, 68, 0.4);
+  --bg-dark: #0B0507;
+  --bg-card: rgba(22, 13, 17, 0.90);
+  --bg-card-hover: rgba(36, 18, 24, 0.95);
+  --border-color: rgba(239, 68, 68, 0.25);
+  --border-pokedex: rgba(239, 68, 68, 0.6);
   
   --pokedex-red: #EF4444;
   --pokedex-red-dark: #DC2626;
-  --pokedex-blue-sensor: #06B6D4;
+  --pokedex-red-deep: #991B1B;
   --pokedex-yellow-led: #F59E0B;
   --pokedex-green-led: #10B981;
-  --pokedex-accent: #00E5FF;
+  --pokedex-blue-sensor: #38BDF8;
   
   --text-main: #F9FAFB;
-  --text-muted: #9CA3AF;
-  --text-dim: #6B7280;
+  --text-muted: #D1D5DB;
+  --text-dim: #9CA3AF;
 
   --font-main: 'Plus Jakarta Sans', 'Outfit', -apple-system, sans-serif;
   --font-heading: 'Outfit', 'Space Grotesk', sans-serif;
@@ -31,10 +31,10 @@
 }
 
 body {
-  background-color: var(--bg-dark);
+  background-color: #0A0406;
   background-image: 
-    radial-gradient(circle at 15% 10%, rgba(239, 68, 68, 0.08) 0%, transparent 45%),
-    radial-gradient(circle at 85% 90%, rgba(6, 182, 212, 0.08) 0%, transparent 45%);
+    radial-gradient(circle at 15% 10%, rgba(220, 38, 38, 0.18) 0%, transparent 50%),
+    radial-gradient(circle at 85% 90%, rgba(185, 28, 28, 0.12) 0%, transparent 50%);
   color: var(--text-main);
   font-family: var(--font-main);
   min-height: 100vh;
