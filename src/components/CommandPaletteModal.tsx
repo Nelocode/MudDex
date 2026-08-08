@@ -31,15 +31,15 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
     : COBBLEMON_POKEDEX.slice(0, 5);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center pt-16 sm:pt-24 p-4 bg-zinc-950/85 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="w-full max-w-xl bg-zinc-900 border border-zinc-800 rounded-3xl space-y-0 shadow-2xl overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-start justify-center pt-4 sm:pt-24 p-2 sm:p-4 bg-zinc-950/85 backdrop-blur-md animate-in fade-in duration-200">
+      <div className="w-full max-w-xl bg-zinc-900 border border-zinc-800 rounded-2xl sm:rounded-3xl space-y-0 shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
         
         {/* Search Bar Input */}
-        <div className="flex items-center gap-3 px-5 py-4 border-b border-zinc-800">
+        <div className="flex items-center gap-3 px-4 sm:px-5 py-3.5 sm:py-4 border-b border-zinc-800 shrink-0">
           <Search className="w-5 h-5 text-red-500 shrink-0" />
           <input
             type="text"
-            placeholder="Buscar Pokémon por nombre o número (ej: Pikachu, Snorlax, 150)..."
+            placeholder="Buscar Pokémon (ej: Pikachu, 150)..."
             value={query}
             onChange={e => setQuery(e.target.value)}
             autoFocus
@@ -47,25 +47,25 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
           />
           <button
             onClick={onClose}
-            className="p-1 rounded-lg text-zinc-500 hover:text-white transition-colors"
+            className="p-2 rounded-xl text-zinc-400 hover:text-white transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Results List */}
-        <div className="p-3 max-h-96 overflow-y-auto space-y-1">
+        <div className="p-2 sm:p-3 overflow-y-auto space-y-1 flex-1">
           {results.map(p => (
             <div
               key={p.id}
-              className="flex items-center justify-between p-3 rounded-2xl bg-zinc-950/50 hover:bg-zinc-950 border border-transparent hover:border-zinc-800 transition-all group"
+              className="flex items-center justify-between p-2.5 sm:p-3 rounded-xl sm:rounded-2xl bg-zinc-950/50 hover:bg-zinc-950 border border-transparent hover:border-zinc-800 transition-all group"
             >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-800 p-1 flex items-center justify-center">
+              <div className="flex items-center gap-2.5 sm:gap-3">
+                <div className="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-800 p-1 flex items-center justify-center shrink-0">
                   <img src={p.spriteUrl || p.artworkUrl} alt={p.name} className="max-h-full object-contain" />
                 </div>
                 <div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1.5">
                     <h4 className="text-xs font-bold text-white group-hover:text-red-400 transition-colors">
                       {p.name}
                     </h4>
@@ -82,7 +82,7 @@ export const CommandPaletteModal: React.FC<CommandPaletteModalProps> = ({
               </div>
 
               {/* Action Buttons */}
-              <div className="flex items-center gap-1.5 opacity-90 sm:opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="flex items-center gap-1 sm:gap-1.5">
                 <button
                   onClick={() => {
                     onSelectPokemon(p.id, 'spawns');
