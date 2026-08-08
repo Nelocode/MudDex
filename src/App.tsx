@@ -4,13 +4,18 @@ import { SpawnRadarView } from './components/SpawnRadarView';
 import { CatchCalculatorView } from './components/CatchCalculatorView';
 import { PokedexView } from './components/PokedexView';
 import { DropsView } from './components/DropsView';
+import { BiomeGuideView } from './components/BiomeGuideView';
+import { ShinyHunterView } from './components/ShinyHunterView';
+import { MovesCompendiumView } from './components/MovesCompendiumView';
+import { BossCountersView } from './components/BossCountersView';
+import { EvTrainingView } from './components/EvTrainingView';
 import { DiosesmonInfoModal } from './components/DiosesmonInfoModal';
 import { CommandPaletteModal } from './components/CommandPaletteModal';
 import { PwaInstallPrompt } from './components/PwaInstallPrompt';
 import { Sparkles, ShieldCheck, Heart } from 'lucide-react';
 
 export function App() {
-  const [activeTab, setActiveTab] = useState<'spawns' | 'calculator' | 'pokedex' | 'drops'>('spawns');
+  const [activeTab, setActiveTab] = useState<string>('spawns');
   const [selectedPokemonId, setSelectedPokemonId] = useState<string>('snorlax');
   const [isInfoModalOpen, setIsInfoModalOpen] = useState<boolean>(false);
   const [isSearchModalOpen, setIsSearchModalOpen] = useState<boolean>(false);
@@ -61,8 +66,8 @@ export function App() {
         <Header
           activeTab={activeTab}
           setActiveTab={setActiveTab}
-          onOpenSearch={() => setIsSearchModalOpen(true)}
-          onOpenInfo={() => setIsInfoModalOpen(true)}
+          onOpenCommandPalette={() => setIsSearchModalOpen(true)}
+          onOpenInfoModal={() => setIsInfoModalOpen(true)}
         />
 
         {/* View Router */}
@@ -88,6 +93,26 @@ export function App() {
 
           {activeTab === 'drops' && (
             <DropsView />
+          )}
+
+          {activeTab === 'biomes' && (
+            <BiomeGuideView />
+          )}
+
+          {activeTab === 'shinies' && (
+            <ShinyHunterView />
+          )}
+
+          {activeTab === 'moves' && (
+            <MovesCompendiumView />
+          )}
+
+          {activeTab === 'bosses' && (
+            <BossCountersView />
+          )}
+
+          {activeTab === 'evs' && (
+            <EvTrainingView />
           )}
         </main>
       </div>

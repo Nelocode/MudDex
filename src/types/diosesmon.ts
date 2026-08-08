@@ -28,13 +28,13 @@ export interface BaseStats {
 }
 
 export interface Pokemon {
-  id: string; // e.g. 'pikachu'
+  id: string;
   dexNumber: number;
   name: string;
   generation: number;
   types: PokemonType[];
   baseStats: BaseStats;
-  catchRate: number; // 3 to 255
+  catchRate: number;
   baseHp: number;
   weightKg: number;
   heightM: number;
@@ -42,6 +42,7 @@ export interface Pokemon {
     normal: string[];
     hidden?: string;
   };
+  isAlphaAvailable?: boolean;
   spriteUrl: string;
   shinySpriteUrl?: string;
   artworkUrl: string;
@@ -60,7 +61,7 @@ export type TimeOfDay = 'any' | 'day' | 'night' | 'dawn' | 'dusk';
 export type WeatherCondition = 'any' | 'clear' | 'rain' | 'thunder';
 
 export interface SpawnCondition {
-  biomes: string[]; // e.g. ['#cobblemon:is_jungle', 'minecraft:jungle']
+  biomes: string[];
   timeOfDay?: TimeOfDay;
   weather?: WeatherCondition;
   minY?: number;
@@ -102,7 +103,7 @@ export type StatusCondition = 'none' | 'sleep' | 'freeze' | 'paralysis' | 'poiso
 
 export interface CatchContext {
   pokemonId: string;
-  currentHpPercent: number; // 1 to 100
+  currentHpPercent: number;
   status: StatusCondition;
   isNightOrCave?: boolean;
   isWaterOrBugTarget?: boolean;
@@ -125,7 +126,7 @@ export interface PokeBall {
 export interface BallCatchResult {
   ball: PokeBall;
   multiplier: number;
-  catchChance: number; // 0 to 100
+  catchChance: number;
   expectedThrows: number;
   efficiencyRating: 's' | 'a' | 'b' | 'c' | 'd';
 }
@@ -154,4 +155,73 @@ export interface ServerInfo {
   status: 'online' | 'offline';
   playersOnline: number;
   maxPlayers: number;
+}
+
+// 1. Biomes Guide Interface
+export interface MinecraftBiome {
+  id: string;
+  name: string;
+  dimension: 'Overworld' | 'Nether' | 'End';
+  yRange: string;
+  temperature: string;
+  icon: string;
+  description: string;
+  keySpawns: string[];
+  blockHacks: string[];
+}
+
+// 4. Shiny Hunting Interface
+export interface ShinyMethod {
+  id: string;
+  name: string;
+  odds: string;
+  chanceFraction: number;
+  description: string;
+  requirements: string;
+}
+
+// 5. Moves Compendium Interface
+export interface MoveInfo {
+  id: string;
+  name: string;
+  type: PokemonType;
+  category: 'physical' | 'special' | 'status';
+  power: number | null;
+  accuracy: number | null;
+  pp: number;
+  effect: string;
+  isTm: boolean;
+  tmItemName?: string;
+  learnedBy: string[];
+}
+
+// 7. Boss & Gym Counters Interface
+export interface BossCounter {
+  id: string;
+  bossName: string;
+  bossType: PokemonType;
+  icon: string;
+  recommendedTeam: {
+    pokemonId: string;
+    role: string;
+    keyMove: string;
+    heldItem: string;
+  }[];
+  strategyTips: string[];
+}
+
+// 8. EV Training Guide Interface
+export interface EvSpot {
+  stat: 'hp' | 'attack' | 'defense' | 'specialAttack' | 'specialDefense' | 'speed';
+  statNameEs: string;
+  icon: string;
+  color: string;
+  bestTargets: {
+    pokemonId: string;
+    pokemonName: string;
+    evYield: number;
+    biome: string;
+    spawnTime: string;
+  }[];
+  powerItemName: string;
 }

@@ -1,27 +1,41 @@
 import React, { useState } from 'react';
-import { Search, Copy, Check, ShieldCheck, Sparkles, Compass, Target, BookOpen, Gem, Info } from 'lucide-react';
+import { Compass, Target, BookOpen, Gem, Search, Info, Copy, Check, ShieldCheck, Map, Sparkles, Scroll, Swords, Activity } from 'lucide-react';
+import { WorldClockWidget } from './WorldClockWidget';
 
 interface HeaderProps {
-  activeTab: 'spawns' | 'calculator' | 'pokedex' | 'drops';
-  setActiveTab: (tab: 'spawns' | 'calculator' | 'pokedex' | 'drops') => void;
-  onOpenSearch: () => void;
-  onOpenInfo: () => void;
+  activeTab: string;
+  setActiveTab: (tab: string) => void;
+  onOpenInfoModal: () => void;
+  onOpenCommandPalette: () => void;
 }
+
+export const SERVER_IP = 'mc.diosesmon.net';
 
 export const Header: React.FC<HeaderProps> = ({
   activeTab,
   setActiveTab,
-  onOpenSearch,
-  onOpenInfo
+  onOpenInfoModal,
+  onOpenCommandPalette
 }) => {
   const [copied, setCopied] = useState(false);
-  const SERVER_IP = 'mc.diosesmon.net';
 
   const handleCopyIp = () => {
     navigator.clipboard.writeText(SERVER_IP);
     setCopied(true);
     setTimeout(() => setCopied(false), 2200);
   };
+
+  const tabs = [
+    { id: 'spawns', label: 'Radar & Spawns', icon: Compass, color: 'cyan' },
+    { id: 'calculator', label: 'Calculador Captura', icon: Target, color: 'indigo' },
+    { id: 'pokedex', label: 'Pokédex', icon: BookOpen, color: 'sky' },
+    { id: 'drops', label: 'Drops', icon: Gem, color: 'amber' },
+    { id: 'biomes', label: 'Biomas 1.21.1', icon: Map, color: 'emerald' },
+    { id: 'shinies', label: 'Shiny Hunting', icon: Sparkles, color: 'amber' },
+    { id: 'moves', label: 'MTs & Movs', icon: Scroll, color: 'purple' },
+    { id: 'bosses', label: 'Boss Counters', icon: Swords, color: 'rose' },
+    { id: 'evs', label: 'EV Training', icon: Activity, color: 'blue' }
+  ];
 
   return (
     <header className="sticky top-0 z-40 w-full backdrop-blur-xl bg-slate-950/80 border-b border-slate-800/80 transition-all duration-300">
@@ -56,7 +70,7 @@ export const Header: React.FC<HeaderProps> = ({
             {/* Server IP Quick Copy Pill */}
             <button
               onClick={handleCopyIp}
-              className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-900/90 hover:bg-slate-800 border border-slate-700/60 text-slate-300 text-xs font-semibold transition-all group relative overflow-hidden active:scale-95"
+              className="hidden lg:flex items-center gap-1.5 px-3 py-1 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-xs font-mono text-slate-300 transition-all duration-200 group relative"
               title="Copiar dirección IP del servidor"
             >
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
@@ -72,77 +86,29 @@ export const Header: React.FC<HeaderProps> = ({
                 </span>
               )}
             </button>
+
+            {/* Minecraft World Clock & Weather Widget */}
+            <div className="hidden xl:block">
+              <WorldClockWidget />
+            </div>
           </div>
 
-          {/* Navigation Tabs */}
-          <nav className="flex items-center gap-1 sm:gap-2">
-            <button
-              onClick={() => setActiveTab('spawns')}
-              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 ${
-                activeTab === 'spawns'
-                  ? 'bg-cyan-500/15 text-cyan-300 border border-cyan-500/40 shadow-sm shadow-cyan-500/10'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/60'
-              }`}
-            >
-              <Compass className="w-4 h-4" />
-              <span className="hidden sm:inline">Radar & Spawns</span>
-              <span className="sm:hidden">Spawns</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('calculator')}
-              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 ${
-                activeTab === 'calculator'
-                  ? 'bg-indigo-500/15 text-indigo-300 border border-indigo-500/40 shadow-sm shadow-indigo-500/10'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/60'
-              }`}
-            >
-              <Target className="w-4 h-4" />
-              <span className="hidden sm:inline">Calculador Captura</span>
-              <span className="sm:hidden">Captura</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('pokedex')}
-              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 ${
-                activeTab === 'pokedex'
-                  ? 'bg-sky-500/15 text-sky-300 border border-sky-500/40 shadow-sm shadow-sky-500/10'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/60'
-              }`}
-            >
-              <BookOpen className="w-4 h-4" />
-              <span>Pokédex</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab('drops')}
-              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 ${
-                activeTab === 'drops'
-                  ? 'bg-amber-500/15 text-amber-300 border border-amber-500/40 shadow-sm shadow-amber-500/10'
-                  : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/60'
-              }`}
-            >
-              <Gem className="w-4 h-4" />
-              <span>Drops</span>
-            </button>
-          </nav>
-
-          {/* Right Actions: Quick Search (⌘K) & Info */}
+          {/* Quick Action Buttons & Command Palette Trigger */}
           <div className="flex items-center gap-2">
             <button
-              onClick={onOpenSearch}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-900/80 hover:bg-slate-800 border border-slate-700/60 text-slate-400 hover:text-slate-200 text-xs font-medium transition-all group"
+              onClick={onOpenCommandPalette}
+              className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-800 text-xs font-medium text-slate-400 hover:text-slate-200 transition-all duration-200"
             >
-              <Search className="w-3.5 h-3.5 group-hover:text-cyan-400 transition-colors" />
-              <span className="hidden lg:inline">Buscar...</span>
-              <kbd className="hidden sm:inline-block px-1.5 py-0.5 text-[10px] font-semibold text-slate-500 bg-slate-950 border border-slate-800 rounded">
+              <Search className="w-3.5 h-3.5" />
+              <span>Buscar...</span>
+              <kbd className="px-1.5 py-0.5 text-[10px] font-mono bg-slate-950 rounded border border-slate-800 text-slate-400">
                 ⌘K
               </kbd>
             </button>
 
             <button
-              onClick={onOpenInfo}
-              className="p-2 rounded-lg bg-slate-900/80 hover:bg-slate-800 border border-slate-700/60 text-slate-400 hover:text-cyan-400 transition-colors"
+              onClick={onOpenInfoModal}
+              className="p-2 rounded-xl bg-slate-900/80 hover:bg-slate-800 border border-slate-800 text-slate-400 hover:text-cyan-400 transition-all duration-200"
               title="Información del Servidor Diosesmon"
             >
               <Info className="w-4 h-4" />
@@ -150,6 +116,28 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
 
         </div>
+
+        {/* Navigation Tabs Bar */}
+        <nav className="flex items-center gap-1.5 overflow-x-auto pb-2.5 pt-1 custom-scrollbar-horizontal border-t border-slate-800/60">
+          {tabs.map(tab => {
+            const Icon = tab.icon;
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all duration-200 ${
+                  isActive
+                    ? 'bg-cyan-500/15 text-cyan-300 border border-cyan-500/40 shadow-sm shadow-cyan-500/10'
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900/60 border border-transparent'
+                }`}
+              >
+                <Icon className="w-3.5 h-3.5" />
+                <span>{tab.label}</span>
+              </button>
+            );
+          })}
+        </nav>
       </div>
     </header>
   );
