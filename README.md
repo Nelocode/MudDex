@@ -1,43 +1,37 @@
-# Pokelinker
+# MudDex — Wiki & Compendio Oficial Diosesmon
 
-Asistente de crianza y competitivo Pokémon — guía paso a paso para criar Pokémon competitivos (IVs, naturaleza, habilidades, movimientos de huevo) con integración de builds Smogon.
+Plataforma oficial de consulta, radar de spawns, calculador de captura y guía interactiva de Cobblemon (Minecraft 1.21.1 / Fabric) para la comunidad de **Diosesmon**. Creado por **Mudkill**.
 
-## Stack
-- Vite 5 + React 18 + TypeScript
-- PokeAPI (pokeapi.co) para datos de Pokémon
-- Datos Smogon competitivos integrados
-- Persistencia en localStorage (proyectos + caja de Pokémon)
+## 🌟 Funcionalidades Principales
 
-## Funcionalidades
-- Selector de Pokémon (1025 especies) con búsqueda
-- Configurador de objetivo: IVs objetivo (2x31 a 6x31), naturaleza, 0 IVs ATK/VEL, habilidades, movimientos de huevo
-- Árbol de crianza guiado paso a paso (CRÍA 1 → CRÍA FINAL) con probabilidades de éxito
-- Validación de compatibilidad de grupos huevo
-- Lista de preparativos/materiales
-- Builds competitivos Smogon recomendados
-- Calculadora de odds para variocolor (Método Masuda + Amuleto Iris)
-- Caja de Pokémon (padres) persistente con Ditto 6IV por defecto
+1. **Radar de Spawns & Recetas de Bloques**: Coordenadas Y, biomas y trucos de colocación de bloques para forzar spawns.
+2. **Calculador Matemático de Captura Gen 8/9**: Tasa de éxito por Pokéball con multiplicadores en vivo.
+3. **Pokédex de 1,025 Especies**: Sprites HD, animaciones Shiny, audios de rugido y estadísticas base.
+4. **Enciclopedia de Objetos Equipables & Bayas**: Efectos en combate, bonificadores y métodos de obtención.
+5. **Calculadora de Caza de Shinies (Shiny Hunting)**: Avistamientos acumulados con Amuleto Iris y Poder Variocolor.
+6. **Matriz Interactiva de Efectividad de Tipos 18x18**: Debilidades 4x/2x, resistencias e inmunidades.
+7. **Tier List Competitiva & Roles PvP**: Builds recomendados, naturalezas e ítems.
+8. **Minijuego PokéQuiz ("¿Quién es este Pokémon?")**: Modos Silueta y Rugido de Audio.
+9. **Guía de Entrenamiento de EVs**: Zonas de farming y objetos recios (+8 EVs).
+10. **Perfil de Minecraft por Nickname & Backup JSON**: Cabeza 3D del skin de Minecraft y persistencia de datos.
 
-## Scripts
-- `npm run dev` — servidor de desarrollo (puerto 3000)
-- `npm run build` — build de producción (TypeScript + Vite) a `dist/`
-- `npm run preview` / `npm run start` — sirve el build en `dist/` en el puerto 3000
+## 🚀 Instalación y Desarrollo Local
 
-## Deploy (EasyPanel)
-Este proyecto está **dockerizado**. El `Dockerfile` usa un build multi-stage:
-
-1. **Stage `build`**: Node 20 compila la app (`npm ci && npm run build`) a `dist/`.
-2. **Stage `runtime`**: Nginx Alpine sirve los estáticos de `dist/` en el puerto **80**, con configuración SPA (fallback a `index.html`) y caching de assets.
-
-Para desplegar en EasyPanel: crea la app y apunta al `Dockerfile` del repositorio. El contenedor expone el puerto **80** (Nginx).
-
-También puedes correrlo localmente con Docker:
 ```bash
-docker build -t pokelinker .
-docker run -p 3000:80 pokelinker
-# abre http://localhost:3000
+# Instalar dependencias
+npm install
+
+# Iniciar servidor de desarrollo en puerto 3000
+npm run dev
+
+# Compilar para producción
+npm run build
 ```
 
-## Notas de build
-- El `node_modules` incluido en ZIPs de macOS no funciona en Windows; siempre correr `npm install` sobre el código fuente.
-- `vite.config.ts` usa `host: true` para aceptar conexiones en el contenedor del server.
+## 🐳 Despliegue con Docker / Easypanel
+
+Este proyecto cuenta con un `Dockerfile` multi-stage ligero con Node 20 y Nginx Alpine.
+
+1. Conecta tu repositorio a **Easypanel**.
+2. Selecciona Build Method: **Dockerfile**.
+3. Puerto del contenedor: **80**.

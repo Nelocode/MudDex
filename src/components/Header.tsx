@@ -76,7 +76,7 @@ export const Header: React.FC<HeaderProps> = ({
               <div>
                 <div className="flex items-center gap-1">
                   <span className="font-extrabold text-base sm:text-lg tracking-tight text-white">
-                    Diosesmon <span className="text-red-500">Dex</span>
+                    Mud<span className="text-red-500">Dex</span>
                   </span>
                   <span className="px-1.5 py-0.5 text-[9px] sm:text-[10px] font-extrabold uppercase rounded bg-red-600 text-white shadow-sm">
                     Wiki
