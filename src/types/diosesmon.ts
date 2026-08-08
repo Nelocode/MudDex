@@ -42,9 +42,12 @@ export interface Pokemon {
     normal: string[];
     hidden?: string;
   };
-  isAlphaAvailable?: boolean;
   spriteUrl: string;
+  shinySpriteUrl?: string;
   artworkUrl: string;
+  audioCryUrl?: string;
+  categoryTitle?: string;
+  evolutionLine?: { stage: number; name: string; dexNumber: number; condition: string }[];
   forms?: string[];
 }
 
