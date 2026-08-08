@@ -162,24 +162,50 @@ export function getSpawnRecipeForPokemon(pokemonId: string) {
   const spawn = COBBLEMON_SPAWNS.find(s => s.pokemonId.toLowerCase() === pokemonId.toLowerCase());
   if (!spawn) return null;
 
-  const biomesStr = spawn.condition.biomes.map(b => b.replace('#cobblemon:', '').replace('minecraft:', '')).join(' / ');
-  let blockTip = `Construye una plataforma de al menos 9x9 bloques en biomas de ${biomesStr}.`;
-  let requiredBlocks = ['Grass Block', 'Moss Block'];
+  const biomesStr = spawn.condition.biomes.map(b => b.replace('#cobblemon:', '').replace('minecraft:', '')).join(', ');
+  let blockTip = `Construye una plataforma plana de al menos 9x9 bloques despejada en los biomas de ${biomesStr}.`;
+  let requiredBlocks = ['Grass Block', 'Moss Block', 'Oak Leaves'];
+  let steps = [
+    `Ubicación: Dirígete a los biomas recomendados (${biomesStr}).`,
+    `Estructura: Coloca una plataforma plana de 9x9 bloques de pasto/musgo despejada.`,
+    `Condiciones: Asegúrate de tener visibilidad directa al cielo durante el horario de ${spawn.condition.timeOfDay === 'night' ? 'Noche' : 'Día'}.`,
+    `Consejo: Mantén un radio de 24 a 32 bloques de distancia para que el motor de Cobblemon genere los spawns.`
+  ];
 
   if (spawn.condition.biomes.some(b => b.includes('badlands') || b.includes('desert'))) {
-    blockTip = `⚡ TRUCO DE GRANJA: Construye una plataforma con Terracota Roja, Arena de Alma o Piedra del Nether.`;
-    requiredBlocks = ['Red Terracotta', 'Sand', 'Magma Block'];
+    blockTip = `⚡ TRUCO DE GRANJA: Construye una plataforma industrial con Terracota Roja, Arena de Alma o bloques de Magma.`;
+    requiredBlocks = ['Red Terracotta', 'Sand', 'Magma Block', 'Netherrack'];
+    steps = [
+      `Ubicación: Encuentra biomas cálidos como Badlands, Desierto o zonas rocosas.`,
+      `Estructura: Construye una plataforma de 11x11 bloques de Terracota Roja o Arena con Magma en el centro.`,
+      `Condiciones: Iluminación natural sin bloqueos de techo durante el día.`,
+      `Consejo: Limpia mobs hostiles cercanos para liberar el límite de spawns (cap de entidades).`
+    ];
   } else if (spawn.condition.biomes.some(b => b.includes('cave') || b.includes('dark'))) {
-    blockTip = `⚡ TRUCO DE GRANJA: Coloca una cámara subterránea oscura despejada a menos de Y=0 con Piedra Profunda (Deepslate).`;
-    requiredBlocks = ['Deepslate', 'Sculk', 'Obsidian'];
+    blockTip = `⚡ TRUCO DE GRANJA: Diseña una cámara subterránea oscura a capa profunda (Y < 0) usando Piedra Profunda (Deepslate) y bloques de Pizarra.`;
+    requiredBlocks = ['Deepslate', 'Cobbled Deepslate', 'Sculk', 'Obsidian'];
+    steps = [
+      `Ubicación: Desciende por debajo del nivel Y=0 en cuevas profundas o Deep Dark.`,
+      `Estructura: Crea un recinto cerrado de 9x9x4 de alto con suelo de Deepslate o Sculk.`,
+      `Condiciones: Mantiene el nivel de luz en 0 (oscuridad total).`,
+      `Consejo: Usa antorchas en las zonas exteriores adyacentes para canalizar las apariciones en tu plataforma.`
+    ];
   } else if (spawn.context === 'submerged') {
-    blockTip = `⚡ TRUCO DE GRANJA: Sumerge un área acuática de 7x7 con Coral, Prismarina y Algas.`;
-    requiredBlocks = ['Prismarine', 'Brain Coral', 'Sea Lantern'];
+    blockTip = `⚡ TRUCO DE GRANJA: Sumerge un tanque acuático de 7x7x5 de profundidad decorado con Coral, Prismarina y Linternas Marinas.`;
+    requiredBlocks = ['Prismarine', 'Brain Coral', 'Sea Lantern', 'Kelp'];
+    steps = [
+      `Ubicación: Ve a biomas de Océano, Océano Profundo o Ríos.`,
+      `Estructura: Construye una piscina o recinto acuático sumergido de 7x7x5 de profundidad con Prismarina en el fondo.`,
+      `Condiciones: Totalmente lleno de agua (bloques fuente) decorado con Coral y Algas.`,
+      `Consejo: Mantén la zona libre de construcciones terrestres flotantes.`
+    ];
   }
 
   return {
     pokemonId,
     naturalLanguageInstruction: blockTip,
-    requiredBlocks
+    requiredBlocks,
+    steps,
+    spawn
   };
 }

@@ -413,52 +413,130 @@ export const SpawnRadarView: React.FC<SpawnRadarViewProps> = ({
         const recipe = getSpawnRecipeForPokemon(selectedRecipePokemon);
         if (!p || !recipe) return null;
 
+        const totalStats = p.baseStats.hp + p.baseStats.attack + p.baseStats.defense + p.baseStats.specialAttack + p.baseStats.specialDefense + p.baseStats.speed;
+
         return (
           <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-2 sm:p-4 bg-zinc-950/85 backdrop-blur-md animate-in fade-in duration-200">
-            <div className="w-full max-w-lg bg-zinc-900 border border-zinc-800 rounded-t-3xl sm:rounded-3xl p-5 sm:p-6 space-y-4 shadow-2xl relative max-h-[92vh] overflow-y-auto">
+            <div className="w-full max-w-xl bg-zinc-900 border border-zinc-800 rounded-t-3xl sm:rounded-3xl p-5 sm:p-6 space-y-5 shadow-2xl relative max-h-[92vh] overflow-y-auto">
               
-              <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
+              {/* Modal Header: Pokemon Specs & Types */}
+              <div className="flex items-start justify-between border-b border-zinc-800 pb-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-zinc-950 border border-zinc-800 p-1 flex items-center justify-center">
-                    <img src={p.spriteUrl || p.artworkUrl} alt={p.name} className="w-8 h-8 object-contain" />
+                  <div className="w-14 h-14 rounded-2xl bg-zinc-950 border border-zinc-800 p-1 flex items-center justify-center shrink-0 shadow-inner">
+                    <img src={p.spriteUrl || p.artworkUrl} alt={p.name} className="max-h-full object-contain filter drop-shadow-md" />
                   </div>
                   <div>
-                    <h3 className="text-base font-extrabold text-white">{p.name}</h3>
-                    <span className="text-xs font-mono text-zinc-400">Receta de Granja de Spawns</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-mono font-bold text-zinc-500">#{String(p.dexNumber).padStart(3, '0')}</span>
+                      <h3 className="text-lg font-extrabold text-white">{p.name}</h3>
+                    </div>
+                    <span className="text-xs text-red-400 font-medium block mb-1.5">{p.categoryTitle || 'Especie Pokémon'}</span>
+                    <div className="flex gap-1">
+                      {p.types.map(t => (
+                        <span key={t} className="px-2 py-0.5 text-[10px] font-bold uppercase rounded bg-zinc-950 text-zinc-300 border border-zinc-800">
+                          {t}
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 </div>
                 <button
                   onClick={() => setSelectedRecipePokemon(null)}
-                  className="p-1.5 rounded-xl text-zinc-400 hover:text-white"
+                  className="p-2 rounded-xl bg-zinc-950 hover:bg-zinc-800 border border-zinc-800 text-zinc-400 hover:text-white transition-colors"
                 >
                   ✕
                 </button>
               </div>
 
-              <div className="space-y-3 text-xs">
-                <div className="bg-zinc-950 p-4 rounded-xl border border-zinc-800 space-y-2">
-                  <span className="font-bold text-amber-400 block">💡 Instrucción de Colocación de Bloques:</span>
-                  <p className="text-zinc-200 leading-relaxed text-xs">{recipe.naturalLanguageInstruction}</p>
+              {/* Base Stats Bar */}
+              <div className="bg-zinc-950/70 border border-zinc-800 rounded-2xl p-3.5 space-y-2">
+                <div className="flex items-center justify-between text-xs font-bold">
+                  <span className="text-zinc-400 uppercase text-[10px]">Estadísticas Base Totales (BST):</span>
+                  <span className="text-amber-400 font-mono">{totalStats} pts</span>
                 </div>
+                <div className="grid grid-cols-6 gap-1 text-center text-[10px] font-mono">
+                  <div className="bg-zinc-900 p-1.5 rounded-lg border border-zinc-800"><span className="text-zinc-500 block">HP</span><strong className="text-white">{p.baseStats.hp}</strong></div>
+                  <div className="bg-zinc-900 p-1.5 rounded-lg border border-zinc-800"><span className="text-zinc-500 block">ATK</span><strong className="text-white">{p.baseStats.attack}</strong></div>
+                  <div className="bg-zinc-900 p-1.5 rounded-lg border border-zinc-800"><span className="text-zinc-500 block">DEF</span><strong className="text-white">{p.baseStats.defense}</strong></div>
+                  <div className="bg-zinc-900 p-1.5 rounded-lg border border-zinc-800"><span className="text-zinc-500 block">SPA</span><strong className="text-white">{p.baseStats.specialAttack}</strong></div>
+                  <div className="bg-zinc-900 p-1.5 rounded-lg border border-zinc-800"><span className="text-zinc-500 block">SPD</span><strong className="text-white">{p.baseStats.specialDefense}</strong></div>
+                  <div className="bg-zinc-900 p-1.5 rounded-lg border border-zinc-800"><span className="text-zinc-500 block">SPE</span><strong className="text-white">{p.baseStats.speed}</strong></div>
+                </div>
+              </div>
 
-                <div className="space-y-1.5">
-                  <span className="font-bold text-zinc-400 uppercase text-[10px]">Bloques Requeridos / Recomendados:</span>
-                  <div className="flex flex-wrap gap-1.5">
-                    {recipe.requiredBlocks.map(b => (
-                      <span key={b} className="px-2.5 py-1 rounded-lg bg-zinc-950 border border-zinc-800 text-zinc-300 font-mono text-[11px]">
-                        🧱 {b}
-                      </span>
-                    ))}
+              {/* Comprehensive Spawn Conditions Box */}
+              <div className="bg-zinc-950 border border-zinc-800 rounded-2xl p-4 space-y-2.5 text-xs">
+                <h4 className="font-extrabold text-zinc-200 uppercase text-[11px] tracking-wider flex items-center gap-1.5">
+                  <MapPin className="w-3.5 h-3.5 text-red-500" /> Condiciones Exactas de Hábitat:
+                </h4>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                  <div>
+                    <span className="text-zinc-500 block">Biomas de Generación:</span>
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {recipe.spawn.condition.biomes.map((b: string) => (
+                        <span key={b} className="px-2 py-0.5 text-[10px] font-mono rounded bg-zinc-900 border border-zinc-800 text-zinc-300">
+                          {b.replace('#cobblemon:', '').replace('minecraft:', '')}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="space-y-1 font-mono">
+                    <div><span className="text-zinc-500">Capa Y / Altura:</span> <strong className="text-red-400">{recipe.spawn.condition.minY !== undefined ? `Y: ${recipe.spawn.condition.minY} a ${recipe.spawn.condition.maxY}` : 'Superficie'}</strong></div>
+                    <div><span className="text-zinc-500">Horario:</span> <strong className="text-zinc-200 capitalize">{recipe.spawn.condition.timeOfDay || 'Cualquiera'}</strong></div>
+                    <div><span className="text-zinc-500">Rango de Nivel:</span> <strong className="text-amber-400">Lv. {recipe.spawn.minLevel} - {recipe.spawn.maxLevel}</strong></div>
+                    <div><span className="text-zinc-500">Tasa de Captura:</span> <strong className="text-emerald-400">{p.catchRate}</strong></div>
                   </div>
                 </div>
               </div>
 
+              {/* Natural Language Block Instruction */}
+              <div className="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4 space-y-2">
+                <span className="font-bold text-amber-400 block text-xs flex items-center gap-1.5">
+                  💡 Instrucción de Colocación de Bloques para Granja:
+                </span>
+                <p className="text-zinc-200 leading-relaxed text-xs">
+                  {recipe.naturalLanguageInstruction}
+                </p>
+              </div>
+
+              {/* Required & Recommended Blocks */}
+              <div className="space-y-2">
+                <span className="font-bold text-zinc-400 uppercase text-[10px] block">Bloques Requeridos / Recomendados:</span>
+                <div className="flex flex-wrap gap-1.5">
+                  {recipe.requiredBlocks.map((b: string) => (
+                    <span key={b} className="px-3 py-1.5 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-200 font-mono text-xs flex items-center gap-1.5 shadow-sm">
+                      🧱 {b}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Step-by-step Farm Construction Guide */}
+              {recipe.steps && (
+                <div className="space-y-2 bg-zinc-950/60 border border-zinc-800 rounded-2xl p-4">
+                  <span className="font-bold text-zinc-300 uppercase text-[10px] block">Guía Paso a Paso para Construir la Granja:</span>
+                  <ul className="space-y-2 text-xs text-zinc-300">
+                    {recipe.steps.map((step: string, idx: number) => (
+                      <li key={idx} className="flex items-start gap-2 leading-relaxed">
+                        <span className="w-5 h-5 rounded-full bg-red-600/20 border border-red-500/40 text-red-400 text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">
+                          {idx + 1}
+                        </span>
+                        <span>{step}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {/* Action Button: Open Catch Calculator */}
               <button
                 onClick={() => {
                   onSelectPokemonForCalculator(p.id);
                   setSelectedRecipePokemon(null);
                 }}
-                className="w-full py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-extrabold text-xs shadow-md shadow-red-600/20 transition-all flex items-center justify-center gap-2"
+                className="w-full py-3 rounded-2xl bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-extrabold text-xs shadow-lg shadow-red-600/20 transition-all flex items-center justify-center gap-2 active:scale-95"
               >
                 <Target className="w-4 h-4" />
                 <span>Calcular Probabilidad de Captura de {p.name}</span>
