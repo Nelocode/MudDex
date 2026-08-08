@@ -22,17 +22,17 @@ export const ShinyHunterView: React.FC = () => {
     <div className="space-y-6">
       
       {/* Banner */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 via-slate-900/90 to-amber-950/40 border border-slate-800 p-6 sm:p-8">
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-zinc-900 via-zinc-900/90 to-amber-950/40 border border-zinc-800 p-4 sm:p-6 md:p-8">
         <div className="absolute top-0 right-0 -translate-y-12 translate-x-12 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="relative z-10 max-w-3xl space-y-3">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-semibold">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Shiny Hunting & Probabilidades • Cobblemon</span>
+        <div className="relative z-10 max-w-3xl space-y-2 sm:space-y-3">
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-[11px] sm:text-xs font-semibold max-w-full truncate">
+            <Sparkles className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">Shiny Hunting & Probabilidades • Cobblemon</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-white tracking-tight leading-snug">
             Calculadora de Caza de Pokémon Variocolor (Shiny)
           </h1>
-          <p className="text-sm text-slate-300 leading-relaxed">
+          <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed">
             Calcula tus probabilidades matemáticas acumuladas de encontrar un Pokémon Shiny en Diosesmon según tu número de encuentros y modificadores activos.
           </p>
         </div>

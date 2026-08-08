@@ -19,17 +19,17 @@ export const BiomeGuideView: React.FC = () => {
     <div className="space-y-6">
       
       {/* Banner */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 via-slate-900/90 to-emerald-950/40 border border-slate-800 p-6 sm:p-8">
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 via-slate-900/90 to-emerald-950/40 border border-slate-800 p-4 sm:p-6 md:p-8">
         <div className="absolute top-0 right-0 -translate-y-12 translate-x-12 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="relative z-10 max-w-3xl space-y-3">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold">
-            <Map className="w-3.5 h-3.5" />
-            <span>Biomas Minecraft 1.21.1 • Diosesmon</span>
+        <div className="relative z-10 max-w-3xl space-y-2 sm:space-y-3">
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[11px] sm:text-xs font-semibold max-w-full truncate">
+            <Map className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">Biomas Minecraft 1.21.1 • Diosesmon</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-white tracking-tight leading-snug">
             Guía Interactiva de Biomas & Coordenadas Y
           </h1>
-          <p className="text-sm text-slate-300 leading-relaxed">
+          <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
             Explora las capas de altura Y, temperaturas, trucos de colocación de bloques y especies clave que habitan en cada bioma de Diosesmon.
           </p>
         </div>

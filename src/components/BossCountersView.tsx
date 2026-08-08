@@ -7,17 +7,17 @@ export const BossCountersView: React.FC = () => {
     <div className="space-y-6">
       
       {/* Banner */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-slate-900 via-slate-900/90 to-rose-950/40 border border-slate-800 p-6 sm:p-8">
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-zinc-900 via-zinc-900/90 to-rose-950/40 border border-zinc-800 p-4 sm:p-6 md:p-8">
         <div className="absolute top-0 right-0 -translate-y-12 translate-x-12 w-64 h-64 bg-rose-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="relative z-10 max-w-3xl space-y-3">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs font-semibold">
-            <Swords className="w-3.5 h-3.5" />
-            <span>Asistente de Batallas & Raid Counters • Diosesmon</span>
+        <div className="relative z-10 max-w-3xl space-y-2 sm:space-y-3">
+          <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-rose-500/10 border border-rose-500/30 text-rose-400 text-[11px] sm:text-xs font-semibold max-w-full truncate">
+            <Swords className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">Asistente de Batallas & Raid Counters • Diosesmon</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-white tracking-tight leading-snug">
             Recomendador de Equipos & Counters para Bosses y Gimnasios
           </h1>
-          <p className="text-sm text-slate-300 leading-relaxed">
+          <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed">
             Estrategias recomendadas, Pokémon inmunizados y movimientos STAB para derrotar a los jefes, Raids y Gimnasios del servidor Diosesmon.
           </p>
         </div>
