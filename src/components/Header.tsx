@@ -81,6 +81,9 @@ export const Header: React.FC<HeaderProps> = ({
                   <span className="px-1.5 py-0.5 text-[9px] sm:text-[10px] font-extrabold uppercase rounded bg-red-600 text-white shadow-sm">
                     Wiki
                   </span>
+                  <span className="px-1.5 py-0.5 text-[9px] font-mono font-bold rounded bg-zinc-900 border border-zinc-800 text-amber-400 hidden xs:inline-block">
+                    by Mudkill
+                  </span>
                 </div>
                 <p className="text-[10px] sm:text-[11px] text-zinc-400 font-medium hidden sm:block">
                   Cobblemon 1.7.3 • Fabric 1.21.1

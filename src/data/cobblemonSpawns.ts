@@ -157,3 +157,29 @@ export function generateFullSpawns(): SpawnEntry[] {
 }
 
 export const COBBLEMON_SPAWNS: SpawnEntry[] = generateFullSpawns();
+
+export function getSpawnRecipeForPokemon(pokemonId: string) {
+  const spawn = COBBLEMON_SPAWNS.find(s => s.pokemonId.toLowerCase() === pokemonId.toLowerCase());
+  if (!spawn) return null;
+
+  const biomesStr = spawn.condition.biomes.map(b => b.replace('#cobblemon:', '').replace('minecraft:', '')).join(' / ');
+  let blockTip = `Construye una plataforma de al menos 9x9 bloques en biomas de ${biomesStr}.`;
+  let requiredBlocks = ['Grass Block', 'Moss Block'];
+
+  if (spawn.condition.biomes.some(b => b.includes('badlands') || b.includes('desert'))) {
+    blockTip = `⚡ TRUCO DE GRANJA: Construye una plataforma con Terracota Roja, Arena de Alma o Piedra del Nether.`;
+    requiredBlocks = ['Red Terracotta', 'Sand', 'Magma Block'];
+  } else if (spawn.condition.biomes.some(b => b.includes('cave') || b.includes('dark'))) {
+    blockTip = `⚡ TRUCO DE GRANJA: Coloca una cámara subterránea oscura despejada a menos de Y=0 con Piedra Profunda (Deepslate).`;
+    requiredBlocks = ['Deepslate', 'Sculk', 'Obsidian'];
+  } else if (spawn.context === 'submerged') {
+    blockTip = `⚡ TRUCO DE GRANJA: Sumerge un área acuática de 7x7 con Coral, Prismarina y Algas.`;
+    requiredBlocks = ['Prismarine', 'Brain Coral', 'Sea Lantern'];
+  }
+
+  return {
+    pokemonId,
+    naturalLanguageInstruction: blockTip,
+    requiredBlocks
+  };
+}

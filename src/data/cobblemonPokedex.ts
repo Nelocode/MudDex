@@ -1,4 +1,5 @@
 import { Pokemon, PokemonType } from '../types/diosesmon';
+import { POKEMON_NAMES_1025 } from './pokemonNamesList';
 
 export function getGen(dex: number): number {
   if (dex <= 151) return 1;
@@ -83,7 +84,8 @@ export function generateFullPokedex(): Pokemon[] {
 
   for (let dex = 1; dex <= 1025; dex++) {
     const known = POKEMON_NAMES_MAP[dex];
-    const name = known ? known.name : `Pokémon #${dex}`;
+    const officialName = POKEMON_NAMES_1025[dex - 1] || `Pokémon #${dex}`;
+    const name = known ? known.name : officialName;
     const id = name.toLowerCase().replace(/[^a-z0-9]/g, '');
     const gen = getGen(dex);
 

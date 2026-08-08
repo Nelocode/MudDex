@@ -113,7 +113,7 @@ export function App() {
       {/* Footer */}
       <footer className="relative z-10 border-t border-zinc-800 bg-zinc-950/90 py-6 px-3 sm:py-10 text-center text-xs text-zinc-400 space-y-2">
         <p className="font-medium text-zinc-300">
-          MudDex • Modpack Oficial de Cobblemon Minecraft 1.21.1 (Fabric)
+          MudDex • Plataforma Oficial creada por <strong className="text-amber-400 font-extrabold">Mudkill</strong> para Diosesmon (Fabric 1.21.1)
         </p>
         <p className="text-zinc-400">
           Desarrollado para el servidor Diosesmon. Pokémon y sus nombres son marcas registradas de Nintendo / Creatures Inc. / GAME FREAK inc.
