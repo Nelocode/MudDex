@@ -155,14 +155,18 @@ export const PokeQuizView: React.FC = () => {
         <div className="bg-zinc-900/80 border border-zinc-800 rounded-3xl p-6 sm:p-8 space-y-6 shadow-2xl relative overflow-hidden max-w-2xl mx-auto text-center">
           
           {/* Target Display Canvas */}
-          <div className="w-full h-52 bg-zinc-950 rounded-2xl border border-zinc-800/80 flex flex-col items-center justify-center p-4 relative group">
+          <div className="w-full h-60 bg-gradient-to-b from-zinc-800 via-zinc-900 to-zinc-950 rounded-3xl border-2 border-zinc-700/80 flex flex-col items-center justify-center p-4 relative overflow-hidden group shadow-inner">
             
+            {/* High-Contrast Center Spotlight */}
+            <div className="absolute w-48 h-48 rounded-full bg-zinc-700/50 border border-zinc-600/30 blur-2xl pointer-events-none" />
+            <div className="absolute w-36 h-36 rounded-full bg-white/10 blur-xl pointer-events-none" />
+
             {mode === 'cry' && selectedAnswer === null ? (
               <button
                 onClick={() => playAudio(targetPokemon.audioCryUrl)}
-                className="flex flex-col items-center gap-3 text-red-400 hover:text-red-300 transition-colors p-4"
+                className="flex flex-col items-center gap-3 text-red-400 hover:text-red-300 transition-colors p-4 relative z-10"
               >
-                <div className="w-16 h-16 rounded-full bg-red-600/10 border border-red-500/30 flex items-center justify-center animate-bounce">
+                <div className="w-16 h-16 rounded-full bg-red-600/20 border border-red-500/40 flex items-center justify-center animate-bounce shadow-lg">
                   <Volume2 className="w-8 h-8" />
                 </div>
                 <span className="text-xs font-bold font-mono">Pulsa para reproducir el rugido 🔊</span>
@@ -171,16 +175,16 @@ export const PokeQuizView: React.FC = () => {
               <img
                 src={targetPokemon.spriteUrl || targetPokemon.artworkUrl}
                 alt={targetPokemon.name}
-                className={`max-h-full object-contain transition-all duration-500 ${
+                className={`max-h-44 object-contain transition-all duration-500 relative z-10 ${
                   selectedAnswer === null && mode === 'silhouette'
-                    ? 'brightness-0 invert-0 filter drop-shadow-lg scale-110'
-                    : 'brightness-100 scale-125 filter drop-shadow-2xl animate-bounce'
+                    ? 'brightness-0 contrast-200 filter drop-shadow-[0_0_12px_rgba(255,255,255,0.85)] drop-shadow-[0_0_24px_rgba(255,255,255,0.4)] scale-125'
+                    : 'brightness-100 scale-125 filter drop-shadow-[0_10px_20px_rgba(0,0,0,0.5)] animate-bounce'
                 }`}
               />
             )}
 
             {selectedAnswer !== null && (
-              <span className="absolute bottom-3 text-xs font-mono font-bold text-zinc-400">
+              <span className="absolute bottom-3 text-xs font-mono font-bold text-zinc-300 bg-zinc-950/80 px-3 py-1 rounded-full border border-zinc-800 relative z-10">
                 #{String(targetPokemon.dexNumber).padStart(3, '0')} - {targetPokemon.name}
               </span>
             )}
