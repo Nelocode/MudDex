@@ -58,7 +58,7 @@ export const COBBLEMON_EV_SPOTS: EvSpot[] = [
     bestTargets: [
       { pokemonId: 'tinkaton', pokemonName: 'Tinkaton', evYield: 2, biome: 'Stony Peaks', spawnTime: 'Día' },
       { pokemonId: 'blastoise', pokemonName: 'Blastoise', evYield: 3, biome: 'Océano', spawnTime: 'Día' },
-      { pokemonId: 'tyranitar', pokemonName: 'Tyranitar', evYield: 3, biome: 'Badlands', spawnTime: 'Cualquiera' }
+      { pokemonId: 'steelix', pokemonName: 'Steelix', evYield: 3, biome: 'Dripstone Caves / Cueva', spawnTime: 'Cualquiera' }
     ]
   },
   {
