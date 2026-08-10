@@ -55,7 +55,8 @@ export const BreedingPlannerView: React.FC = () => {
     }
   };
 
-  // Step 2: Pasture Inventory State
+  // Step 2 & 3: Pasture Inventory & Shopping Items State
+  const [manualAcquiredItems, setManualAcquiredItems] = useState<Record<string, boolean>>({});
   const [pastura, setPastura] = useState<BreederInventoryItem[]>([
     {
       id: 'p1',
@@ -590,46 +591,84 @@ export const BreedingPlannerView: React.FC = () => {
       )}
 
       {/* STEP 3: Lista de Compras */}
-      {currentWizardStep === 3 && (
-        <div className="space-y-6">
-          <div className="bg-zinc-900/90 border border-zinc-800 rounded-3xl p-6 space-y-5 shadow-xl">
-            <h3 className="text-sm font-extrabold text-white flex items-center gap-2 border-b border-zinc-800 pb-3">
-              <ShoppingBag className="w-4 h-4 text-amber-400" />
-              <span>Lista de Compras & Requisitos Previos Necesarios</span>
-            </h3>
+      {currentWizardStep === 3 && (() => {
+        const totalItems = generatedPlan.shoppingList.length;
+        const acquiredCount = generatedPlan.shoppingList.filter(item => {
+          return manualAcquiredItems[item.id] !== undefined ? manualAcquiredItems[item.id] : item.isAcquired;
+        }).length;
+        const percent = totalItems > 0 ? Math.round((acquiredCount / totalItems) * 100) : 0;
 
-            <div className="space-y-3">
-              {generatedPlan.shoppingList.map(item => (
-                <div key={item.id} className={`p-4 rounded-2xl border flex items-center justify-between text-xs transition-all ${
-                  item.isAcquired ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300' : 'bg-zinc-950 border-zinc-800 text-zinc-200'
-                }`}>
-                  <div className="flex items-center gap-3">
-                    <span className="text-xl">{item.icon}</span>
-                    <div>
-                      <strong className="font-extrabold block text-white">{item.name}</strong>
-                      <span className="text-[10px] text-zinc-400">{item.notes}</span>
-                    </div>
-                  </div>
+        return (
+          <div className="space-y-6">
+            <div className="bg-zinc-900/90 border border-zinc-800 rounded-3xl p-6 space-y-5 shadow-xl">
+              
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-800 pb-3">
+                <h3 className="text-sm font-extrabold text-white flex items-center gap-2">
+                  <ShoppingBag className="w-4 h-4 text-amber-400" />
+                  <span>Lista de Compras & Requisitos Previos Necesarios</span>
+                </h3>
+                <span className="text-xs font-mono font-bold text-amber-400">
+                  {acquiredCount} / {totalItems} Adquiridos ({percent}%)
+                </span>
+              </div>
 
-                  <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase border ${
-                    item.isAcquired ? 'bg-emerald-950 border-emerald-800 text-emerald-400' : 'bg-amber-950 border-amber-800 text-amber-400'
-                  }`}>
-                    {item.isAcquired ? '✓ En tu Pastura / Adquirido' : 'Pendiente por Adquirir'}
-                  </span>
+              {/* Progress bar */}
+              <div className="space-y-1">
+                <div className="w-full h-2.5 bg-zinc-950 rounded-full border border-zinc-800 overflow-hidden p-0.5">
+                  <div
+                    className="h-full bg-gradient-to-r from-amber-500 to-emerald-500 rounded-full transition-all duration-300"
+                    style={{ width: `${percent}%` }}
+                  />
                 </div>
-              ))}
-            </div>
+                <span className="text-[10px] text-zinc-400 block">💡 Toca cualquier objeto en la lista para marcarlo como Adquirido o Pendiente.</span>
+              </div>
 
-            <button
-              onClick={() => setCurrentWizardStep(4)}
-              className="w-full py-3 rounded-2xl bg-red-600 hover:bg-red-500 text-white font-extrabold text-xs shadow-lg shadow-red-600/20 transition-all flex items-center justify-center gap-2"
-            >
-              <span>Generar Ruta Paso a Paso Determinista</span>
-              <ChevronRight className="w-4 h-4" />
-            </button>
+              <div className="space-y-3">
+                {generatedPlan.shoppingList.map(item => {
+                  const isItemAcquired = manualAcquiredItems[item.id] !== undefined ? manualAcquiredItems[item.id] : item.isAcquired;
+
+                  return (
+                    <div
+                      key={item.id}
+                      onClick={() => {
+                        setManualAcquiredItems(prev => ({
+                          ...prev,
+                          [item.id]: !isItemAcquired
+                        }));
+                      }}
+                      className={`p-4 rounded-2xl border flex items-center justify-between text-xs transition-all cursor-pointer ${
+                        isItemAcquired ? 'bg-emerald-500/10 border-emerald-500/40 text-emerald-300 shadow-sm' : 'bg-zinc-950 border-zinc-800 text-zinc-200 hover:border-red-500/40'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="text-xl">{item.icon}</span>
+                        <div>
+                          <strong className="font-extrabold block text-white">{item.name}</strong>
+                          <span className="text-[10px] text-zinc-400">{item.notes}</span>
+                        </div>
+                      </div>
+
+                      <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase border transition-colors ${
+                        isItemAcquired ? 'bg-emerald-950 border-emerald-800 text-emerald-400' : 'bg-amber-950 border-amber-800 text-amber-400'
+                      }`}>
+                        {isItemAcquired ? '✓ Adquirido / En Inventario' : '⏳ Pendiente por Adquirir'}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <button
+                onClick={() => setCurrentWizardStep(4)}
+                className="w-full py-3 rounded-2xl bg-red-600 hover:bg-red-500 text-white font-extrabold text-xs shadow-lg shadow-red-600/20 transition-all flex items-center justify-center gap-2"
+              >
+                <span>Generar Ruta Paso a Paso Determinista</span>
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* STEP 4: Ruta paso a paso */}
       {currentWizardStep === 4 && (

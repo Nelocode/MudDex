@@ -127,6 +127,8 @@ export function generateBreedingPlan(
   const hasDitto = pastura.some(b => b.speciesId === 'ditto');
   const targetSpeciesBreeders = pastura.filter(b => b.speciesId === targetSpeciesId);
 
+  const hasDestinyKnotInPastura = pastura.some(b => (b as any).equippedItem === 'Lazo Destino' || (b as any).hasDestinyKnot);
+
   // 1. Shopping List Building
   shoppingList.push({
     id: 'lazo_destino',
@@ -134,8 +136,8 @@ export function generateBreedingPlan(
     category: 'destiny_knot',
     icon: '🎗️',
     quantityNeeded: 1,
-    isAcquired: true,
-    notes: 'Transmite 5 IVs combinados de ambos padres.'
+    isAcquired: hasDestinyKnotInPastura,
+    notes: 'Transmite 5 IVs combinados de ambos padres. Requerido para cruces de 4x31, 5x31 y 6x31.'
   });
 
   shoppingList.push({
