@@ -534,7 +534,7 @@ export const BreedingPlannerView: React.FC = () => {
                     { key: 'defense', label: 'DEF 31' },
                     { key: 'specialAttack', label: 'SpA 31' },
                     { key: 'specialDefense', label: 'SpD 31' },
-                    { key: 'speed', label: 'SPE 31' }
+                    { key: 'speed', label: 'VEL 31' }
                   ].map(iv => (
                     <label key={iv.key} className="flex items-center gap-1.5 p-2.5 rounded-xl bg-zinc-900 border border-zinc-800 cursor-pointer hover:border-red-500/40">
                       <input
@@ -577,7 +577,7 @@ export const BreedingPlannerView: React.FC = () => {
                   <div className="flex flex-wrap gap-1 font-mono text-[10px]">
                     {Object.entries(item.ivs).map(([k, v]) => v ? (
                       <span key={k} className="px-2 py-0.5 rounded bg-emerald-950 border border-emerald-800 text-emerald-300 font-bold uppercase">
-                        {k === 'hp' ? 'HP' : k === 'attack' ? 'ATT' : k === 'defense' ? 'DEF' : k === 'specialAttack' ? 'SpA' : k === 'specialDefense' ? 'SpD' : 'SPE'} 31
+                        {k === 'hp' ? 'HP' : k === 'attack' ? 'ATT' : k === 'defense' ? 'DEF' : k === 'specialAttack' ? 'SpA' : k === 'specialDefense' ? 'SpD' : 'VEL'} 31
                       </span>
                     ) : null)}
                   </div>
