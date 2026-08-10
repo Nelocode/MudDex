@@ -83,59 +83,119 @@ export function generateFullSpawns(): SpawnEntry[] {
     let minY: number | undefined = undefined;
     let maxY: number | undefined = undefined;
 
-    // Bucket calculation
-    if (pokemon.catchRate <= 5) bucket = 'ultra-rare';
-    else if (pokemon.catchRate <= 45) bucket = 'rare';
-    else if (pokemon.catchRate <= 120) bucket = 'uncommon';
-    else bucket = 'common';
+    // Authentic Bucket calculation from catch rate and legendaries
+    if (pokemon.catchRate <= 5 || [150, 151, 249, 250, 384, 487, 493, 643, 644, 716, 717, 785, 786, 787, 788, 888, 889, 890, 1007, 1008].includes(pokemon.dexNumber)) {
+      bucket = 'ultra-rare';
+    } else if (pokemon.catchRate <= 45) {
+      bucket = 'rare';
+    } else if (pokemon.catchRate <= 120) {
+      bucket = 'uncommon';
+    } else {
+      bucket = 'common';
+    }
 
-    // Type-based biome & environment assignment
+    // Authentic Type-based biome & environment assignment
     switch (mainType) {
       case 'grass':
+        biomes = ['#cobblemon:is_forest', 'minecraft:jungle', 'minecraft:sparse_jungle', 'minecraft:meadow', 'minecraft:plains'];
+        timeOfDay = 'day';
+        break;
+
       case 'bug':
-        biomes = ['#cobblemon:is_jungle', 'minecraft:jungle', 'minecraft:sparse_jungle', 'minecraft:forest'];
+        biomes = ['#cobblemon:is_forest', 'minecraft:jungle', 'minecraft:dark_forest', 'minecraft:birch_forest'];
         timeOfDay = 'day';
         break;
 
       case 'fire':
-      case 'ground':
-      case 'rock':
-        biomes = ['#cobblemon:is_badlands', 'minecraft:badlands', 'minecraft:desert'];
+        biomes = ['#cobblemon:is_badlands', 'minecraft:badlands', 'minecraft:desert', 'minecraft:nether_wastes', 'minecraft:basalt_deltas'];
         timeOfDay = 'day';
         break;
 
       case 'water':
-      case 'ice':
-        biomes = ['#cobblemon:is_ocean', 'minecraft:ocean', 'minecraft:river', 'minecraft:deep_ocean'];
+        biomes = ['#cobblemon:is_ocean', 'minecraft:ocean', 'minecraft:deep_ocean', 'minecraft:river', 'minecraft:warm_ocean'];
         context = 'submerged';
         break;
 
+      case 'ice':
+        biomes = ['minecraft:snowy_plains', 'minecraft:frozen_ocean', 'minecraft:jagged_peaks', 'minecraft:ice_spikes'];
+        timeOfDay = 'any';
+        break;
+
       case 'electric':
-      case 'dragon':
-      case 'flying':
-        biomes = ['#cobblemon:is_mountain', 'minecraft:jagged_peaks', 'minecraft:stony_peaks'];
-        minY = 75;
+        biomes = ['minecraft:stony_peaks', 'minecraft:savanna', 'minecraft:windswept_hills', '#cobblemon:is_mountain'];
+        minY = 70;
         timeOfDay = 'day';
+        break;
+
+      case 'ground':
+      case 'rock':
+        biomes = ['#cobblemon:is_badlands', 'minecraft:dripstone_caves', 'minecraft:desert', 'minecraft:stony_shore'];
         break;
 
       case 'ghost':
       case 'dark':
-      case 'poison':
-        biomes = ['minecraft:dark_forest', '#cobblemon:is_cave', 'minecraft:deep_dark'];
+        biomes = ['minecraft:dark_forest', '#cobblemon:is_cave', 'minecraft:deep_dark', 'minecraft:soul_sand_valley'];
         timeOfDay = 'night';
+        break;
+
+      case 'poison':
+        biomes = ['minecraft:swamp', 'minecraft:mangrove_swamp', 'minecraft:dark_forest'];
+        timeOfDay = 'night';
+        break;
+
+      case 'dragon':
+        biomes = ['minecraft:jagged_peaks', 'minecraft:stony_peaks', 'minecraft:deep_dark', 'minecraft:end_barrens'];
+        minY = 80;
+        timeOfDay = 'any';
+        break;
+
+      case 'steel':
+        biomes = ['minecraft:dripstone_caves', '#cobblemon:is_mountain', 'minecraft:deepslate'];
+        minY = -30;
+        maxY = 30;
         break;
 
       case 'psychic':
       case 'fairy':
-      case 'steel':
+        biomes = ['minecraft:cherry_grove', 'minecraft:meadow', 'minecraft:dark_forest', 'minecraft:old_growth_birch_taiga'];
+        timeOfDay = 'any';
+        break;
+
+      case 'flying':
+        biomes = ['minecraft:windswept_hills', 'minecraft:jagged_peaks', 'minecraft:meadow', 'minecraft:cherry_grove'];
+        minY = 64;
+        timeOfDay = 'day';
+        break;
+
       case 'fighting':
+        biomes = ['minecraft:bamboo_jungle', 'minecraft:stony_peaks', 'minecraft:windswept_hills'];
+        timeOfDay = 'day';
+        break;
+
       case 'normal':
       default:
-        biomes = ['minecraft:plains', 'minecraft:meadow', '#cobblemon:is_forest'];
+        biomes = ['minecraft:plains', 'minecraft:meadow', 'minecraft:savanna', 'minecraft:sunflower_plains'];
+        timeOfDay = 'any';
         break;
     }
 
-    const weight = bucket === 'ultra-rare' ? 1.0 : bucket === 'rare' ? 5.0 : bucket === 'uncommon' ? 15.0 : 35.0;
+    const weight = bucket === 'ultra-rare' ? 0.5 : bucket === 'rare' ? 3.5 : bucket === 'uncommon' ? 12.0 : 30.0;
+
+    // Authentic level scaling based on species BST (Base Stat Total)
+    const bst = pokemon.baseStats.hp + pokemon.baseStats.attack + pokemon.baseStats.defense + pokemon.baseStats.specialAttack + pokemon.baseStats.specialDefense + pokemon.baseStats.speed;
+    let minLevel = 3;
+    let maxLevel = 22;
+
+    if (bucket === 'ultra-rare' || bst >= 540) {
+      minLevel = 50;
+      maxLevel = 75;
+    } else if (bucket === 'rare' || bst >= 450) {
+      minLevel = 30;
+      maxLevel = 55;
+    } else if (bucket === 'uncommon' || bst >= 340) {
+      minLevel = 18;
+      maxLevel = 38;
+    }
 
     return {
       id: `${pokemon.id}-spawn`,
@@ -143,8 +203,8 @@ export function generateFullSpawns(): SpawnEntry[] {
       bucket,
       weight,
       context,
-      minLevel: Math.max(5, Math.min(50, pokemon.dexNumber % 50 + 5)),
-      maxLevel: Math.max(25, Math.min(75, pokemon.dexNumber % 50 + 30)),
+      minLevel,
+      maxLevel,
       condition: {
         biomes,
         timeOfDay,
