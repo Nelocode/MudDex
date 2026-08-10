@@ -1,4 +1,4 @@
-import { POKEMON_EGG_DATASET, PokemonEggData } from '../data/cobblemonEggGroups';
+import { POKEMON_EGG_DATASET, PokemonEggData, EggGroup } from '../data/cobblemonEggGroups';
 
 export interface BreederInventoryItem {
   id: string;
@@ -101,6 +101,29 @@ export const POWER_ITEMS_MAP = [
   { ivKey: 'speed', name: 'Franja Recia (Power Anklet)', statName: 'Velocidad', icon: '⚡' }
 ];
 
+export function findBridgeSpecies(sourceEggGroups: EggGroup[], targetEggGroups: EggGroup[]): PokemonEggData | null {
+  // If directly compatible, no bridge needed
+  if (sourceEggGroups.some(s => targetEggGroups.includes(s))) {
+    return null;
+  }
+  // Find iconic dual-egg group species bridging source and target
+  const bridge = POKEMON_EGG_DATASET.find(p => {
+    if (p.eggGroups.includes('undiscovered') || p.eggGroups.includes('ditto')) return false;
+    const hasSource = p.eggGroups.some(eg => sourceEggGroups.includes(eg));
+    const hasTarget = p.eggGroups.some(eg => targetEggGroups.includes(eg));
+    return hasSource && hasTarget;
+  });
+
+  if (bridge) return bridge;
+
+  // Shuckle fallback for Bug + Mineral
+  if (sourceEggGroups.includes('bug') && targetEggGroups.includes('mineral')) {
+    return POKEMON_EGG_DATASET.find(p => p.pokemonId === 'shuckle') || POKEMON_EGG_DATASET.find(p => p.pokemonId === 'dwebble') || null;
+  }
+
+  return null;
+}
+
 export function generateBreedingPlan(
   targetSpeciesId: string,
   targetIvs: { hp: boolean; attack: boolean; defense: boolean; specialAttack: boolean; specialDefense: boolean; speed: boolean },
@@ -123,90 +146,126 @@ export function generateBreedingPlan(
   const hasEverstone = pastura.some(b => b.nature === targetNature);
   const hasDitto = pastura.some(b => b.speciesId === 'ditto');
 
-  // Check if pastura contains compatible breeders from the same Egg Group (e.g. Spinda in Field group)
-  const compatiblePasturaBreeders = pastura.filter(b => {
-    const speciesInfo = POKEMON_EGG_DATASET.find(p => p.pokemonId === b.speciesId);
-    if (!speciesInfo) return false;
-    return speciesInfo.eggGroups.some(eg => targetData.eggGroups.includes(eg));
-  });
+  // Check if pastura has breeders and if they need a Bridge Species
+  const pastureBreederA = pastura[0];
+  const pastureBreederB = pastura[1];
 
-  const parentABreeder = compatiblePasturaBreeders[0] || pastura[0];
-  const parentBBreeder = compatiblePasturaBreeders[1] || pastura[1];
+  let bridgeSpeciesData: PokemonEggData | null = null;
+  let isDirectlyCompatible = false;
 
-  const parentASpeciesData = parentABreeder ? POKEMON_EGG_DATASET.find(p => p.pokemonId === parentABreeder.speciesId) : targetData;
-  const parentBSpeciesData = parentBBreeder ? POKEMON_EGG_DATASET.find(p => p.pokemonId === parentBBreeder.speciesId) : targetData;
+  if (pastureBreederA) {
+    const pASpecies = POKEMON_EGG_DATASET.find(p => p.pokemonId === pastureBreederA.speciesId) || targetData;
+    isDirectlyCompatible = pASpecies.eggGroups.some(eg => targetData.eggGroups.includes(eg));
+    if (!isDirectlyCompatible) {
+      bridgeSpeciesData = findBridgeSpecies(pASpecies.eggGroups, targetData.eggGroups) || POKEMON_EGG_DATASET.find(p => p.pokemonId === 'shuckle') || null;
+    }
+  }
 
-  const parentASprite = parentASpeciesData ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${parentASpeciesData.dexNumber}.png` : targetSprite;
-  const parentBSprite = parentBSpeciesData ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${parentBSpeciesData.dexNumber}.png` : (hasDitto ? dittoSprite : targetSprite);
-
-  // 1. Phase 1: Initial 2x31 Merge using Pasture Breeders if compatible
+  // 1. Phase 1: Merge Pasture Breeders
   const ivKey1 = requiredIvKeys[0] || 'hp';
   const ivKey2 = requiredIvKeys[1] || 'speed';
   const item1 = POWER_ITEMS_MAP.find(p => p.ivKey === ivKey1);
   const item2 = POWER_ITEMS_MAP.find(p => p.ivKey === ivKey2);
 
-  const parentAName = parentABreeder
-    ? `🌉 ${parentABreeder.speciesName} (Pastura - Grupo Huevo Compatible)`
-    : `${targetData.pokemonName} Macho`;
+  const pASpeciesData = pastureBreederA ? POKEMON_EGG_DATASET.find(p => p.pokemonId === pastureBreederA.speciesId) : targetData;
+  const pBSpeciesData = pastureBreederB ? POKEMON_EGG_DATASET.find(p => p.pokemonId === pastureBreederB.speciesId) : targetData;
 
-  const parentBName = parentBBreeder
-    ? `🌉 ${parentBBreeder.speciesName} (Pastura - Grupo Huevo Compatible)`
-    : (hasDitto ? 'Ditto (Pastura)' : `${targetData.pokemonName} Hembra`);
+  const pASprite = pASpeciesData ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pASpeciesData.dexNumber}.png` : targetSprite;
+  const pBSprite = pBSpeciesData ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pBSpeciesData.dexNumber}.png` : (hasDitto ? dittoSprite : targetSprite);
 
   steps.push({
     stepNumber: 1,
     title: `Fase 1: Cruce de Criadores Iniciales de Pastura (2x31 IVs)`,
     parentA: {
-      name: parentAName,
-      gender: parentABreeder ? parentABreeder.gender : 'male',
+      name: pastureBreederA ? `${pastureBreederA.speciesName} (Pastura)` : `${targetData.pokemonName} Macho`,
+      gender: pastureBreederA ? pastureBreederA.gender : 'male',
       equippedItem: item1 ? item1.name : 'Pesa Recia (Power Weight)',
       ivSummary: `31 en ${item1?.statName || 'HP'}`,
-      isPreOwned: !!parentABreeder,
-      spriteUrl: parentASprite
+      isPreOwned: !!pastureBreederA,
+      spriteUrl: pASprite
     },
     parentB: {
-      name: parentBName,
-      gender: parentBBreeder ? parentBBreeder.gender : (hasDitto ? 'genderless' : 'female'),
+      name: pastureBreederB ? `${pastureBreederB.speciesName} (Pastura)` : (hasDitto ? 'Ditto (Pastura)' : `${targetData.pokemonName} Hembra`),
+      gender: pastureBreederB ? pastureBreederB.gender : (hasDitto ? 'genderless' : 'female'),
       equippedItem: item2 ? item2.name : 'Franja Recia (Power Anklet)',
       ivSummary: `31 en ${item2?.statName || 'Velocidad'}`,
-      isPreOwned: !!parentBBreeder || hasDitto,
-      spriteUrl: parentBSprite
+      isPreOwned: !!pastureBreederB || hasDitto,
+      spriteUrl: pBSprite
     },
     offspringTarget: {
-      name: parentABreeder && parentABreeder.speciesId !== targetSpeciesId
-        ? `${targetData.pokemonName} (Hijo Puente 2x31)`
-        : `${targetData.pokemonName} (Cría 2x31)`,
-      genderRequired: genderInfo.femaleRate <= 0.15 ? 'female' : 'either',
+      name: pastureBreederA ? `${pASpeciesData?.pokemonName || targetData.pokemonName} (Cría 2x31)` : `${targetData.pokemonName} (Cría 2x31)`,
+      genderRequired: 'male',
       expectedIvsSummary: `2x31 IVs Garantizados 100% (${item1?.statName || 'HP'} + ${item2?.statName || 'Velocidad'})`,
-      genderCostAlert: genderInfo.femaleRate <= 0.15 ? `⚠️ Requiere Cría Hembra (Tasa 12.5%): Se estiman ~8 huevos para obtener la Hembra.` : undefined,
-      spriteUrl: targetSprite
+      spriteUrl: pASprite
     },
-    strategyNotes: parentABreeder
-      ? `Aprovecha los Pokémon de tu Pastura (${parentABreeder.speciesName}) del mismo grupo huevo para transferir IVs de 31 directamente a la especie ${targetData.pokemonName}.`
+    strategyNotes: pastureBreederA
+      ? `Combina los criadores de tu Pastura (${pastureBreederA.speciesName} y ${pastureBreederB?.speciesName || 'Ditto'}) para consolidar los primeros IVs de 31.`
       : `Equipa a cada padre con su Objeto Recio para garantizar al 100% la herencia de ambos IVs sin azar.`,
     hatchStepsEstimate: 5120,
     flameBodyStepsEstimate: 2560
   });
 
-  // 2. Phase 2: Nature Lock with Everstone + 3rd IV (3x31 IVs)
+  // 2. Phase 1.5: Inter-Egg Group Bridge Step if Pasture Species cannot breed directly with Target
+  let stepOffset = 1;
+
+  if (bridgeSpeciesData && !isDirectlyCompatible) {
+    stepOffset = 2;
+    const bridgeSprite = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${bridgeSpeciesData.dexNumber}.png`;
+
+    steps.push({
+      stepNumber: 2,
+      title: `Fase 2: Cruce de Transferencia con Pokémon Puente 🌉 (${bridgeSpeciesData.pokemonName})`,
+      parentA: {
+        name: `${pASpeciesData?.pokemonName || 'Criador Pastura'} Macho (2x31)`,
+        gender: 'male',
+        equippedItem: item1 ? item1.name : 'Pesa Recia',
+        ivSummary: `2x31 IVs (${pASpeciesData?.eggGroups.join(', ')})`,
+        isPreOwned: false,
+        spriteUrl: pASprite
+      },
+      parentB: {
+        name: `💡 ${bridgeSpeciesData.pokemonName} Hembra (Pokémon Puente Recomendado)`,
+        gender: 'female',
+        equippedItem: item2 ? item2.name : 'Franja Recia',
+        ivSummary: `Puente entre Grupos (${bridgeSpeciesData.eggGroups.join(', ')})`,
+        isPreOwned: false,
+        spriteUrl: bridgeSprite
+      },
+      offspringTarget: {
+        name: `${bridgeSpeciesData.pokemonName} Macho (Cría 2x31 con IVs Transferidos)`,
+        genderRequired: 'male',
+        expectedIvsSummary: `2x31 IVs + Grupo Huevo ${targetData.eggGroups.join(', ')}`,
+        spriteUrl: bridgeSprite
+      },
+      strategyNotes: `🌉 ¡Paso Puente Crucial! Como ${pASpeciesData?.pokemonName} (${pASpeciesData?.eggGroups.join(', ')}) no puede criar con ${targetData.pokemonName} (${targetData.eggGroups.join(', ')}), se utiliza a ${bridgeSpeciesData.pokemonName} (${bridgeSpeciesData.eggGroups.join(', ')}) para transferir los IVs de 31 entre ambos grupos.`,
+      hatchStepsEstimate: 5120,
+      flameBodyStepsEstimate: 2560
+    });
+  }
+
+  // 3. Phase 2/3: Nature Lock with Everstone + 3rd IV (3x31 IVs)
   if (ivCount >= 3) {
     const ivKey3 = requiredIvKeys[2] || 'attack';
     const item3 = POWER_ITEMS_MAP.find(p => p.ivKey === ivKey3);
 
     steps.push({
-      stepNumber: 2,
-      title: `Fase 2: Herencia de Naturaleza ${targetNature} con Piedra Eterna (3x31 IVs)`,
+      stepNumber: 1 + stepOffset,
+      title: `Fase ${1 + stepOffset}: Herencia de Naturaleza ${targetNature} con Piedra Eterna (3x31 IVs)`,
       parentA: {
-        name: `${targetData.pokemonName} (Cría 2x31)`,
-        gender: 'female',
+        name: bridgeSpeciesData && !isDirectlyCompatible
+          ? `${bridgeSpeciesData.pokemonName} Macho (2x31 Grupo ${targetData.eggGroups[0]})`
+          : `${targetData.pokemonName} Macho (2x31)`,
+        gender: 'male',
         equippedItem: item1 ? item1.name : 'Pesa Recia',
         ivSummary: `2x31 IVs`,
         isPreOwned: false,
-        spriteUrl: targetSprite
+        spriteUrl: bridgeSpeciesData && !isDirectlyCompatible
+          ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${bridgeSpeciesData.dexNumber}.png`
+          : targetSprite
       },
       parentB: {
-        name: `Criador Compatible con Naturaleza ${targetNature}`,
-        gender: 'male',
+        name: `${targetData.pokemonName} Hembra con Naturaleza ${targetNature}`,
+        gender: 'female',
         equippedItem: `Piedra Eterna (Everstone)`,
         ivSummary: `31 en ${item3?.statName || 'Ataque'} + Naturaleza ${targetNature}`,
         isPreOwned: hasEverstone,
@@ -224,7 +283,7 @@ export function generateBreedingPlan(
     });
   }
 
-  // 3. Phase 3: Final Merge Tree (With or Without Destiny Knot)
+  // 4. Final Merge Tree (With or Without Destiny Knot)
   if (ivCount >= 4) {
     const ivKey3 = requiredIvKeys[2] || 'attack';
     const item3 = POWER_ITEMS_MAP.find(p => p.ivKey === ivKey3);
@@ -232,10 +291,9 @@ export function generateBreedingPlan(
     const item4 = POWER_ITEMS_MAP.find(p => p.ivKey === ivKey4);
 
     if (useDestinyKnot) {
-      // Destiny Knot Route (High Density Merge)
       steps.push({
-        stepNumber: 3,
-        title: `Fase 3: Combinación Lazo Destino de Alta Densidad (${ivCount}x31 IVs)`,
+        stepNumber: 2 + stepOffset,
+        title: `Fase ${2 + stepOffset}: Combinación Lazo Destino de Alta Densidad (${ivCount}x31 IVs)`,
         parentA: {
           name: `${targetData.pokemonName} Macho (3x31/4x31)`,
           gender: 'male',
@@ -263,10 +321,9 @@ export function generateBreedingPlan(
         flameBodyStepsEstimate: 2560
       });
     } else {
-      // PURE POWER ITEMS ROUTE (100% Deterministic, ZERO RNG!)
       steps.push({
-        stepNumber: 3,
-        title: `Fase 3: Cruce Determinista 100% Objetos Recios (4x31 IVs)`,
+        stepNumber: 2 + stepOffset,
+        title: `Fase ${2 + stepOffset}: Cruce Determinista 100% Objetos Recios (4x31 IVs)`,
         parentA: {
           name: `${targetData.pokemonName} Macho (3x31)`,
           gender: 'male',
@@ -296,8 +353,8 @@ export function generateBreedingPlan(
 
       if (ivCount >= 5) {
         steps.push({
-          stepNumber: 4,
-          title: `Fase 4: Cruce Final Determinista 100% (5x31/6x31 Competitivo)`,
+          stepNumber: 3 + stepOffset,
+          title: `Fase ${3 + stepOffset}: Cruce Final Determinista 100% (${ivCount}x31 Competitivo)`,
           parentA: {
             name: `${targetData.pokemonName} Macho (4x31)`,
             gender: 'male',
@@ -328,7 +385,7 @@ export function generateBreedingPlan(
     }
   }
 
-  // 4. Build Shopping List strictly from equipped items in steps
+  // 5. Build Shopping List strictly from equipped items in steps
   const shoppingList: ShoppingListItem[] = [];
   const equippedItemNames = new Set<string>();
 
@@ -376,6 +433,18 @@ export function generateBreedingPlan(
     }
   });
 
+  if (bridgeSpeciesData && !isDirectlyCompatible) {
+    shoppingList.push({
+      id: `bridge_${bridgeSpeciesData.pokemonId}`,
+      name: `Pokémon Puente: ${bridgeSpeciesData.pokemonName}`,
+      category: 'breeder',
+      icon: '🌉',
+      quantityNeeded: 1,
+      isAcquired: pastura.some(b => b.speciesId === bridgeSpeciesData?.pokemonId),
+      notes: `Especie puente dual (${bridgeSpeciesData.eggGroups.join(', ')}) requerida para conectar el grupo ${pASpeciesData?.eggGroups.join(', ')} con ${targetData.eggGroups.join(', ')}.`
+    });
+  }
+
   shoppingList.push({
     id: 'flame_body',
     name: 'Pokémon con Habilidad Cuerpo Llama (Flame Body)',
@@ -385,18 +454,6 @@ export function generateBreedingPlan(
     isAcquired: pastura.some(b => b.ability?.toLowerCase().includes('cuerpo llama') || b.ability?.toLowerCase().includes('flame body')),
     notes: 'Reduce los pasos de eclosión en Minecraft un 50% (Talonflame, Coalossal, Magcargo).'
   });
-
-  if (!compatiblePasturaBreeders.some(b => b.speciesId === targetSpeciesId) && pastura.length === 0) {
-    shoppingList.push({
-      id: `breeder_${targetSpeciesId}`,
-      name: `Criador Base: ${targetData.pokemonName}`,
-      category: 'breeder',
-      icon: '🥚',
-      quantityNeeded: 1,
-      isAcquired: false,
-      notes: `Especie objetivo ${targetData.pokemonName}.`
-    });
-  }
 
   return {
     targetPokemonName: targetData.pokemonName,

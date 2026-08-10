@@ -58,29 +58,7 @@ export const BreedingPlannerView: React.FC = () => {
 
   // Step 2 & 3: Pasture Inventory & Shopping Items State
   const [manualAcquiredItems, setManualAcquiredItems] = useState<Record<string, boolean>>({});
-  const [pastura, setPastura] = useState<BreederInventoryItem[]>([
-    {
-      id: 'p1',
-      speciesId: 'spinda',
-      speciesName: 'Spinda 1',
-      gender: 'male',
-      ivs: { hp: true, attack: false, defense: false, specialAttack: false, specialDefense: false, speed: false }
-    },
-    {
-      id: 'p2',
-      speciesId: 'spinda',
-      speciesName: 'Spinda 2',
-      gender: 'female',
-      ivs: { hp: false, attack: false, defense: false, specialAttack: false, specialDefense: false, speed: true }
-    },
-    {
-      id: 'p3',
-      speciesId: 'eevee',
-      speciesName: 'Eevee Macho Inicial',
-      gender: 'male',
-      ivs: { hp: false, attack: false, defense: false, specialAttack: false, specialDefense: false, speed: false }
-    }
-  ]);
+  const [pastura, setPastura] = useState<BreederInventoryItem[]>([]);
 
   // Form for adding breeder to Pasture
   const [newBreederSpecies, setNewBreederSpecies] = useState<string>('ditto');
