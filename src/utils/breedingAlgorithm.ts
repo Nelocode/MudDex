@@ -26,6 +26,7 @@ export interface BreedingStepInstruction {
     equippedItem: string;
     ivSummary: string;
     isPreOwned: boolean;
+    originLabel: string;
     spriteUrl: string;
   };
   parentB: {
@@ -34,6 +35,7 @@ export interface BreedingStepInstruction {
     equippedItem: string;
     ivSummary: string;
     isPreOwned: boolean;
+    originLabel: string;
     spriteUrl: string;
   };
   offspringTarget: {
@@ -154,7 +156,6 @@ export function generateBreedingPlan(
     if (pastureBreederA.gender === 'genderless') {
       pastureBreederB = pastura.find(b => b.id !== pastureBreederA.id);
     } else {
-      // Find opposite gender in pastura, or Ditto
       pastureBreederB = pastura.find(b => b.id !== pastureBreederA.id && (b.gender !== pastureBreederA.gender || b.gender === 'genderless'));
     }
   }
@@ -193,18 +194,18 @@ export function generateBreedingPlan(
     ? `${pastureBreederB.speciesName} (Pastura)`
     : (hasDitto ? 'Ditto (Pastura)' : `${targetData.pokemonName} ${parentAGender === 'male' ? 'Hembra (♀)' : 'Macho (♂)'}`);
 
-  // Required gender for offspring in Step 1
   const requiredOffspringGenderInStep1 = bridgeSpeciesData ? 'male' : (genderInfo.femaleRate <= 0.15 ? 'female' : 'male');
 
   steps.push({
     stepNumber: 1,
-    title: `Fase 1: Cruce Biológico Garantizado (2x31 IVs)`,
+    title: `Fase 1: Cruce Biológico Inicial (2x31 IVs)`,
     parentA: {
       name: parentAName,
       gender: parentAGender,
       equippedItem: item1 ? item1.name : 'Pesa Recia (Power Weight)',
       ivSummary: `31 en ${item1?.statName || 'HP'}`,
       isPreOwned: !!pastureBreederA,
+      originLabel: pastureBreederA ? '🌾 Registrado en tu Pastura' : '🛒 Capturar / Conseguir en Salvaje',
       spriteUrl: pASprite
     },
     parentB: {
@@ -213,6 +214,7 @@ export function generateBreedingPlan(
       equippedItem: item2 ? item2.name : 'Franja Recia (Power Anklet)',
       ivSummary: `31 en ${item2?.statName || 'Velocidad'}`,
       isPreOwned: !!pastureBreederB || hasDitto,
+      originLabel: (pastureBreederB || hasDitto) ? '🌾 Registrado en tu Pastura' : '🛒 Capturar / Conseguir en Salvaje',
       spriteUrl: pBSprite
     },
     offspringTarget: {
@@ -247,6 +249,7 @@ export function generateBreedingPlan(
         equippedItem: item1 ? item1.name : 'Pesa Recia',
         ivSummary: `2x31 IVs (${pASpeciesData?.eggGroups.join(', ')})`,
         isPreOwned: false,
+        originLabel: '🐣 Cría Obtenida en la Fase 1',
         spriteUrl: pASprite
       },
       parentB: {
@@ -255,6 +258,7 @@ export function generateBreedingPlan(
         equippedItem: item2 ? item2.name : 'Franja Recia',
         ivSummary: `Puente Dual (${bridgeSpeciesData.eggGroups.join(', ')})`,
         isPreOwned: false,
+        originLabel: '🛒 Conseguir Especie Puente',
         spriteUrl: bridgeSprite
       },
       offspringTarget: {
@@ -264,7 +268,7 @@ export function generateBreedingPlan(
         expectedIvsSummary: `2x31 IVs + Grupo Huevo ${targetData.eggGroups.join(', ')}`,
         spriteUrl: bridgeSprite
       },
-      strategyNotes: `🌉 ¡Paso Puente Crucial! Se cruza ${pASpeciesData?.pokemonName} Macho con ${bridgeSpeciesData.pokemonName} Hembra para obtener un Macho de ${bridgeSpeciesData.pokemonName} que herede el grupo ${targetData.eggGroups.join(', ')}.`,
+      strategyNotes: `🌉 ¡Paso Puente Crucial! Se cruza ${pASpeciesData?.pokemonName} Macho (de la Fase 1) con ${bridgeSpeciesData.pokemonName} Hembra para obtener un Macho de ${bridgeSpeciesData.pokemonName} que herede el grupo ${targetData.eggGroups.join(', ')}.`,
       hatchStepsEstimate: 5120,
       flameBodyStepsEstimate: 2560
     });
@@ -286,6 +290,7 @@ export function generateBreedingPlan(
         equippedItem: item1 ? item1.name : 'Pesa Recia',
         ivSummary: `2x31 IVs`,
         isPreOwned: false,
+        originLabel: `🐣 Cría Obtenida en la Fase ${stepOffset} (2x31 IVs)`,
         spriteUrl: bridgeSpeciesData && !isDirectlyCompatible
           ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${bridgeSpeciesData.dexNumber}.png`
           : targetSprite
@@ -296,6 +301,7 @@ export function generateBreedingPlan(
         equippedItem: `Piedra Eterna (Everstone)`,
         ivSummary: `31 en ${item3?.statName || 'Ataque'} + Naturaleza ${targetNature}`,
         isPreOwned: hasEverstone,
+        originLabel: hasEverstone ? '🌾 Registrada en tu Pastura' : `🛒 Capturar / Conseguir (con Naturaleza ${targetNature})`,
         spriteUrl: targetSprite
       },
       offspringTarget: {
@@ -305,7 +311,7 @@ export function generateBreedingPlan(
         expectedIvsSummary: `3x31 IVs + Naturaleza ${targetNature} Fijada 100%`,
         spriteUrl: targetSprite
       },
-      strategyNotes: `La Piedra Eterna garantiza la transmisión de la Naturaleza ${targetNature} al 100% mientras el Objeto Recio fija el 3er IV 31.`,
+      strategyNotes: `El Padre A es la cría obtenida en la Fase ${stepOffset}. La Piedra Eterna en la Madre transmite la Naturaleza ${targetNature} al 100% mientras el Objeto Recio fija el 3er IV 31.`,
       hatchStepsEstimate: 5120,
       flameBodyStepsEstimate: 2560
     });
@@ -328,6 +334,7 @@ export function generateBreedingPlan(
           equippedItem: 'Lazo Destino (Destiny Knot)',
           ivSummary: `3x31/4x31 IVs Complementarios`,
           isPreOwned: false,
+          originLabel: `🐣 Cría Obtenida en la Fase ${1 + stepOffset}`,
           spriteUrl: targetSprite
         },
         parentB: {
@@ -336,6 +343,7 @@ export function generateBreedingPlan(
           equippedItem: `Piedra Eterna (Everstone)`,
           ivSummary: `3x31/4x31 IVs + Naturaleza ${targetNature}`,
           isPreOwned: false,
+          originLabel: `🐣 Cría Obtenida en la Fase ${1 + stepOffset}`,
           spriteUrl: targetSprite
         },
         offspringTarget: {
@@ -359,6 +367,7 @@ export function generateBreedingPlan(
           equippedItem: item3 ? item3.name : 'Brazal Recio',
           ivSummary: `3x31 IVs`,
           isPreOwned: false,
+          originLabel: `🐣 Cría Obtenida en la Fase ${1 + stepOffset}`,
           spriteUrl: targetSprite
         },
         parentB: {
@@ -367,6 +376,7 @@ export function generateBreedingPlan(
           equippedItem: item4 ? item4.name : 'Cinto Recio',
           ivSummary: `3x31 IVs + Naturaleza ${targetNature}`,
           isPreOwned: false,
+          originLabel: `🐣 Cría Obtenida en la Fase ${1 + stepOffset}`,
           spriteUrl: targetSprite
         },
         offspringTarget: {
@@ -391,6 +401,7 @@ export function generateBreedingPlan(
             equippedItem: 'Pesa Recia (Power Weight)',
             ivSummary: `4x31 IVs`,
             isPreOwned: false,
+            originLabel: `🐣 Cría Obtenida en la Fase ${2 + stepOffset}`,
             spriteUrl: targetSprite
           },
           parentB: {
@@ -399,6 +410,7 @@ export function generateBreedingPlan(
             equippedItem: `Piedra Eterna (Everstone)`,
             ivSummary: `4x31 IVs + Naturaleza ${targetNature}`,
             isPreOwned: false,
+            originLabel: `🐣 Cría Obtenida en la Fase ${2 + stepOffset}`,
             spriteUrl: targetSprite
           },
           offspringTarget: {

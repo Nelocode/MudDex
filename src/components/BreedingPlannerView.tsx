@@ -801,7 +801,18 @@ export const BreedingPlannerView: React.FC = () => {
                           />
                         </div>
                         <div className="space-y-1 font-mono text-[11px] flex-1">
-                          <span className="font-extrabold text-amber-400 block text-xs">Padre A: {step.parentA.name}</span>
+                          <div className="flex flex-wrap items-center justify-between gap-1">
+                            <span className="font-extrabold text-amber-400 block text-xs">Padre A: {step.parentA.name}</span>
+                            <span className={`text-[9px] font-bold px-2 py-0.5 rounded border ${
+                              step.parentA.originLabel.includes('Cría')
+                                ? 'bg-amber-950/80 text-amber-300 border-amber-800'
+                                : step.parentA.originLabel.includes('Pastura')
+                                ? 'bg-emerald-950/80 text-emerald-300 border-emerald-800'
+                                : 'bg-purple-950/80 text-purple-300 border-purple-800'
+                            }`}>
+                              {step.parentA.originLabel}
+                            </span>
+                          </div>
                           <div><span className="text-zinc-500">Objeto:</span> <strong className="text-white font-bold">{step.parentA.equippedItem}</strong></div>
                           <div><span className="text-zinc-500">IVs 31:</span> <strong className="text-emerald-400 font-bold">{step.parentA.ivSummary}</strong></div>
                         </div>
@@ -817,7 +828,18 @@ export const BreedingPlannerView: React.FC = () => {
                           />
                         </div>
                         <div className="space-y-1 font-mono text-[11px] flex-1">
-                          <span className="font-extrabold text-amber-400 block text-xs">Padre B: {step.parentB.name}</span>
+                          <div className="flex flex-wrap items-center justify-between gap-1">
+                            <span className="font-extrabold text-amber-400 block text-xs">Padre B: {step.parentB.name}</span>
+                            <span className={`text-[9px] font-bold px-2 py-0.5 rounded border ${
+                              step.parentB.originLabel.includes('Cría')
+                                ? 'bg-amber-950/80 text-amber-300 border-amber-800'
+                                : step.parentB.originLabel.includes('Pastura')
+                                ? 'bg-emerald-950/80 text-emerald-300 border-emerald-800'
+                                : 'bg-purple-950/80 text-purple-300 border-purple-800'
+                            }`}>
+                              {step.parentB.originLabel}
+                            </span>
+                          </div>
                           <div><span className="text-zinc-500">Objeto:</span> <strong className="text-white font-bold">{step.parentB.equippedItem}</strong></div>
                           <div><span className="text-zinc-500">IVs 31:</span> <strong className="text-emerald-400 font-bold">{step.parentB.ivSummary}</strong></div>
                         </div>
