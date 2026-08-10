@@ -528,15 +528,24 @@ export const BreedingPlannerView: React.FC = () => {
               <div className="space-y-1.5">
                 <span className="text-[10px] font-bold text-zinc-400 block">IVs de 31 que posee este Pokémon:</span>
                 <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 text-[10px] font-mono">
-                  {['hp', 'attack', 'defense', 'specialAttack', 'specialDefense', 'speed'].map(key => (
-                    <label key={key} className="flex items-center gap-1.5 p-2 rounded-lg bg-zinc-900 border border-zinc-800 cursor-pointer">
+                  {[
+                    { key: 'hp', label: 'HP 31' },
+                    { key: 'attack', label: 'ATT 31' },
+                    { key: 'defense', label: 'DEF 31' },
+                    { key: 'specialAttack', label: 'SpA 31' },
+                    { key: 'specialDefense', label: 'SpD 31' },
+                    { key: 'speed', label: 'SPE 31' }
+                  ].map(iv => (
+                    <label key={iv.key} className="flex items-center gap-1.5 p-2.5 rounded-xl bg-zinc-900 border border-zinc-800 cursor-pointer hover:border-red-500/40">
                       <input
                         type="checkbox"
-                        checked={newBreederIvs[key as keyof typeof newBreederIvs]}
-                        onChange={(e) => setNewBreederIvs(prev => ({ ...prev, [key]: e.target.checked }))}
-                        className="accent-red-600"
+                        checked={newBreederIvs[iv.key as keyof typeof newBreederIvs]}
+                        onChange={(e) => setNewBreederIvs(prev => ({ ...prev, [iv.key]: e.target.checked }))}
+                        className="w-3.5 h-3.5 accent-red-600 rounded"
                       />
-                      <span className="uppercase text-zinc-300">{key.slice(0, 3)} 31</span>
+                      <span className={newBreederIvs[iv.key as keyof typeof newBreederIvs] ? 'text-amber-400 font-bold' : 'text-zinc-400'}>
+                        {iv.label}
+                      </span>
                     </label>
                   ))}
                 </div>
@@ -568,7 +577,7 @@ export const BreedingPlannerView: React.FC = () => {
                   <div className="flex flex-wrap gap-1 font-mono text-[10px]">
                     {Object.entries(item.ivs).map(([k, v]) => v ? (
                       <span key={k} className="px-2 py-0.5 rounded bg-emerald-950 border border-emerald-800 text-emerald-300 font-bold uppercase">
-                        {k.slice(0, 3)} 31
+                        {k === 'hp' ? 'HP' : k === 'attack' ? 'ATT' : k === 'defense' ? 'DEF' : k === 'specialAttack' ? 'SpA' : k === 'specialDefense' ? 'SpD' : 'SPE'} 31
                       </span>
                     ) : null)}
                   </div>

@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { Search, ChevronDown, Check, X } from 'lucide-react';
-import { POKEMON_EGG_DATASET, PokemonEggData } from '../data/cobblemonEggGroups';
+import { POKEMON_EGG_DATASET, PokemonEggData, EGG_GROUPS_INFO } from '../data/cobblemonEggGroups';
 
 interface PokemonSearchSelectProps {
   value: string;
@@ -13,7 +13,7 @@ export const PokemonSearchSelect: React.FC<PokemonSearchSelectProps> = ({
   value,
   onChange,
   label = 'Pokémon Objetivo:',
-  placeholder = 'Buscar por nombre o # Pokédex (ej: Eevee, Lucario, #025)...'
+  placeholder = 'Buscar por nombre, # Pokédex o Grupo Huevo (ej: Eevee, #025, Bicho, Campo, Mineral)...'
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -25,15 +25,23 @@ export const PokemonSearchSelect: React.FC<PokemonSearchSelectProps> = ({
 
   const filteredList = useMemo(() => {
     if (!searchTerm.trim()) {
-      return POKEMON_EGG_DATASET.slice(0, 40);
+      return POKEMON_EGG_DATASET.slice(0, 50);
     }
     const term = searchTerm.toLowerCase().trim();
     return POKEMON_EGG_DATASET.filter(p => {
       const matchName = p.pokemonName.toLowerCase().includes(term);
       const matchDex = String(p.dexNumber).includes(term) || `#${String(p.dexNumber).padStart(3, '0')}`.includes(term);
       const matchId = p.pokemonId.includes(term);
-      return matchName || matchDex || matchId;
-    }).slice(0, 50);
+
+      // Egg group matching (search by English or Spanish name)
+      const matchEggGroup = p.eggGroups.some(eg => {
+        const info = EGG_GROUPS_INFO[eg];
+        if (!info) return eg.toLowerCase().includes(term);
+        return eg.toLowerCase().includes(term) || info.nameEs.toLowerCase().includes(term);
+      });
+
+      return matchName || matchDex || matchId || matchEggGroup;
+    }).slice(0, 60);
   }, [searchTerm]);
 
   // Close dropdown on outside click
@@ -58,21 +66,31 @@ export const PokemonSearchSelect: React.FC<PokemonSearchSelectProps> = ({
           onClick={() => setIsOpen(prev => !prev)}
           className="w-full px-3.5 py-2.5 rounded-2xl bg-zinc-950 border border-zinc-800 hover:border-red-500/50 text-white font-bold text-xs flex items-center justify-between transition-all shadow-md focus:outline-none"
         >
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 overflow-hidden">
             <img
               src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${selectedPokemon.dexNumber}.png`}
               alt={selectedPokemon.pokemonName}
-              className="w-7 h-7 object-contain drop-shadow"
+              className="w-7 h-7 object-contain drop-shadow shrink-0"
             />
-            <div className="flex items-center gap-2">
-              <span className="font-mono text-[10px] text-amber-400 bg-amber-950 px-2 py-0.5 rounded-md border border-amber-800">
+            <div className="flex items-center gap-2 overflow-hidden">
+              <span className="font-mono text-[10px] text-amber-400 bg-amber-950 px-2 py-0.5 rounded-md border border-amber-800 shrink-0">
                 #{String(selectedPokemon.dexNumber).padStart(3, '0')}
               </span>
-              <span className="font-extrabold text-white text-xs">{selectedPokemon.pokemonName}</span>
+              <span className="font-extrabold text-white text-xs truncate">{selectedPokemon.pokemonName}</span>
+              <div className="hidden md:flex items-center gap-1">
+                {selectedPokemon.eggGroups.map(eg => {
+                  const info = EGG_GROUPS_INFO[eg];
+                  return (
+                    <span key={eg} className="text-[9px] font-mono text-zinc-400 bg-zinc-900 px-1.5 py-0.5 rounded border border-zinc-800">
+                      {info ? `${info.icon} ${info.nameEs.split(' ')[0]}` : eg}
+                    </span>
+                  );
+                })}
+              </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 text-zinc-400">
+          <div className="flex items-center gap-2 text-zinc-400 shrink-0">
             <span className="text-[10px] text-zinc-500 font-mono hidden sm:inline">Cambiar</span>
             <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isOpen ? 'rotate-180 text-red-500' : ''}`} />
           </div>
@@ -102,8 +120,14 @@ export const PokemonSearchSelect: React.FC<PokemonSearchSelectProps> = ({
               )}
             </div>
 
+            {/* Helper notice */}
+            <div className="text-[10px] text-zinc-400 px-1 flex items-center justify-between font-mono">
+              <span>💡 Puedes buscar por nombre, # Pokédex o Grupo Huevo.</span>
+              <span>{filteredList.length} resultados</span>
+            </div>
+
             {/* Results List */}
-            <div className="max-h-60 overflow-y-auto space-y-1 scrollbar-thin pr-1">
+            <div className="max-h-64 overflow-y-auto space-y-1 scrollbar-thin pr-1">
               {filteredList.length === 0 ? (
                 <div className="p-4 text-center text-zinc-500 text-xs font-mono">
                   No se encontraron Pokémon con "{searchTerm}"
@@ -127,19 +151,29 @@ export const PokemonSearchSelect: React.FC<PokemonSearchSelectProps> = ({
                           : 'bg-zinc-950/60 border-zinc-800/80 hover:bg-zinc-800/80 hover:border-zinc-700 text-zinc-300'
                       }`}
                     >
-                      <div className="flex items-center gap-2.5">
+                      <div className="flex items-center gap-2.5 overflow-hidden">
                         <img
                           src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.dexNumber}.png`}
                           alt={pokemon.pokemonName}
-                          className="w-6 h-6 object-contain"
+                          className="w-6 h-6 object-contain shrink-0"
                         />
-                        <span className="font-mono text-[10px] text-zinc-400">
+                        <span className="font-mono text-[10px] text-zinc-400 shrink-0">
                           #{String(pokemon.dexNumber).padStart(3, '0')}
                         </span>
-                        <span className="font-bold text-white">{pokemon.pokemonName}</span>
+                        <span className="font-bold text-white truncate">{pokemon.pokemonName}</span>
                       </div>
 
-                      {isSelected && <Check className="w-4 h-4 text-red-500" />}
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        {pokemon.eggGroups.map(eg => {
+                          const info = EGG_GROUPS_INFO[eg];
+                          return (
+                            <span key={eg} className="text-[9px] font-mono text-zinc-400 bg-zinc-900 px-1.5 py-0.5 rounded border border-zinc-800">
+                              {info ? `${info.icon} ${info.nameEs.split(' ')[0]}` : eg}
+                            </span>
+                          );
+                        })}
+                        {isSelected && <Check className="w-4 h-4 text-red-500 ml-1" />}
+                      </div>
                     </button>
                   );
                 })
