@@ -1,4 +1,4 @@
-import { POKEMON_EGG_DATASET } from '../data/cobblemonEggGroups';
+import { POKEMON_EGG_DATASET, PokemonEggData } from '../data/cobblemonEggGroups';
 
 export interface BreederInventoryItem {
   id: string;
@@ -63,6 +63,7 @@ export interface GeneratedBreedingPlan {
   targetNature: string;
   targetAbility: string;
   targetIvCount: number;
+  strategyUsed: 'destiny_knot' | 'pure_power_items';
   shoppingList: ShoppingListItem[];
   steps: BreedingStepInstruction[];
   totalEstimatedEggs: number;
@@ -106,7 +107,8 @@ export function generateBreedingPlan(
   targetNature: string,
   targetAbility: string,
   eggMoves: string[],
-  pastura: BreederInventoryItem[]
+  pastura: BreederInventoryItem[],
+  useDestinyKnot: boolean = true
 ): GeneratedBreedingPlan {
   const targetData = POKEMON_EGG_DATASET.find(p => p.pokemonId === targetSpeciesId) || POKEMON_EGG_DATASET[0];
   const genderInfo = getGenderRatio(targetSpeciesId);
@@ -120,41 +122,68 @@ export function generateBreedingPlan(
 
   const hasEverstone = pastura.some(b => b.nature === targetNature);
   const hasDitto = pastura.some(b => b.speciesId === 'ditto');
-  const targetSpeciesBreeders = pastura.filter(b => b.speciesId === targetSpeciesId);
 
-  // 1. Phase 1: Deterministic 2x31 merge with Power Items (100% guarantee)
+  // Check if pastura contains compatible breeders from the same Egg Group (e.g. Spinda in Field group)
+  const compatiblePasturaBreeders = pastura.filter(b => {
+    const speciesInfo = POKEMON_EGG_DATASET.find(p => p.pokemonId === b.speciesId);
+    if (!speciesInfo) return false;
+    return speciesInfo.eggGroups.some(eg => targetData.eggGroups.includes(eg));
+  });
+
+  const parentABreeder = compatiblePasturaBreeders[0] || pastura[0];
+  const parentBBreeder = compatiblePasturaBreeders[1] || pastura[1];
+
+  const parentASpeciesData = parentABreeder ? POKEMON_EGG_DATASET.find(p => p.pokemonId === parentABreeder.speciesId) : targetData;
+  const parentBSpeciesData = parentBBreeder ? POKEMON_EGG_DATASET.find(p => p.pokemonId === parentBBreeder.speciesId) : targetData;
+
+  const parentASprite = parentASpeciesData ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${parentASpeciesData.dexNumber}.png` : targetSprite;
+  const parentBSprite = parentBSpeciesData ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${parentBSpeciesData.dexNumber}.png` : (hasDitto ? dittoSprite : targetSprite);
+
+  // 1. Phase 1: Initial 2x31 Merge using Pasture Breeders if compatible
   const ivKey1 = requiredIvKeys[0] || 'hp';
   const ivKey2 = requiredIvKeys[1] || 'speed';
   const item1 = POWER_ITEMS_MAP.find(p => p.ivKey === ivKey1);
   const item2 = POWER_ITEMS_MAP.find(p => p.ivKey === ivKey2);
 
+  const parentAName = parentABreeder
+    ? `🌉 ${parentABreeder.speciesName} (Pastura - Grupo Huevo Compatible)`
+    : `${targetData.pokemonName} Macho`;
+
+  const parentBName = parentBBreeder
+    ? `🌉 ${parentBBreeder.speciesName} (Pastura - Grupo Huevo Compatible)`
+    : (hasDitto ? 'Ditto (Pastura)' : `${targetData.pokemonName} Hembra`);
+
   steps.push({
     stepNumber: 1,
-    title: `Fase 1: Cruce Determinista 100% Garantizado (2x31 IVs)`,
+    title: `Fase 1: Cruce de Criadores Iniciales de Pastura (2x31 IVs)`,
     parentA: {
-      name: targetSpeciesBreeders[0] ? targetSpeciesBreeders[0].speciesName : `${targetData.pokemonName} Macho`,
-      gender: 'male',
+      name: parentAName,
+      gender: parentABreeder ? parentABreeder.gender : 'male',
       equippedItem: item1 ? item1.name : 'Pesa Recia (Power Weight)',
       ivSummary: `31 en ${item1?.statName || 'HP'}`,
-      isPreOwned: targetSpeciesBreeders.length > 0,
-      spriteUrl: targetSprite
+      isPreOwned: !!parentABreeder,
+      spriteUrl: parentASprite
     },
     parentB: {
-      name: hasDitto ? 'Ditto (Pastura)' : `${targetData.pokemonName} Hembra`,
-      gender: 'female',
+      name: parentBName,
+      gender: parentBBreeder ? parentBBreeder.gender : (hasDitto ? 'genderless' : 'female'),
       equippedItem: item2 ? item2.name : 'Franja Recia (Power Anklet)',
       ivSummary: `31 en ${item2?.statName || 'Velocidad'}`,
-      isPreOwned: hasDitto,
-      spriteUrl: hasDitto ? dittoSprite : targetSprite
+      isPreOwned: !!parentBBreeder || hasDitto,
+      spriteUrl: parentBSprite
     },
     offspringTarget: {
-      name: `${targetData.pokemonName} (Cría 2x31)`,
+      name: parentABreeder && parentABreeder.speciesId !== targetSpeciesId
+        ? `${targetData.pokemonName} (Hijo Puente 2x31)`
+        : `${targetData.pokemonName} (Cría 2x31)`,
       genderRequired: genderInfo.femaleRate <= 0.15 ? 'female' : 'either',
-      expectedIvsSummary: `2x31 IVs Garantizados (${item1?.statName || 'HP'} + ${item2?.statName || 'Velocidad'})`,
+      expectedIvsSummary: `2x31 IVs Garantizados 100% (${item1?.statName || 'HP'} + ${item2?.statName || 'Velocidad'})`,
       genderCostAlert: genderInfo.femaleRate <= 0.15 ? `⚠️ Requiere Cría Hembra (Tasa 12.5%): Se estiman ~8 huevos para obtener la Hembra.` : undefined,
       spriteUrl: targetSprite
     },
-    strategyNotes: `Al equipar a cada padre con su Objeto Recio, se garantiza al 100% que la cría herede ambos IVs de 31 sin depender del azar.`,
+    strategyNotes: parentABreeder
+      ? `Aprovecha los Pokémon de tu Pastura (${parentABreeder.speciesName}) del mismo grupo huevo para transferir IVs de 31 directamente a la especie ${targetData.pokemonName}.`
+      : `Equipa a cada padre con su Objeto Recio para garantizar al 100% la herencia de ambos IVs sin azar.`,
     hatchStepsEstimate: 5120,
     flameBodyStepsEstimate: 2560
   });
@@ -168,7 +197,7 @@ export function generateBreedingPlan(
       stepNumber: 2,
       title: `Fase 2: Herencia de Naturaleza ${targetNature} con Piedra Eterna (3x31 IVs)`,
       parentA: {
-        name: `${targetData.pokemonName} (Cría Fase 1 - 2x31)`,
+        name: `${targetData.pokemonName} (Cría 2x31)`,
         gender: 'female',
         equippedItem: item1 ? item1.name : 'Pesa Recia',
         ivSummary: `2x31 IVs`,
@@ -189,43 +218,114 @@ export function generateBreedingPlan(
         expectedIvsSummary: `3x31 IVs + Naturaleza ${targetNature} Fijada 100%`,
         spriteUrl: targetSprite
       },
-      strategyNotes: `La Piedra Eterna garantiza la transmisión de la Naturaleza ${targetNature} al 100% mientras el Objeto Recio transmite el 3er IV de 31.`,
+      strategyNotes: `La Piedra Eterna garantiza la transmisión de la Naturaleza ${targetNature} al 100% mientras el Objeto Recio fija el 3er IV 31.`,
       hatchStepsEstimate: 5120,
       flameBodyStepsEstimate: 2560
     });
   }
 
-  // 3. Phase 3: Final Convergence with Destiny Knot + Everstone when Parents reach 3x31/4x31+
+  // 3. Phase 3: Final Merge Tree (With or Without Destiny Knot)
   if (ivCount >= 4) {
-    steps.push({
-      stepNumber: 3,
-      title: `Fase 3: Combinación Lazo Destino de Alta Densidad (${ivCount}x31 IVs)`,
-      parentA: {
-        name: `${targetData.pokemonName} Macho (3x31/4x31)`,
-        gender: 'male',
-        equippedItem: 'Lazo Destino (Destiny Knot)',
-        ivSummary: `3x31/4x31 IVs Complementarios`,
-        isPreOwned: false,
-        spriteUrl: targetSprite
-      },
-      parentB: {
-        name: `${targetData.pokemonName} Hembra (3x31/4x31)`,
-        gender: 'female',
-        equippedItem: `Piedra Eterna (Everstone)`,
-        ivSummary: `3x31/4x31 IVs + Naturaleza ${targetNature}`,
-        isPreOwned: false,
-        spriteUrl: targetSprite
-      },
-      offspringTarget: {
-        name: `🏆 ${targetData.pokemonName} FINAL COMPETITIVO`,
-        genderRequired: 'either',
-        expectedIvsSummary: `${ivCount}x31 IVs Perfectos + Naturaleza ${targetNature} + Habilidad ${targetAbility}`,
-        spriteUrl: targetSprite
-      },
-      strategyNotes: `¡Fase Final! El Lazo Destino se utiliza únicamente cuando ambos padres ya cuentan con 3x31/4x31 para maximizar la densidad de herencia y asegurar la obtención del ${ivCount}x31.`,
-      hatchStepsEstimate: 5120,
-      flameBodyStepsEstimate: 2560
-    });
+    const ivKey3 = requiredIvKeys[2] || 'attack';
+    const item3 = POWER_ITEMS_MAP.find(p => p.ivKey === ivKey3);
+    const ivKey4 = requiredIvKeys[3] || 'defense';
+    const item4 = POWER_ITEMS_MAP.find(p => p.ivKey === ivKey4);
+
+    if (useDestinyKnot) {
+      // Destiny Knot Route (High Density Merge)
+      steps.push({
+        stepNumber: 3,
+        title: `Fase 3: Combinación Lazo Destino de Alta Densidad (${ivCount}x31 IVs)`,
+        parentA: {
+          name: `${targetData.pokemonName} Macho (3x31/4x31)`,
+          gender: 'male',
+          equippedItem: 'Lazo Destino (Destiny Knot)',
+          ivSummary: `3x31/4x31 IVs Complementarios`,
+          isPreOwned: false,
+          spriteUrl: targetSprite
+        },
+        parentB: {
+          name: `${targetData.pokemonName} Hembra (3x31/4x31)`,
+          gender: 'female',
+          equippedItem: `Piedra Eterna (Everstone)`,
+          ivSummary: `3x31/4x31 IVs + Naturaleza ${targetNature}`,
+          isPreOwned: false,
+          spriteUrl: targetSprite
+        },
+        offspringTarget: {
+          name: `🏆 ${targetData.pokemonName} FINAL COMPETITIVO`,
+          genderRequired: 'either',
+          expectedIvsSummary: `${ivCount}x31 IVs Perfectos + Naturaleza ${targetNature} + Habilidad ${targetAbility}`,
+          spriteUrl: targetSprite
+        },
+        strategyNotes: `Estrategia Lazo Destino activada: Se equipa entre padres 3x31/4x31 para transmitir 5 IVs combinados.`,
+        hatchStepsEstimate: 5120,
+        flameBodyStepsEstimate: 2560
+      });
+    } else {
+      // PURE POWER ITEMS ROUTE (100% Deterministic, ZERO RNG!)
+      steps.push({
+        stepNumber: 3,
+        title: `Fase 3: Cruce Determinista 100% Objetos Recios (4x31 IVs)`,
+        parentA: {
+          name: `${targetData.pokemonName} Macho (3x31)`,
+          gender: 'male',
+          equippedItem: item3 ? item3.name : 'Brazal Recio',
+          ivSummary: `3x31 IVs`,
+          isPreOwned: false,
+          spriteUrl: targetSprite
+        },
+        parentB: {
+          name: `${targetData.pokemonName} Hembra (3x31)`,
+          gender: 'female',
+          equippedItem: item4 ? item4.name : 'Cinto Recio',
+          ivSummary: `3x31 IVs + Naturaleza ${targetNature}`,
+          isPreOwned: false,
+          spriteUrl: targetSprite
+        },
+        offspringTarget: {
+          name: `${targetData.pokemonName} (Cría 4x31)`,
+          genderRequired: 'either',
+          expectedIvsSummary: `4x31 IVs Garantizados 100% Fijos`,
+          spriteUrl: targetSprite
+        },
+        strategyNotes: `Ruta 100% Sin Azar: Se evitan Lazo Destino y herencias aleatorias equipando Objetos Recios en cada generación.`,
+        hatchStepsEstimate: 5120,
+        flameBodyStepsEstimate: 2560
+      });
+
+      if (ivCount >= 5) {
+        steps.push({
+          stepNumber: 4,
+          title: `Fase 4: Cruce Final Determinista 100% (5x31/6x31 Competitivo)`,
+          parentA: {
+            name: `${targetData.pokemonName} Macho (4x31)`,
+            gender: 'male',
+            equippedItem: 'Pesa Recia (Power Weight)',
+            ivSummary: `4x31 IVs`,
+            isPreOwned: false,
+            spriteUrl: targetSprite
+          },
+          parentB: {
+            name: `${targetData.pokemonName} Hembra (4x31)`,
+            gender: 'female',
+            equippedItem: `Piedra Eterna (Everstone)`,
+            ivSummary: `4x31 IVs + Naturaleza ${targetNature}`,
+            isPreOwned: false,
+            spriteUrl: targetSprite
+          },
+          offspringTarget: {
+            name: `🏆 ${targetData.pokemonName} FINAL COMPETITIVO`,
+            genderRequired: 'either',
+            expectedIvsSummary: `${ivCount}x31 IVs Perfectos + Naturaleza ${targetNature} + Habilidad ${targetAbility}`,
+            spriteUrl: targetSprite
+          },
+          strategyNotes: `¡Fase Final Determinista! Herencia garantizada con Objetos Recios y Piedra Eterna con 0% de aleatoriedad.`,
+          hatchStepsEstimate: 5120,
+          flameBodyStepsEstimate: 2560
+        });
+      }
+    }
   }
 
   // 4. Build Shopping List strictly from equipped items in steps
@@ -286,7 +386,7 @@ export function generateBreedingPlan(
     notes: 'Reduce los pasos de eclosión en Minecraft un 50% (Talonflame, Coalossal, Magcargo).'
   });
 
-  if (targetSpeciesBreeders.length === 0) {
+  if (!compatiblePasturaBreeders.some(b => b.speciesId === targetSpeciesId) && pastura.length === 0) {
     shoppingList.push({
       id: `breeder_${targetSpeciesId}`,
       name: `Criador Base: ${targetData.pokemonName}`,
@@ -303,9 +403,10 @@ export function generateBreedingPlan(
     targetNature,
     targetAbility,
     targetIvCount: ivCount,
+    strategyUsed: useDestinyKnot ? 'destiny_knot' : 'pure_power_items',
     shoppingList,
     steps,
-    totalEstimatedEggs: ivCount >= 5 ? 24 : ivCount >= 4 ? 12 : 6,
+    totalEstimatedEggs: useDestinyKnot ? (ivCount >= 5 ? 24 : 12) : (ivCount >= 5 ? 18 : 8),
     genderAlertSummary: genderInfo.femaleRate <= 0.15 ? `⚠️ Atención: ${targetData.pokemonName} tiene un ratio de género de 87.5% Macho / 12.5% Hembra. Las fases que requieran Hembras tomarán más intentos.` : undefined
   };
 }

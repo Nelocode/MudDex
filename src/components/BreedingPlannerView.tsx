@@ -112,6 +112,8 @@ export const BreedingPlannerView: React.FC = () => {
     setPastura(prev => prev.filter(item => item.id !== id));
   };
 
+  const [useDestinyKnot, setUseDestinyKnot] = useState<boolean>(true);
+
   // Step 4 & 5: Breeding Plan & Progress State
   const generatedPlan: GeneratedBreedingPlan = useMemo(() => {
     const moves = eggMovesInput.split(',').map(m => m.trim()).filter(Boolean);
@@ -121,9 +123,10 @@ export const BreedingPlannerView: React.FC = () => {
       targetNature,
       targetAbility,
       moves,
-      pastura
+      pastura,
+      useDestinyKnot
     );
-  }, [selectedSpeciesId, targetIvs, targetNature, targetAbility, eggMovesInput, pastura]);
+  }, [selectedSpeciesId, targetIvs, targetNature, targetAbility, eggMovesInput, pastura, useDestinyKnot]);
 
   const [completedSteps, setCompletedSteps] = useState<Record<number, boolean>>({});
 
@@ -317,6 +320,43 @@ export const BreedingPlannerView: React.FC = () => {
                     </span>
                   </label>
                 ))}
+              </div>
+            </div>
+
+            {/* Strategy Toggle (Destiny Knot vs 100% Pure Power Items) */}
+            <div className="space-y-2 p-4 rounded-2xl bg-zinc-950 border border-zinc-800">
+              <label className="text-xs font-extrabold text-white flex items-center justify-between">
+                <span>⚙️ Estrategia de Herencia de IVs:</span>
+                <span className="text-[10px] font-mono text-amber-400">
+                  {useDestinyKnot ? '🎗️ Lazo Destino Activado' : '🛡️ 100% Sin Lazo Destino (Puro Objetos Recios)'}
+                </span>
+              </label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                <button
+                  type="button"
+                  onClick={() => setUseDestinyKnot(true)}
+                  className={`p-3 rounded-xl border text-xs font-bold text-left transition-all ${
+                    useDestinyKnot
+                      ? 'bg-red-600/20 border-red-500 text-white shadow-sm ring-1 ring-red-500/30'
+                      : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white'
+                  }`}
+                >
+                  <span className="font-extrabold text-amber-400 block mb-0.5">🎗️ Usar Lazo Destino en Fase Final</span>
+                  <span className="text-[10px] text-zinc-300 block leading-tight">Transmite 5 IVs combinados en el cruce final. Rápido pero probabilístico en la última fase.</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setUseDestinyKnot(false)}
+                  className={`p-3 rounded-xl border text-xs font-bold text-left transition-all ${
+                    !useDestinyKnot
+                      ? 'bg-emerald-600/20 border-emerald-500 text-white shadow-sm ring-1 ring-emerald-500/30'
+                      : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white'
+                  }`}
+                >
+                  <span className="font-extrabold text-emerald-400 block mb-0.5">🛡️ 100% Sin Lazo Destino (Cero Azar)</span>
+                  <span className="text-[10px] text-zinc-300 block leading-tight">0% Suerte / Zero RNG: Herencia 100% garantizada usando Objetos Recios en todas las fases.</span>
+                </button>
               </div>
             </div>
 
