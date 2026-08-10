@@ -4,6 +4,7 @@ import { POKEMON_EGG_DATASET } from '../data/cobblemonEggGroups';
 import { getSmogonBuildsForPokemon, SmogonBuild } from '../data/smogonBuilds';
 import { OFFICIAL_POKEMON_NATURES } from '../data/pokemonNatures';
 import { getAbilitiesAndEggMovesForDex } from '../data/cobblemonSpeciesAbilitiesAndEggMoves';
+import { PokemonSearchSelect } from './PokemonSearchSelect';
 import {
   generateBreedingPlan,
   BreederInventoryItem,
@@ -247,23 +248,15 @@ export const BreedingPlannerView: React.FC = () => {
               <span>Especie & Recomendación Smogon</span>
             </h3>
 
-            <div className="space-y-2">
-              <label className="text-xs font-bold text-zinc-400 block">Pokémon Objetivo:</label>
-              <select
-                value={selectedSpeciesId}
-                onChange={(e) => {
-                  setSelectedSpeciesId(e.target.value);
-                  setSelectedBuildIndex(0);
-                }}
-                className="w-full px-4 py-2.5 rounded-2xl bg-zinc-950 border border-zinc-800 text-white font-bold text-xs focus:outline-none focus:border-red-500"
-              >
-                {POKEMON_EGG_DATASET.map(p => (
-                  <option key={p.pokemonId} value={p.pokemonId}>
-                    #{String(p.dexNumber).padStart(3, '0')} - {p.pokemonName}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <PokemonSearchSelect
+              value={selectedSpeciesId}
+              onChange={(newId) => {
+                setSelectedSpeciesId(newId);
+                setSelectedBuildIndex(0);
+              }}
+              label="Pokémon Objetivo:"
+              placeholder="Buscar por nombre o # Pokédex..."
+            />
 
             {/* Smogon Presets List */}
             <div className="space-y-2">
@@ -476,20 +469,12 @@ export const BreedingPlannerView: React.FC = () => {
               <span className="text-xs font-extrabold text-zinc-300 block">➕ Añadir Nuevo Pokémon a tu Pastura:</span>
               
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div>
-                  <label className="text-[10px] font-bold text-zinc-400 block mb-1">Especie:</label>
-                  <select
-                    value={newBreederSpecies}
-                    onChange={(e) => setNewBreederSpecies(e.target.value)}
-                    className="w-full px-3 py-2 rounded-xl bg-zinc-900 border border-zinc-800 text-white font-bold text-xs"
-                  >
-                    {POKEMON_EGG_DATASET.map(p => (
-                      <option key={p.pokemonId} value={p.pokemonId}>
-                        {p.pokemonName}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                <PokemonSearchSelect
+                  value={newBreederSpecies}
+                  onChange={(newId) => setNewBreederSpecies(newId)}
+                  label="Especie:"
+                  placeholder="Buscar especie..."
+                />
 
                 <div>
                   <label className="text-[10px] font-bold text-zinc-400 block mb-1">Sexo:</label>
