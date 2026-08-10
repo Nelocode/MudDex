@@ -143,6 +143,7 @@ export function generateBreedingPlan(
   const targetSprite = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${targetData.dexNumber}.png`;
   const dittoSprite = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/132.png';
 
+  const pastureNatureBreeder = pastura.find(b => b.nature === targetNature);
   const hasEverstone = pastura.some(b => b.nature === targetNature);
   const dittoBreeder = pastura.find(b => b.speciesId === 'ditto');
   const hasDitto = !!dittoBreeder;
@@ -194,7 +195,8 @@ export function generateBreedingPlan(
     ? `${pastureBreederB.speciesName} (Pastura)`
     : (hasDitto ? 'Ditto (Pastura)' : `${targetData.pokemonName} ${parentAGender === 'male' ? 'Hembra (♀)' : 'Macho (♂)'}`);
 
-  const requiredOffspringGenderInStep1 = bridgeSpeciesData ? 'male' : (genderInfo.femaleRate <= 0.15 ? 'female' : 'male');
+  // Required gender for offspring in Step 1 (Must match Parent A in Step 2: Macho ♂!)
+  const requiredOffspringGenderInStep1 = 'male';
 
   steps.push({
     stepNumber: 1,
@@ -218,11 +220,9 @@ export function generateBreedingPlan(
       spriteUrl: pBSprite
     },
     offspringTarget: {
-      name: pastureBreederA ? `${pASpeciesData?.pokemonName || targetData.pokemonName} (Cría 2x31)` : `${targetData.pokemonName} (Cría 2x31)`,
+      name: pastureBreederA ? `${pASpeciesData?.pokemonName || targetData.pokemonName} Macho (Cría 2x31)` : `${targetData.pokemonName} Macho (Cría 2x31)`,
       genderRequired: requiredOffspringGenderInStep1,
-      genderRequiredLabel: requiredOffspringGenderInStep1 === 'female'
-        ? '♀ Hembra Requerida (para transmitir la especie al criar)'
-        : '♂ Macho Requerido (para usar como Padre en la siguiente fase)',
+      genderRequiredLabel: '♂ Macho Requerido (Eclosionar Macho para usar como Padre A en la Fase 2)',
       expectedIvsSummary: `2x31 IVs Garantizados 100% (${item1?.statName || 'HP'} + ${item2?.statName || 'Velocidad'})`,
       spriteUrl: pASprite
     },
@@ -264,7 +264,7 @@ export function generateBreedingPlan(
       offspringTarget: {
         name: `${bridgeSpeciesData.pokemonName} Macho (Cría 2x31)`,
         genderRequired: 'male',
-        genderRequiredLabel: '♂ Macho Requerido (para transferir los IVs de 31 al grupo objetivo)',
+        genderRequiredLabel: '♂ Macho Requerido (Eclosionar Macho para transferir IVs al grupo objetivo)',
         expectedIvsSummary: `2x31 IVs + Grupo Huevo ${targetData.eggGroups.join(', ')}`,
         spriteUrl: bridgeSprite
       },
@@ -279,6 +279,15 @@ export function generateBreedingPlan(
     const ivKey3 = requiredIvKeys[2] || 'attack';
     const item3 = POWER_ITEMS_MAP.find(p => p.ivKey === ivKey3);
 
+    // Flexible Nature Carrier (Can be ANY compatible species from target's Egg Group!)
+    const natureParentBName = pastureNatureBreeder
+      ? `${pastureNatureBreeder.speciesName} Hembra (♀) (Pastura)`
+      : `💡 Pareja Compatible (Hembra ♀ de Grupo ${targetData.eggGroups.join('/')}) con Naturaleza ${targetNature}`;
+
+    const natureParentBOrigin = pastureNatureBreeder
+      ? '🌾 Registrada en tu Pastura'
+      : `💡 Usar cualquier Pokémon del Grupo ${targetData.eggGroups.join('/')} con Naturaleza ${targetNature}`;
+
     steps.push({
       stepNumber: 1 + stepOffset,
       title: `Fase ${1 + stepOffset}: Herencia de Naturaleza ${targetNature} con Piedra Eterna (3x31 IVs)`,
@@ -290,18 +299,18 @@ export function generateBreedingPlan(
         equippedItem: item1 ? item1.name : 'Pesa Recia',
         ivSummary: `2x31 IVs`,
         isPreOwned: false,
-        originLabel: `🐣 Cría Obtenida en la Fase ${stepOffset} (2x31 IVs)`,
+        originLabel: `🐣 Cría Obtenida en la Fase ${stepOffset} (Macho 2x31)`,
         spriteUrl: bridgeSpeciesData && !isDirectlyCompatible
           ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${bridgeSpeciesData.dexNumber}.png`
           : targetSprite
       },
       parentB: {
-        name: `${targetData.pokemonName} Hembra (♀) con Naturaleza ${targetNature}`,
+        name: natureParentBName,
         gender: 'female',
         equippedItem: `Piedra Eterna (Everstone)`,
         ivSummary: `31 en ${item3?.statName || 'Ataque'} + Naturaleza ${targetNature}`,
         isPreOwned: hasEverstone,
-        originLabel: hasEverstone ? '🌾 Registrada en tu Pastura' : `🛒 Capturar / Conseguir (con Naturaleza ${targetNature})`,
+        originLabel: natureParentBOrigin,
         spriteUrl: targetSprite
       },
       offspringTarget: {
@@ -311,7 +320,7 @@ export function generateBreedingPlan(
         expectedIvsSummary: `3x31 IVs + Naturaleza ${targetNature} Fijada 100%`,
         spriteUrl: targetSprite
       },
-      strategyNotes: `El Padre A es la cría obtenida en la Fase ${stepOffset}. La Piedra Eterna en la Madre transmite la Naturaleza ${targetNature} al 100% mientras el Objeto Recio fija el 3er IV 31.`,
+      strategyNotes: `💡 ¡Consejo de Eficiencia! El Padre B NO necesita ser obligatoriamente un ${targetData.pokemonName}. Puedes usar cualquier Pokémon Hembra compatible del grupo (${targetData.eggGroups.join(', ')}) que tenga la Naturaleza ${targetNature} y equiparlo con la Piedra Eterna para fijar la naturaleza al 100%.`,
       hatchStepsEstimate: 5120,
       flameBodyStepsEstimate: 2560
     });
