@@ -12,8 +12,11 @@ import {
   getGenderRatio
 } from '../utils/breedingAlgorithm';
 
+import { AiBreedingAssistantModal } from './AiBreedingAssistantModal';
+
 export const BreedingPlannerView: React.FC = () => {
   const [currentWizardStep, setCurrentWizardStep] = useState<number>(1);
+  const [isAiModalOpen, setIsAiModalOpen] = useState<boolean>(false);
 
   // Step 1: Goal State
   const [selectedSpeciesId, setSelectedSpeciesId] = useState<string>('eevee');
@@ -169,6 +172,14 @@ export const BreedingPlannerView: React.FC = () => {
             Diseña la ruta exacta sin saltos para criar tus Pokémon competitivos de 3x31 a 6x31. Incluye recomendaciones de Smogon, registro de tu Pastura, lista de compras y alertas de costo por sexo.
           </p>
         </div>
+
+        <button
+          onClick={() => setIsAiModalOpen(true)}
+          className="px-4 py-2.5 rounded-2xl bg-gradient-to-r from-amber-600 to-red-600 hover:from-amber-500 hover:to-red-500 text-white font-extrabold text-xs shadow-lg shadow-amber-600/20 transition-all flex items-center gap-2.5 shrink-0"
+        >
+          <Sparkles className="w-4 h-4 text-amber-200 animate-pulse" />
+          <span>🤖 Maestro IA de Crianza (Gemini / GPT)</span>
+        </button>
       </div>
 
       {/* 4-Step Unified Wizard Navigation Header */}
@@ -924,6 +935,18 @@ export const BreedingPlannerView: React.FC = () => {
           </div>
         );
       })()}
+
+      {/* AI Assistant Modal */}
+      <AiBreedingAssistantModal
+        isOpen={isAiModalOpen}
+        onClose={() => setIsAiModalOpen(false)}
+        targetPokemonName={targetData.pokemonName}
+        targetIvs={targetIvs}
+        targetNature={targetNature}
+        targetAbility={targetAbility}
+        eggMoves={eggMovesInput.split(',').map(s => s.trim()).filter(Boolean)}
+        pastura={pastura}
+      />
 
     </div>
   );

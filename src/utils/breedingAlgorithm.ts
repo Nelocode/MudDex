@@ -188,14 +188,35 @@ export function generateBreedingPlan(
   const pASprite = pASpeciesData ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pASpeciesData.dexNumber}.png` : targetSprite;
   const pBSprite = pBSpeciesData ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pBSpeciesData.dexNumber}.png` : (hasDitto ? dittoSprite : targetSprite);
 
-  // --- CADENA 1: LÍNEA PATERNA (MACHO ♂) ---
+  const parentAGender = pastureBreederA ? pastureBreederA.gender : 'male';
+  const parentBGender = pastureBreederB ? pastureBreederB.gender : (parentAGender === 'male' ? 'female' : 'male');
+
+  const parentAName = pastureBreederA
+    ? `${pastureBreederA.speciesName} (Pastura)`
+    : `${targetData.pokemonName} Macho (♂)`;
+
+  const parentBName = pastureBreederB
+    ? `${pastureBreederB.speciesName} (Pastura)`
+    : (hasDitto ? 'Ditto (Pastura)' : `${targetData.pokemonName} ${parentAGender === 'male' ? 'Hembra (♀)' : 'Macho (♂)'}`);
+
+  const requiredOffspringGenderInStep1 = 'male';
+
+  // Offspring species in Step 1A matches the MOTHER (Parent B species)
+  const step1AOffspringName = pastureBreederB && pBSpeciesData && pBSpeciesData.pokemonId !== targetData.pokemonId
+    ? `${pBSpeciesData.pokemonName} Macho (Cría 2x31)`
+    : `${targetData.pokemonName} Macho (Cría 2x31 Cadena 1)`;
+
+  const step1AOffspringSprite = pastureBreederB && pBSpeciesData && pBSpeciesData.pokemonId !== targetData.pokemonId
+    ? pBSprite
+    : targetSprite;
+
   steps.push({
     stepNumber: 1,
     chainName: '🌱 CADENA 1: Línea Paterna Macho (♂)',
-    title: `Paso 1A: Construcción de Padre Macho 2x31 (${item1?.statName || 'HP'} + ${item2?.statName || 'Ataque'})`,
+    title: `Paso 1A: Cruce Inicial de Pastura (${item1?.statName || 'HP'} + ${item2?.statName || 'Ataque'})`,
     parentA: {
-      name: pastureBreederA ? `${pastureBreederA.speciesName} (Pastura)` : `${targetData.pokemonName} Macho (♂)`,
-      gender: pastureBreederA ? pastureBreederA.gender : 'male',
+      name: parentAName,
+      gender: parentAGender,
       equippedItem: item1 ? item1.name : 'Pesa Recia',
       ivSummary: `31 en ${item1?.statName || 'HP'}`,
       isPreOwned: !!pastureBreederA,
@@ -203,8 +224,8 @@ export function generateBreedingPlan(
       spriteUrl: pASprite
     },
     parentB: {
-      name: pastureBreederB ? `${pastureBreederB.speciesName} (Pastura)` : (hasDitto ? 'Ditto (Pastura)' : `${targetData.pokemonName} Hembra (♀)`),
-      gender: pastureBreederB ? pastureBreederB.gender : (hasDitto ? 'genderless' : 'female'),
+      name: parentBName,
+      gender: parentBGender,
       equippedItem: item2 ? item2.name : 'Brazal Recio',
       ivSummary: `31 en ${item2?.statName || 'Ataque'}`,
       isPreOwned: !!pastureBreederB || hasDitto,
@@ -212,20 +233,21 @@ export function generateBreedingPlan(
       spriteUrl: pBSprite
     },
     offspringTarget: {
-      name: `${targetData.pokemonName} Macho (Cría 2x31 Cadena 1)`,
-      genderRequired: 'male',
-      genderRequiredLabel: '♂ Macho Requerido (Resultado de Cadena 1 para cruzar en la Cadena Final)',
+      name: step1AOffspringName,
+      genderRequired: requiredOffspringGenderInStep1,
+      genderRequiredLabel: '♂ Macho Requerido (Eclosionar Macho 2x31 para cruzar con la especie objetivo)',
       expectedIvsSummary: `2x31 IVs Garantizados (${item1?.statName || 'HP'} + ${item2?.statName || 'Ataque'})`,
-      spriteUrl: targetSprite
+      spriteUrl: step1AOffspringSprite
     },
-    strategyNotes: `Construcción de la Cadena 1: Se combinan dos criadores para asegurar los primeros 2 IVs de 31 en un progenitor Macho.`,
+    strategyNotes: pastureBreederB && pBSpeciesData && pBSpeciesData.pokemonId !== targetData.pokemonId
+      ? `💡 Regla Biológica: La cría nace como ${pBSpeciesData.pokemonName} porque la Madre es de especie ${pBSpeciesData.pokemonName}. En el siguiente paso se cruzará este Macho con una ${targetData.pokemonName} Hembra.`
+      : `Construcción de la Cadena 1: Se combinan dos criadores para asegurar los primeros 2 IVs de 31 en un progenitor Macho.`,
     hatchStepsEstimate: 5120,
     flameBodyStepsEstimate: 2560
   });
 
   let stepOffset = 1;
 
-  // Optional Inter-Egg Group Bridge Step if needed for Pasture species
   if (bridgeSpeciesData && !isDirectlyCompatible) {
     stepOffset = 2;
     const bridgeSprite = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${bridgeSpeciesData.dexNumber}.png`;
