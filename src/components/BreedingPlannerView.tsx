@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { Layers, Dna, ShoppingBag, CheckCircle2, AlertTriangle, Plus, Trash2, Download, Upload, Flame, Sparkles, RefreshCw, ChevronRight, Shield, Award } from 'lucide-react';
 import { POKEMON_EGG_DATASET } from '../data/cobblemonEggGroups';
 import { getSmogonBuildsForPokemon, SmogonBuild } from '../data/smogonBuilds';
+import { getAbilitiesAndEggMovesForDex } from '../data/cobblemonSpeciesAbilitiesAndEggMoves';
 import {
   generateBreedingPlan,
   BreederInventoryItem,
@@ -18,6 +19,9 @@ export const BreedingPlannerView: React.FC = () => {
 
   const smogonBuilds = useMemo(() => getSmogonBuildsForPokemon(selectedSpeciesId), [selectedSpeciesId]);
   const activeBuild = smogonBuilds[selectedBuildIndex] || smogonBuilds[0];
+
+  const targetData = useMemo(() => POKEMON_EGG_DATASET.find(p => p.pokemonId === selectedSpeciesId) || POKEMON_EGG_DATASET[0], [selectedSpeciesId]);
+  const speciesData = useMemo(() => getAbilitiesAndEggMovesForDex(targetData.dexNumber), [targetData.dexNumber]);
 
   const [targetIvs, setTargetIvs] = useState({
     hp: true,
@@ -327,36 +331,111 @@ export const BreedingPlannerView: React.FC = () => {
 
             {/* Nature, Ability & Egg Moves Form */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              
+              {/* Nature Selector */}
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-zinc-400 block">Naturaleza Objetivo:</label>
+                <div className="flex justify-between items-center text-xs">
+                  <label className="font-bold text-zinc-400 block">Naturaleza Objetivo:</label>
+                  <span className="text-[10px] text-amber-400 font-mono font-bold">💡 Rec. Smogon: {activeBuild.recommendedNature}</span>
+                </div>
                 <input
                   type="text"
                   value={targetNature}
                   onChange={(e) => setTargetNature(e.target.value)}
-                  className="w-full px-4 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-white font-mono text-xs focus:outline-none focus:border-red-500"
+                  className="w-full px-4 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-white font-mono text-xs focus:outline-none focus:border-red-500"
                 />
               </div>
 
+              {/* Ability Dropdown Selector */}
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-zinc-400 block">Habilidad Objetivo:</label>
-                <input
-                  type="text"
+                <div className="flex justify-between items-center text-xs">
+                  <label className="font-bold text-zinc-400 block">Habilidad Objetivo:</label>
+                  <span className="text-[10px] text-amber-400 font-mono font-bold">💡 Rec. Smogon: {activeBuild.recommendedAbility}</span>
+                </div>
+                <select
                   value={targetAbility}
                   onChange={(e) => setTargetAbility(e.target.value)}
-                  className="w-full px-4 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-white font-mono text-xs focus:outline-none focus:border-red-500"
-                />
+                  className="w-full px-4 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-white font-bold text-xs focus:outline-none focus:border-red-500"
+                >
+                  <option value={activeBuild.recommendedAbility}>
+                    ⭐ {activeBuild.recommendedAbility} [Recomendada por Smogon]
+                  </option>
+                  {speciesData.abilities.map((a, idx) => (
+                    <option key={idx} value={a.label}>
+                      {a.label} {a.isHidden ? '(Habilidad Oculta HO)' : '(Habilidad Normal)'}
+                    </option>
+                  ))}
+                </select>
               </div>
 
-              <div className="sm:col-span-2 space-y-1.5">
-                <label className="text-xs font-bold text-zinc-400 block">Movimientos Huevo (Egg Moves):</label>
+              {/* Egg Moves Interactive Selector */}
+              <div className="sm:col-span-2 space-y-2.5 pt-2 border-t border-zinc-800">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-xs">
+                  <label className="font-bold text-zinc-300 block">Movimientos Huevo Compatibles (Egg Moves):</label>
+                  {activeBuild.recommendedEggMoves.length > 0 ? (
+                    <span className="text-[10px] text-amber-400 font-mono font-bold">
+                      💡 Recomendados por Smogon: {activeBuild.recommendedEggMoves.join(', ')}
+                    </span>
+                  ) : (
+                    <span className="text-[10px] text-zinc-500 font-mono">
+                      Sin sugerencia específica de Smogon
+                    </span>
+                  )}
+                </div>
+
+                {speciesData.eggMoves.length === 0 ? (
+                  <div className="bg-zinc-950 p-3.5 rounded-xl border border-zinc-800 text-zinc-400 text-xs flex items-center gap-2">
+                    <span>ℹ️ Esta especie ({targetData.pokemonName}) no puede aprender Movimientos Huevo.</span>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <span className="text-[10px] text-zinc-400 block">Toca los movimientos compatibles para añadirlos o quitarlos:</span>
+                    <div className="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto p-2 bg-zinc-950 rounded-2xl border border-zinc-800 scrollbar-thin">
+                      {speciesData.eggMoves.map(move => {
+                        const isSelected = eggMovesInput.toLowerCase().includes(move.toLowerCase());
+                        const isSmogonRec = activeBuild.recommendedEggMoves.some(rm => rm.toLowerCase().includes(move.toLowerCase()));
+
+                        return (
+                          <button
+                            key={move}
+                            type="button"
+                            onClick={() => {
+                              if (isSelected) {
+                                const updated = eggMovesInput.split(',').map(m => m.trim()).filter(m => m.toLowerCase() !== move.toLowerCase()).join(', ');
+                                setEggMovesInput(updated);
+                              } else {
+                                const currentList = eggMovesInput ? eggMovesInput.split(',').map(m => m.trim()) : [];
+                                currentList.push(move);
+                                setEggMovesInput(currentList.join(', '));
+                              }
+                            }}
+                            className={`px-3 py-1 rounded-xl text-xs font-bold font-mono transition-all border flex items-center gap-1.5 ${
+                              isSelected
+                                ? 'bg-red-600/30 border-red-500 text-white shadow-sm'
+                                : isSmogonRec
+                                ? 'bg-amber-500/10 border-amber-500/40 text-amber-300 hover:bg-amber-500/20'
+                                : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-850'
+                            }`}
+                          >
+                            {isSmogonRec && <span>⭐</span>}
+                            <span>{move}</span>
+                            {isSelected && <span className="text-red-400">✓</span>}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
                 <input
                   type="text"
                   value={eggMovesInput}
                   onChange={(e) => setEggMovesInput(e.target.value)}
-                  placeholder="Ej: Deseo, Bostezos, Maldición"
+                  placeholder="Movimientos seleccionados (editables libremente)..."
                   className="w-full px-4 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-white font-mono text-xs focus:outline-none focus:border-red-500"
                 />
               </div>
+
             </div>
 
             {/* Next Button */}
