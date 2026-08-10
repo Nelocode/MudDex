@@ -759,20 +759,33 @@ export const BreedingPlannerView: React.FC = () => {
                     
                     {/* Step Card Header */}
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-800/80 pb-3">
-                      <div className="flex items-center gap-3">
-                        <button
-                          onClick={() => toggleStepCompleted(step.stepNumber)}
-                          className={`w-7 h-7 rounded-xl border flex items-center justify-center font-extrabold text-xs transition-all ${
-                            isDone
-                              ? 'bg-emerald-600 border-emerald-400 text-white shadow-lg shadow-emerald-600/30'
-                              : 'bg-zinc-950 border-zinc-700 text-zinc-400 hover:border-red-500'
-                          }`}
-                        >
-                          {isDone ? '✓' : step.stepNumber}
-                        </button>
-                        <span className="font-black text-sm text-white tracking-wide">
-                          {step.title}
-                        </span>
+                      <div className="flex flex-col gap-1.5">
+                        {step.chainName && (
+                          <span className={`text-[10px] font-mono font-extrabold px-3 py-0.5 rounded-full border self-start ${
+                            step.chainName.includes('CADENA 1')
+                              ? 'bg-sky-950/90 text-sky-300 border-sky-800'
+                              : step.chainName.includes('CADENA 2')
+                              ? 'bg-pink-950/90 text-pink-300 border-pink-800'
+                              : 'bg-amber-950/90 text-amber-300 border-amber-800'
+                          }`}>
+                            {step.chainName}
+                          </span>
+                        )}
+                        <div className="flex items-center gap-3">
+                          <button
+                            onClick={() => toggleStepCompleted(step.stepNumber)}
+                            className={`w-7 h-7 rounded-xl border flex items-center justify-center font-extrabold text-xs transition-all ${
+                              isDone
+                                ? 'bg-emerald-600 border-emerald-400 text-white shadow-lg shadow-emerald-600/30'
+                                : 'bg-zinc-950 border-zinc-700 text-zinc-400 hover:border-red-500'
+                            }`}
+                          >
+                            {isDone ? '✓' : step.stepNumber}
+                          </button>
+                          <span className="font-black text-sm text-white tracking-wide">
+                            {step.title}
+                          </span>
+                        </div>
                       </div>
 
                       <div className="flex items-center gap-3 text-xs font-mono">
