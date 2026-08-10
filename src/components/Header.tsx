@@ -47,6 +47,7 @@ export const Header: React.FC<HeaderProps> = ({
     { id: 'calculator', label: 'Calculador Captura', icon: Target },
     { id: 'pokedex', label: 'Pokédex', icon: BookOpen },
     { id: 'breeding', label: 'Planificador Crianza', icon: Dna },
+    { id: 'teambuilder', label: 'Equipos PvP', icon: ShieldCheck },
     { id: 'drops', label: 'Drops', icon: Gem },
     { id: 'helditems', label: 'Objetos & Bayas', icon: Package },
     { id: 'typematrix', label: 'Matriz de Tipos', icon: Target },

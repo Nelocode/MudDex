@@ -1,24 +1,23 @@
 {
-  "name": "Pokelinker PRO - Asistente de Crianza Pokémon",
-  "short_name": "Pokelinker",
-  "description": "Asistente Maestro de Crianza y Competitivo Pokémon. Sincroniza tus proyectos, cajas y árboles de crianza.",
-  "start_url": "/",
-  "display": "standalone",
-  "orientation": "portrait-primary",
-  "background_color": "#090C15",
-  "theme_color": "#00D2FF",
+  "short_name": "MudDex",
+  "name": "MudDex • Plataforma Pokémon Oficial Diosesmon",
   "icons": [
     {
-      "src": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/pokeball.png",
+      "src": "/pokeball.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/pokeball.png",
+      "src": "/pokeball.png",
       "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
     }
-  ]
+  ],
+  "start_url": "/",
+  "background_color": "#09090b",
+  "theme_color": "#dc2626",
+  "display": "standalone",
+  "orientation": "portrait",
+  "description": "Plataforma Oficial de Pokédex, Radar de Spawns, Calculadora de Captura y Asistente de Crianza para Minecraft Diosesmon (Fabric 1.21.1)."
 }

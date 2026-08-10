@@ -18,6 +18,8 @@ import { DiosesmonInfoModal } from './components/DiosesmonInfoModal';
 import { CommandPaletteModal } from './components/CommandPaletteModal';
 import { UserProfileModal } from './components/UserProfileModal';
 
+import { TeamBuilderView, TeamMember } from './components/TeamBuilderView';
+
 export function App() {
   const [activeTab, setActiveTab] = useState<string>('spawns');
   const [selectedPokemonId, setSelectedPokemonId] = useState<string>('snorlax');
@@ -90,6 +92,16 @@ export function App() {
           )}
 
           {activeTab === 'breeding' && <BreedingPlannerView />}
+
+          {activeTab === 'teambuilder' && (
+            <TeamBuilderView
+              onSendToBreeding={(member) => {
+                setSelectedPokemonId(member.speciesId);
+                setActiveTab('breeding');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+            />
+          )}
 
           {activeTab === 'drops' && <DropsView />}
 
