@@ -841,9 +841,21 @@ export const BreedingPlannerView: React.FC = () => {
                             <span>🐣 Resultado Esperado:</span>
                             <span className="text-amber-400">{step.offspringTarget.name}</span>
                           </strong>
-                          <span className="text-[11px] font-mono text-emerald-400 font-extrabold bg-emerald-950 px-2.5 py-0.5 rounded-full border border-emerald-800">
-                            {step.offspringTarget.expectedIvsSummary}
-                          </span>
+                          
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className={`text-[10px] font-mono font-extrabold px-2.5 py-0.5 rounded-full border ${
+                              step.offspringTarget.genderRequired === 'female'
+                                ? 'bg-pink-950 text-pink-300 border-pink-800'
+                                : step.offspringTarget.genderRequired === 'male'
+                                ? 'bg-sky-950 text-sky-300 border-sky-800'
+                                : 'bg-zinc-800 text-zinc-300 border-zinc-700'
+                            }`}>
+                              {step.offspringTarget.genderRequiredLabel}
+                            </span>
+                            <span className="text-[11px] font-mono text-emerald-400 font-extrabold bg-emerald-950 px-2.5 py-0.5 rounded-full border border-emerald-800">
+                              {step.offspringTarget.expectedIvsSummary}
+                            </span>
+                          </div>
                         </div>
 
                         {step.offspringTarget.genderCostAlert && (

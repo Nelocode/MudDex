@@ -39,6 +39,7 @@ export interface BreedingStepInstruction {
   offspringTarget: {
     name: string;
     genderRequired: 'male' | 'female' | 'either' | 'genderless';
+    genderRequiredLabel: string;
     expectedIvsSummary: string;
     genderCostAlert?: string;
     spriteUrl: string;
@@ -102,11 +103,9 @@ export const POWER_ITEMS_MAP = [
 ];
 
 export function findBridgeSpecies(sourceEggGroups: EggGroup[], targetEggGroups: EggGroup[]): PokemonEggData | null {
-  // If directly compatible, no bridge needed
   if (sourceEggGroups.some(s => targetEggGroups.includes(s))) {
     return null;
   }
-  // Find iconic dual-egg group species bridging source and target
   const bridge = POKEMON_EGG_DATASET.find(p => {
     if (p.eggGroups.includes('undiscovered') || p.eggGroups.includes('ditto')) return false;
     const hasSource = p.eggGroups.some(eg => sourceEggGroups.includes(eg));
@@ -116,7 +115,6 @@ export function findBridgeSpecies(sourceEggGroups: EggGroup[], targetEggGroups: 
 
   if (bridge) return bridge;
 
-  // Shuckle fallback for Bug + Mineral
   if (sourceEggGroups.includes('bug') && targetEggGroups.includes('mineral')) {
     return POKEMON_EGG_DATASET.find(p => p.pokemonId === 'shuckle') || POKEMON_EGG_DATASET.find(p => p.pokemonId === 'dwebble') || null;
   }
@@ -144,11 +142,22 @@ export function generateBreedingPlan(
   const dittoSprite = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/132.png';
 
   const hasEverstone = pastura.some(b => b.nature === targetNature);
-  const hasDitto = pastura.some(b => b.speciesId === 'ditto');
+  const dittoBreeder = pastura.find(b => b.speciesId === 'ditto');
+  const hasDitto = !!dittoBreeder;
 
-  // Check if pastura has breeders and if they need a Bridge Species
+  // Find Parent A from Pasture (if available)
   const pastureBreederA = pastura[0];
-  const pastureBreederB = pastura[1];
+
+  // Biologically Enforce Parent B Gender (Must be opposite gender of Parent A or Ditto!)
+  let pastureBreederB: BreederInventoryItem | undefined = undefined;
+  if (pastureBreederA) {
+    if (pastureBreederA.gender === 'genderless') {
+      pastureBreederB = pastura.find(b => b.id !== pastureBreederA.id);
+    } else {
+      // Find opposite gender in pastura, or Ditto
+      pastureBreederB = pastura.find(b => b.id !== pastureBreederA.id && (b.gender !== pastureBreederA.gender || b.gender === 'genderless'));
+    }
+  }
 
   let bridgeSpeciesData: PokemonEggData | null = null;
   let isDirectlyCompatible = false;
@@ -168,25 +177,39 @@ export function generateBreedingPlan(
   const item2 = POWER_ITEMS_MAP.find(p => p.ivKey === ivKey2);
 
   const pASpeciesData = pastureBreederA ? POKEMON_EGG_DATASET.find(p => p.pokemonId === pastureBreederA.speciesId) : targetData;
-  const pBSpeciesData = pastureBreederB ? POKEMON_EGG_DATASET.find(p => p.pokemonId === pastureBreederB.speciesId) : targetData;
+  const pBSpeciesData = pastureBreederB ? POKEMON_EGG_DATASET.find(p => p.pokemonId === pastureBreederB.speciesId) : (hasDitto ? null : targetData);
 
   const pASprite = pASpeciesData ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pASpeciesData.dexNumber}.png` : targetSprite;
   const pBSprite = pBSpeciesData ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pBSpeciesData.dexNumber}.png` : (hasDitto ? dittoSprite : targetSprite);
 
+  const parentAGender = pastureBreederA ? pastureBreederA.gender : 'male';
+  const parentBGender = pastureBreederB ? pastureBreederB.gender : (parentAGender === 'male' ? 'female' : 'male');
+
+  const parentAName = pastureBreederA
+    ? `${pastureBreederA.speciesName} (Pastura)`
+    : `${targetData.pokemonName} Macho (♂)`;
+
+  const parentBName = pastureBreederB
+    ? `${pastureBreederB.speciesName} (Pastura)`
+    : (hasDitto ? 'Ditto (Pastura)' : `${targetData.pokemonName} ${parentAGender === 'male' ? 'Hembra (♀)' : 'Macho (♂)'}`);
+
+  // Required gender for offspring in Step 1
+  const requiredOffspringGenderInStep1 = bridgeSpeciesData ? 'male' : (genderInfo.femaleRate <= 0.15 ? 'female' : 'male');
+
   steps.push({
     stepNumber: 1,
-    title: `Fase 1: Cruce de Criadores Iniciales de Pastura (2x31 IVs)`,
+    title: `Fase 1: Cruce Biológico Garantizado (2x31 IVs)`,
     parentA: {
-      name: pastureBreederA ? `${pastureBreederA.speciesName} (Pastura)` : `${targetData.pokemonName} Macho`,
-      gender: pastureBreederA ? pastureBreederA.gender : 'male',
+      name: parentAName,
+      gender: parentAGender,
       equippedItem: item1 ? item1.name : 'Pesa Recia (Power Weight)',
       ivSummary: `31 en ${item1?.statName || 'HP'}`,
       isPreOwned: !!pastureBreederA,
       spriteUrl: pASprite
     },
     parentB: {
-      name: pastureBreederB ? `${pastureBreederB.speciesName} (Pastura)` : (hasDitto ? 'Ditto (Pastura)' : `${targetData.pokemonName} Hembra`),
-      gender: pastureBreederB ? pastureBreederB.gender : (hasDitto ? 'genderless' : 'female'),
+      name: parentBName,
+      gender: parentBGender,
       equippedItem: item2 ? item2.name : 'Franja Recia (Power Anklet)',
       ivSummary: `31 en ${item2?.statName || 'Velocidad'}`,
       isPreOwned: !!pastureBreederB || hasDitto,
@@ -194,12 +217,15 @@ export function generateBreedingPlan(
     },
     offspringTarget: {
       name: pastureBreederA ? `${pASpeciesData?.pokemonName || targetData.pokemonName} (Cría 2x31)` : `${targetData.pokemonName} (Cría 2x31)`,
-      genderRequired: 'male',
+      genderRequired: requiredOffspringGenderInStep1,
+      genderRequiredLabel: requiredOffspringGenderInStep1 === 'female'
+        ? '♀ Hembra Requerida (para transmitir la especie al criar)'
+        : '♂ Macho Requerido (para usar como Padre en la siguiente fase)',
       expectedIvsSummary: `2x31 IVs Garantizados 100% (${item1?.statName || 'HP'} + ${item2?.statName || 'Velocidad'})`,
       spriteUrl: pASprite
     },
     strategyNotes: pastureBreederA
-      ? `Combina los criadores de tu Pastura (${pastureBreederA.speciesName} y ${pastureBreederB?.speciesName || 'Ditto'}) para consolidar los primeros IVs de 31.`
+      ? `Combina los criadores compatibles de tu Pastura (${pastureBreederA.speciesName} ${parentAGender === 'male' ? '♂' : '♀'} + ${pastureBreederB ? pastureBreederB.speciesName : 'Pareja Compatible'}) para consolidar los primeros IVs de 31.`
       : `Equipa a cada padre con su Objeto Recio para garantizar al 100% la herencia de ambos IVs sin azar.`,
     hatchStepsEstimate: 5120,
     flameBodyStepsEstimate: 2560
@@ -216,7 +242,7 @@ export function generateBreedingPlan(
       stepNumber: 2,
       title: `Fase 2: Cruce de Transferencia con Pokémon Puente 🌉 (${bridgeSpeciesData.pokemonName})`,
       parentA: {
-        name: `${pASpeciesData?.pokemonName || 'Criador Pastura'} Macho (2x31)`,
+        name: `${pASpeciesData?.pokemonName || 'Criador Pastura'} Macho (♂) (2x31)`,
         gender: 'male',
         equippedItem: item1 ? item1.name : 'Pesa Recia',
         ivSummary: `2x31 IVs (${pASpeciesData?.eggGroups.join(', ')})`,
@@ -224,20 +250,21 @@ export function generateBreedingPlan(
         spriteUrl: pASprite
       },
       parentB: {
-        name: `💡 ${bridgeSpeciesData.pokemonName} Hembra (Pokémon Puente Recomendado)`,
+        name: `💡 ${bridgeSpeciesData.pokemonName} Hembra (♀) (Pokémon Puente)`,
         gender: 'female',
         equippedItem: item2 ? item2.name : 'Franja Recia',
-        ivSummary: `Puente entre Grupos (${bridgeSpeciesData.eggGroups.join(', ')})`,
+        ivSummary: `Puente Dual (${bridgeSpeciesData.eggGroups.join(', ')})`,
         isPreOwned: false,
         spriteUrl: bridgeSprite
       },
       offspringTarget: {
-        name: `${bridgeSpeciesData.pokemonName} Macho (Cría 2x31 con IVs Transferidos)`,
+        name: `${bridgeSpeciesData.pokemonName} Macho (Cría 2x31)`,
         genderRequired: 'male',
+        genderRequiredLabel: '♂ Macho Requerido (para transferir los IVs de 31 al grupo objetivo)',
         expectedIvsSummary: `2x31 IVs + Grupo Huevo ${targetData.eggGroups.join(', ')}`,
         spriteUrl: bridgeSprite
       },
-      strategyNotes: `🌉 ¡Paso Puente Crucial! Como ${pASpeciesData?.pokemonName} (${pASpeciesData?.eggGroups.join(', ')}) no puede criar con ${targetData.pokemonName} (${targetData.eggGroups.join(', ')}), se utiliza a ${bridgeSpeciesData.pokemonName} (${bridgeSpeciesData.eggGroups.join(', ')}) para transferir los IVs de 31 entre ambos grupos.`,
+      strategyNotes: `🌉 ¡Paso Puente Crucial! Se cruza ${pASpeciesData?.pokemonName} Macho con ${bridgeSpeciesData.pokemonName} Hembra para obtener un Macho de ${bridgeSpeciesData.pokemonName} que herede el grupo ${targetData.eggGroups.join(', ')}.`,
       hatchStepsEstimate: 5120,
       flameBodyStepsEstimate: 2560
     });
@@ -253,8 +280,8 @@ export function generateBreedingPlan(
       title: `Fase ${1 + stepOffset}: Herencia de Naturaleza ${targetNature} con Piedra Eterna (3x31 IVs)`,
       parentA: {
         name: bridgeSpeciesData && !isDirectlyCompatible
-          ? `${bridgeSpeciesData.pokemonName} Macho (2x31 Grupo ${targetData.eggGroups[0]})`
-          : `${targetData.pokemonName} Macho (2x31)`,
+          ? `${bridgeSpeciesData.pokemonName} Macho (♂) (2x31 Grupo ${targetData.eggGroups[0]})`
+          : `${targetData.pokemonName} Macho (♂) (2x31)`,
         gender: 'male',
         equippedItem: item1 ? item1.name : 'Pesa Recia',
         ivSummary: `2x31 IVs`,
@@ -264,7 +291,7 @@ export function generateBreedingPlan(
           : targetSprite
       },
       parentB: {
-        name: `${targetData.pokemonName} Hembra con Naturaleza ${targetNature}`,
+        name: `${targetData.pokemonName} Hembra (♀) con Naturaleza ${targetNature}`,
         gender: 'female',
         equippedItem: `Piedra Eterna (Everstone)`,
         ivSummary: `31 en ${item3?.statName || 'Ataque'} + Naturaleza ${targetNature}`,
@@ -274,6 +301,7 @@ export function generateBreedingPlan(
       offspringTarget: {
         name: `${targetData.pokemonName} (Cría 3x31)`,
         genderRequired: 'either',
+        genderRequiredLabel: '♂ / ♀ Macho o Hembra Indiferente',
         expectedIvsSummary: `3x31 IVs + Naturaleza ${targetNature} Fijada 100%`,
         spriteUrl: targetSprite
       },
@@ -295,7 +323,7 @@ export function generateBreedingPlan(
         stepNumber: 2 + stepOffset,
         title: `Fase ${2 + stepOffset}: Combinación Lazo Destino de Alta Densidad (${ivCount}x31 IVs)`,
         parentA: {
-          name: `${targetData.pokemonName} Macho (3x31/4x31)`,
+          name: `${targetData.pokemonName} Macho (♂) (3x31/4x31)`,
           gender: 'male',
           equippedItem: 'Lazo Destino (Destiny Knot)',
           ivSummary: `3x31/4x31 IVs Complementarios`,
@@ -303,7 +331,7 @@ export function generateBreedingPlan(
           spriteUrl: targetSprite
         },
         parentB: {
-          name: `${targetData.pokemonName} Hembra (3x31/4x31)`,
+          name: `${targetData.pokemonName} Hembra (♀) (3x31/4x31)`,
           gender: 'female',
           equippedItem: `Piedra Eterna (Everstone)`,
           ivSummary: `3x31/4x31 IVs + Naturaleza ${targetNature}`,
@@ -313,6 +341,7 @@ export function generateBreedingPlan(
         offspringTarget: {
           name: `🏆 ${targetData.pokemonName} FINAL COMPETITIVO`,
           genderRequired: 'either',
+          genderRequiredLabel: '🏆 OBJETIVO FINAL ALCANZADO (Macho o Hembra)',
           expectedIvsSummary: `${ivCount}x31 IVs Perfectos + Naturaleza ${targetNature} + Habilidad ${targetAbility}`,
           spriteUrl: targetSprite
         },
@@ -325,7 +354,7 @@ export function generateBreedingPlan(
         stepNumber: 2 + stepOffset,
         title: `Fase ${2 + stepOffset}: Cruce Determinista 100% Objetos Recios (4x31 IVs)`,
         parentA: {
-          name: `${targetData.pokemonName} Macho (3x31)`,
+          name: `${targetData.pokemonName} Macho (♂) (3x31)`,
           gender: 'male',
           equippedItem: item3 ? item3.name : 'Brazal Recio',
           ivSummary: `3x31 IVs`,
@@ -333,7 +362,7 @@ export function generateBreedingPlan(
           spriteUrl: targetSprite
         },
         parentB: {
-          name: `${targetData.pokemonName} Hembra (3x31)`,
+          name: `${targetData.pokemonName} Hembra (♀) (3x31)`,
           gender: 'female',
           equippedItem: item4 ? item4.name : 'Cinto Recio',
           ivSummary: `3x31 IVs + Naturaleza ${targetNature}`,
@@ -342,7 +371,8 @@ export function generateBreedingPlan(
         },
         offspringTarget: {
           name: `${targetData.pokemonName} (Cría 4x31)`,
-          genderRequired: 'either',
+          genderRequired: 'male',
+          genderRequiredLabel: '♂ Macho Requerido (para cruce final)',
           expectedIvsSummary: `4x31 IVs Garantizados 100% Fijos`,
           spriteUrl: targetSprite
         },
@@ -356,7 +386,7 @@ export function generateBreedingPlan(
           stepNumber: 3 + stepOffset,
           title: `Fase ${3 + stepOffset}: Cruce Final Determinista 100% (${ivCount}x31 Competitivo)`,
           parentA: {
-            name: `${targetData.pokemonName} Macho (4x31)`,
+            name: `${targetData.pokemonName} Macho (♂) (4x31)`,
             gender: 'male',
             equippedItem: 'Pesa Recia (Power Weight)',
             ivSummary: `4x31 IVs`,
@@ -364,7 +394,7 @@ export function generateBreedingPlan(
             spriteUrl: targetSprite
           },
           parentB: {
-            name: `${targetData.pokemonName} Hembra (4x31)`,
+            name: `${targetData.pokemonName} Hembra (♀) (4x31)`,
             gender: 'female',
             equippedItem: `Piedra Eterna (Everstone)`,
             ivSummary: `4x31 IVs + Naturaleza ${targetNature}`,
@@ -374,6 +404,7 @@ export function generateBreedingPlan(
           offspringTarget: {
             name: `🏆 ${targetData.pokemonName} FINAL COMPETITIVO`,
             genderRequired: 'either',
+            genderRequiredLabel: '🏆 OBJETIVO FINAL ALCANZADO (Macho o Hembra)',
             expectedIvsSummary: `${ivCount}x31 IVs Perfectos + Naturaleza ${targetNature} + Habilidad ${targetAbility}`,
             spriteUrl: targetSprite
           },
