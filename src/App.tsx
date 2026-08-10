@@ -3,7 +3,7 @@ import { Header } from './components/Header';
 import { PokedexView } from './components/PokedexView';
 import { SpawnRadarView } from './components/SpawnRadarView';
 import { CatchCalculatorView } from './components/CatchCalculatorView';
-import { ShinyBreedingView } from './components/ShinyBreedingView';
+import { BreedingPlannerView } from './components/BreedingPlannerView';
 import { DropsView } from './components/DropsView';
 import { HeldItemsView } from './components/HeldItemsView';
 import { TypeMatrixView } from './components/TypeMatrixView';
@@ -89,7 +89,7 @@ export function App() {
             />
           )}
 
-          {activeTab === 'breeding' && <ShinyBreedingView />}
+          {activeTab === 'breeding' && <BreedingPlannerView />}
 
           {activeTab === 'drops' && <DropsView />}
 
