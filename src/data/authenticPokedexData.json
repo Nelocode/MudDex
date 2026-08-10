@@ -1,23 +1,4 @@
-// 100% Authentic Official Pokémon Species Dataset (Gen 1 - Gen 9)
-// Contains exact official Catch Rates, Base Stats, Height, Weight, and Types sourced directly from official PokeAPI data
-export interface AuthenticPokemonEntry {
-  dexNumber: number;
-  name: string;
-  catchRate: number;
-  weightKg: number;
-  heightM: number;
-  types: string[];
-  baseStats: {
-    hp: number;
-    attack: number;
-    defense: number;
-    specialAttack: number;
-    specialDefense: number;
-    speed: number;
-  };
-}
-
-export const AUTHENTIC_POKEMON_DATA: AuthenticPokemonEntry[] = [
+[
   {
     "dexNumber": 1,
     "name": "Bulbasaur",
@@ -1474,44 +1455,6 @@ export const AUTHENTIC_POKEMON_DATA: AuthenticPokemonEntry[] = [
       "specialAttack": 40,
       "specialDefense": 40,
       "speed": 15
-    }
-  },
-  {
-    "dexNumber": 80,
-    "name": "Slowbro",
-    "catchRate": 75,
-    "weightKg": 78.5,
-    "heightM": 1.6,
-    "types": [
-      "water",
-      "psychic"
-    ],
-    "baseStats": {
-      "hp": 95,
-      "attack": 75,
-      "defense": 110,
-      "specialAttack": 100,
-      "specialDefense": 80,
-      "speed": 30
-    }
-  },
-  {
-    "dexNumber": 81,
-    "name": "Magnemite",
-    "catchRate": 190,
-    "weightKg": 6.0,
-    "heightM": 0.3,
-    "types": [
-      "electric",
-      "steel"
-    ],
-    "baseStats": {
-      "hp": 25,
-      "attack": 35,
-      "defense": 70,
-      "specialAttack": 95,
-      "specialDefense": 55,
-      "speed": 45
     }
   },
   {
@@ -3097,25 +3040,6 @@ export const AUTHENTIC_POKEMON_DATA: AuthenticPokemonEntry[] = [
     }
   },
   {
-    "dexNumber": 168,
-    "name": "Ariados",
-    "catchRate": 90,
-    "weightKg": 33.5,
-    "heightM": 1.1,
-    "types": [
-      "bug",
-      "poison"
-    ],
-    "baseStats": {
-      "hp": 70,
-      "attack": 90,
-      "defense": 70,
-      "specialAttack": 60,
-      "specialDefense": 70,
-      "speed": 40
-    }
-  },
-  {
     "dexNumber": 169,
     "name": "Crobat",
     "catchRate": 90,
@@ -3838,25 +3762,6 @@ export const AUTHENTIC_POKEMON_DATA: AuthenticPokemonEntry[] = [
     }
   },
   {
-    "dexNumber": 208,
-    "name": "Steelix",
-    "catchRate": 25,
-    "weightKg": 400.0,
-    "heightM": 9.2,
-    "types": [
-      "steel",
-      "ground"
-    ],
-    "baseStats": {
-      "hp": 75,
-      "attack": 85,
-      "defense": 200,
-      "specialAttack": 55,
-      "specialDefense": 65,
-      "speed": 30
-    }
-  },
-  {
     "dexNumber": 209,
     "name": "Snubbull",
     "catchRate": 190,
@@ -3909,25 +3814,6 @@ export const AUTHENTIC_POKEMON_DATA: AuthenticPokemonEntry[] = [
       "specialAttack": 55,
       "specialDefense": 55,
       "speed": 85
-    }
-  },
-  {
-    "dexNumber": 212,
-    "name": "Scizor",
-    "catchRate": 25,
-    "weightKg": 118.0,
-    "heightM": 1.8,
-    "types": [
-      "bug",
-      "steel"
-    ],
-    "baseStats": {
-      "hp": 70,
-      "attack": 130,
-      "defense": 100,
-      "specialAttack": 55,
-      "specialDefense": 80,
-      "speed": 65
     }
   },
   {
@@ -6724,25 +6610,6 @@ export const AUTHENTIC_POKEMON_DATA: AuthenticPokemonEntry[] = [
     }
   },
   {
-    "dexNumber": 364,
-    "name": "Sealeo",
-    "catchRate": 120,
-    "weightKg": 87.6,
-    "heightM": 1.1,
-    "types": [
-      "ice",
-      "water"
-    ],
-    "baseStats": {
-      "hp": 90,
-      "attack": 60,
-      "defense": 70,
-      "specialAttack": 75,
-      "specialDefense": 70,
-      "speed": 45
-    }
-  },
-  {
     "dexNumber": 365,
     "name": "Walrein",
     "catchRate": 45,
@@ -7534,24 +7401,6 @@ export const AUTHENTIC_POKEMON_DATA: AuthenticPokemonEntry[] = [
       "specialAttack": 125,
       "specialDefense": 105,
       "speed": 90
-    }
-  },
-  {
-    "dexNumber": 408,
-    "name": "Cranidos",
-    "catchRate": 45,
-    "weightKg": 31.5,
-    "heightM": 0.9,
-    "types": [
-      "rock"
-    ],
-    "baseStats": {
-      "hp": 67,
-      "attack": 125,
-      "defense": 40,
-      "specialAttack": 30,
-      "specialDefense": 30,
-      "speed": 58
     }
   },
   {
@@ -18994,9 +18843,4 @@ export const AUTHENTIC_POKEMON_DATA: AuthenticPokemonEntry[] = [
       "speed": 88
     }
   }
-];
-
-export const AUTHENTIC_POKEMON_MAP: Record<number, AuthenticPokemonEntry> = {};
-AUTHENTIC_POKEMON_DATA.forEach(entry => {
-  AUTHENTIC_POKEMON_MAP[entry.dexNumber] = entry;
-});
+]

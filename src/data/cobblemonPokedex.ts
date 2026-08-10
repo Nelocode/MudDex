@@ -1,5 +1,5 @@
 import { Pokemon, PokemonType } from '../types/diosesmon';
-import { AUTHENTIC_POKEMON_DATA } from './authenticPokedexData';
+import { AUTHENTIC_POKEMON_DATA, AUTHENTIC_POKEMON_MAP } from './authenticPokedexData';
 
 export function getGen(dex: number): number {
   if (dex <= 151) return 1;
@@ -17,7 +17,7 @@ export function generateFullPokedex(): Pokemon[] {
   const pokedex: Pokemon[] = [];
 
   for (let dex = 1; dex <= 1025; dex++) {
-    const auth = AUTHENTIC_POKEMON_DATA[dex - 1];
+    const auth = AUTHENTIC_POKEMON_MAP[dex] || AUTHENTIC_POKEMON_DATA[dex - 1];
     const name = auth ? auth.name : `Pokémon #${dex}`;
     const id = name.toLowerCase().replace(/[^a-z0-9]/g, '');
     const gen = getGen(dex);
