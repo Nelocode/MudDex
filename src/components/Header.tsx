@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Compass, Target, BookOpen, Gem, Search, Info, Copy, Check, ShieldCheck, Map, Sparkles, Scroll, Swords, Activity, Package, Trophy, Gamepad2, User } from 'lucide-react';
+import { Compass, Target, BookOpen, Gem, Search, Info, Copy, Check, ShieldCheck, Map, Sparkles, Scroll, Swords, Activity, Package, Trophy, Gamepad2, User, Dna } from 'lucide-react';
 import { WorldClockWidget } from './WorldClockWidget';
 
 interface HeaderProps {
@@ -46,6 +46,7 @@ export const Header: React.FC<HeaderProps> = ({
     { id: 'spawns', label: 'Radar & Spawns', icon: Compass },
     { id: 'calculator', label: 'Calculador Captura', icon: Target },
     { id: 'pokedex', label: 'Pokédex', icon: BookOpen },
+    { id: 'breeding', label: 'Crianza & Puentes', icon: Dna },
     { id: 'drops', label: 'Drops', icon: Gem },
     { id: 'helditems', label: 'Objetos & Bayas', icon: Package },
     { id: 'typematrix', label: 'Matriz de Tipos', icon: Target },

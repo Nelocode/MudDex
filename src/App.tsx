@@ -3,6 +3,7 @@ import { Header } from './components/Header';
 import { PokedexView } from './components/PokedexView';
 import { SpawnRadarView } from './components/SpawnRadarView';
 import { CatchCalculatorView } from './components/CatchCalculatorView';
+import { ShinyBreedingView } from './components/ShinyBreedingView';
 import { DropsView } from './components/DropsView';
 import { HeldItemsView } from './components/HeldItemsView';
 import { TypeMatrixView } from './components/TypeMatrixView';
@@ -87,6 +88,8 @@ export function App() {
               onSelectPokemonForCalculator={handleSelectPokemonForCalculator}
             />
           )}
+
+          {activeTab === 'breeding' && <ShinyBreedingView />}
 
           {activeTab === 'drops' && <DropsView />}
 
