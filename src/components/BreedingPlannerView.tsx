@@ -189,8 +189,8 @@ export const BreedingPlannerView: React.FC = () => {
         </div>
       </div>
 
-      {/* 5-Step Wizard Navigation Header */}
-      <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 bg-zinc-900/90 p-2 rounded-2xl border border-zinc-800 text-xs font-extrabold shadow-lg">
+      {/* 4-Step Unified Wizard Navigation Header */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 bg-zinc-900/90 p-2 rounded-2xl border border-zinc-800 text-xs font-extrabold shadow-lg">
         <button
           onClick={() => setCurrentWizardStep(1)}
           className={`py-2.5 px-3 rounded-xl transition-all border flex items-center justify-center gap-2 ${
@@ -232,18 +232,7 @@ export const BreedingPlannerView: React.FC = () => {
               : 'bg-zinc-950 text-zinc-400 border-zinc-800 hover:text-white'
           }`}
         >
-          <span>4. Ruta Guía</span>
-        </button>
-
-        <button
-          onClick={() => setCurrentWizardStep(5)}
-          className={`py-2.5 px-3 rounded-xl transition-all border flex items-center justify-center gap-2 col-span-2 sm:col-span-1 ${
-            currentWizardStep === 5
-              ? 'bg-red-600 text-white border-red-500 shadow-md shadow-red-600/20'
-              : 'bg-zinc-950 text-zinc-400 border-zinc-800 hover:text-white'
-          }`}
-        >
-          <span>5. Progreso</span>
+          <span>4. Ruta Guía & Progreso</span>
         </button>
       </div>
 
@@ -517,13 +506,18 @@ export const BreedingPlannerView: React.FC = () => {
 
                 <div>
                   <label className="text-[10px] font-bold text-zinc-400 block mb-1">Naturaleza (Opcional):</label>
-                  <input
-                    type="text"
+                  <select
                     value={newBreederNature}
                     onChange={(e) => setNewBreederNature(e.target.value)}
-                    placeholder="Ej: Modesta"
-                    className="w-full px-3 py-2 rounded-xl bg-zinc-900 border border-zinc-800 text-white font-mono text-xs"
-                  />
+                    className="w-full px-3 py-2 rounded-xl bg-zinc-900 border border-zinc-800 text-white font-bold text-xs"
+                  >
+                    <option value="">Sin Naturaleza Específica</option>
+                    {OFFICIAL_POKEMON_NATURES.map(n => (
+                      <option key={n.nameEs} value={n.nameEs}>
+                        {n.label}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
 
@@ -670,166 +664,207 @@ export const BreedingPlannerView: React.FC = () => {
         );
       })()}
 
-      {/* STEP 4: Ruta paso a paso */}
-      {currentWizardStep === 4 && (
-        <div className="space-y-6">
-          
-          {/* Summary Alert */}
-          {generatedPlan.genderAlertSummary && (
-            <div className="bg-amber-500/10 border border-amber-500/30 rounded-3xl p-5 text-amber-400 text-xs flex items-start gap-3">
-              <AlertTriangle className="w-5 h-5 shrink-0 mt-0.5 text-amber-400" />
-              <div>
-                <strong className="font-bold block mb-1">Alerta de Probabilidad y Costo por Género:</strong>
-                <p className="text-zinc-300 leading-relaxed">{generatedPlan.genderAlertSummary}</p>
-              </div>
-            </div>
-          )}
+      {/* STEP 4: Unified Ruta Guía & Progreso Interactivo */}
+      {currentWizardStep === 4 && (() => {
+        const totalSteps = generatedPlan.steps.length;
+        const completedCount = generatedPlan.steps.filter(s => !!completedSteps[s.stepNumber]).length;
+        const percent = totalSteps > 0 ? Math.round((completedCount / totalSteps) * 100) : 0;
 
-          {/* Steps Tree */}
-          <div className="space-y-4">
-            {generatedPlan.steps.map(step => (
-              <div key={step.stepNumber} className="bg-zinc-900/90 border border-zinc-800 rounded-3xl p-6 space-y-4 shadow-xl">
-                
-                <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
-                  <span className="px-3 py-1 rounded-xl bg-red-600/20 border border-red-500/40 text-red-400 text-xs font-black uppercase">
-                    Paso {step.stepNumber}: {step.title}
-                  </span>
-                  <div className="flex items-center gap-2 text-[10px] font-mono text-zinc-400">
-                    <Flame className="w-3.5 h-3.5 text-amber-500" />
-                    <span>Pasos: {step.flameBodyStepsEstimate} (Con Cuerpo Llama)</span>
-                  </div>
-                </div>
-
-                {/* Parents Combination Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                  
-                  {/* Parent A */}
-                  <div className="bg-zinc-950 p-4 rounded-2xl border border-zinc-800 space-y-2">
-                    <span className="font-bold text-amber-400 block">Padre A: {step.parentA.name}</span>
-                    <div className="text-zinc-300 space-y-1 font-mono text-[11px]">
-                      <div><span className="text-zinc-500">Objeto a Equipar:</span> <strong className="text-white">{step.parentA.equippedItem}</strong></div>
-                      <div><span className="text-zinc-500">IVs Garantizados:</span> <strong className="text-emerald-400">{step.parentA.ivSummary}</strong></div>
-                    </div>
-                  </div>
-
-                  {/* Parent B */}
-                  <div className="bg-zinc-950 p-4 rounded-2xl border border-zinc-800 space-y-2">
-                    <span className="font-bold text-amber-400 block">Padre B: {step.parentB.name}</span>
-                    <div className="text-zinc-300 space-y-1 font-mono text-[11px]">
-                      <div><span className="text-zinc-500">Objeto a Equipar:</span> <strong className="text-white">{step.parentB.equippedItem}</strong></div>
-                      <div><span className="text-zinc-500">IVs Garantizados:</span> <strong className="text-emerald-400">{step.parentB.ivSummary}</strong></div>
-                    </div>
-                  </div>
-
-                </div>
-
-                {/* Offspring Target Result */}
-                <div className="bg-zinc-950 p-4 rounded-2xl border border-zinc-800 space-y-2 text-xs">
-                  <div className="flex items-center justify-between">
-                    <span className="font-extrabold text-white flex items-center gap-2">
-                      🐣 Resultado Esperado: {step.offspringTarget.name}
-                    </span>
-                    <span className="text-[10px] font-mono text-zinc-400">
-                      IVs: {step.offspringTarget.expectedIvsSummary}
-                    </span>
-                  </div>
-
-                  {step.offspringTarget.genderCostAlert && (
-                    <p className="text-[11px] text-amber-400 bg-amber-500/10 p-2.5 rounded-xl border border-amber-500/30">
-                      {step.offspringTarget.genderCostAlert}
-                    </p>
-                  )}
-                  
-                  <p className="text-zinc-400 text-[11px] leading-relaxed">{step.strategyNotes}</p>
-                </div>
-
-              </div>
-            ))}
-          </div>
-
-          <button
-            onClick={() => setCurrentWizardStep(5)}
-            className="w-full py-3 rounded-2xl bg-red-600 hover:bg-red-500 text-white font-extrabold text-xs shadow-lg shadow-red-600/20 transition-all flex items-center justify-center gap-2"
-          >
-            <span>Ir al Gestor Interactivo de Progreso</span>
-            <ChevronRight className="w-4 h-4" />
-          </button>
-
-        </div>
-      )}
-
-      {/* STEP 5: Interactive Checklist & JSON Export */}
-      {currentWizardStep === 5 && (
-        <div className="space-y-6">
-          <div className="bg-zinc-900/90 border border-zinc-800 rounded-3xl p-6 space-y-6 shadow-xl">
+        return (
+          <div className="space-y-6">
             
-            {/* Header Controls */}
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-zinc-800 pb-4">
-              <div>
-                <h3 className="text-sm font-extrabold text-white flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                  <span>Seguimiento de Progreso de Crianza</span>
-                </h3>
-                <span className="text-xs text-zinc-400">Marca los pasos completados conforme avanzas en el servidor.</span>
+            {/* Header Controls & Export / Import */}
+            <div className="bg-zinc-900/90 border border-zinc-800 rounded-3xl p-6 space-y-4 shadow-xl">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-zinc-800 pb-4">
+                <div>
+                  <h3 className="text-base font-extrabold text-white flex items-center gap-2">
+                    <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+                    <span>Ruta Guía Paso a Paso & Progreso de Crianza</span>
+                  </h3>
+                  <span className="text-xs text-zinc-400">
+                    Sigue la combinación determinista garantizada y marca los pasos completados conforme avanzas en Diosesmon.
+                  </span>
+                </div>
+
+                {/* JSON Export / Import Buttons */}
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={handleExportJson}
+                    className="px-3.5 py-2 rounded-xl bg-zinc-950 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 text-xs font-bold transition-colors flex items-center gap-2"
+                  >
+                    <Download className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Exportar Plan JSON</span>
+                  </button>
+
+                  <label className="px-3.5 py-2 rounded-xl bg-zinc-950 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 text-xs font-bold transition-colors flex items-center gap-2 cursor-pointer">
+                    <Upload className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>Importar Plan JSON</span>
+                    <input type="file" accept=".json" onChange={handleImportJson} className="hidden" />
+                  </label>
+                </div>
               </div>
 
-              {/* JSON Export / Import Buttons */}
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={handleExportJson}
-                  className="px-3.5 py-2 rounded-xl bg-zinc-950 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 text-xs font-bold transition-colors flex items-center gap-2"
-                >
-                  <Download className="w-3.5 h-3.5" />
-                  <span>Exportar JSON</span>
-                </button>
-
-                <label className="px-3.5 py-2 rounded-xl bg-zinc-950 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 text-xs font-bold transition-colors flex items-center gap-2 cursor-pointer">
-                  <Upload className="w-3.5 h-3.5" />
-                  <span>Importar JSON</span>
-                  <input type="file" accept=".json" onChange={handleImportJson} className="hidden" />
-                </label>
+              {/* Progress Bar */}
+              <div className="space-y-1.5">
+                <div className="flex justify-between items-center text-xs font-mono">
+                  <span className="text-zinc-300 font-bold">Progreso de la Crianza:</span>
+                  <span className="text-emerald-400 font-extrabold">{completedCount} / {totalSteps} Pasos Completados ({percent}%)</span>
+                </div>
+                <div className="w-full h-3 bg-zinc-950 rounded-full border border-zinc-800 overflow-hidden p-0.5">
+                  <div
+                    className="h-full bg-gradient-to-r from-red-600 via-amber-500 to-emerald-500 rounded-full transition-all duration-500"
+                    style={{ width: `${percent}%` }}
+                  />
+                </div>
               </div>
             </div>
 
-            {/* Checklist items */}
-            <div className="space-y-3">
+            {/* Summary Alert */}
+            {generatedPlan.genderAlertSummary && (
+              <div className="bg-amber-500/10 border border-amber-500/30 rounded-3xl p-5 text-amber-400 text-xs flex items-start gap-3">
+                <AlertTriangle className="w-5 h-5 shrink-0 mt-0.5 text-amber-400" />
+                <div>
+                  <strong className="font-bold block mb-1">Alerta de Dificultad y Género:</strong>
+                  <p className="text-zinc-300 leading-relaxed">{generatedPlan.genderAlertSummary}</p>
+                </div>
+              </div>
+            )}
+
+            {/* Steps Tree with Visual Sprites */}
+            <div className="space-y-6">
               {generatedPlan.steps.map(step => {
                 const isDone = !!completedSteps[step.stepNumber];
+
                 return (
                   <div
                     key={step.stepNumber}
-                    onClick={() => toggleStepCompleted(step.stepNumber)}
-                    className={`p-5 rounded-2xl border transition-all cursor-pointer flex items-center justify-between text-xs ${
+                    className={`border rounded-3xl p-6 space-y-5 shadow-2xl transition-all ${
                       isDone
-                        ? 'bg-emerald-500/10 border-emerald-500/40 text-emerald-300 opacity-80'
-                        : 'bg-zinc-950 border-zinc-800 text-zinc-200 hover:border-red-500/40'
+                        ? 'bg-emerald-950/20 border-emerald-500/40 opacity-90'
+                        : 'bg-zinc-900/90 border-zinc-800'
                     }`}
                   >
-                    <div className="flex items-center gap-4">
-                      <div className={`w-6 h-6 rounded-full border flex items-center justify-center font-bold text-xs ${
-                        isDone ? 'bg-emerald-600 border-emerald-500 text-white' : 'border-zinc-700 bg-zinc-900 text-zinc-400'
-                      }`}>
-                        {isDone ? '✓' : step.stepNumber}
+                    
+                    {/* Step Card Header */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-800/80 pb-3">
+                      <div className="flex items-center gap-3">
+                        <button
+                          onClick={() => toggleStepCompleted(step.stepNumber)}
+                          className={`w-7 h-7 rounded-xl border flex items-center justify-center font-extrabold text-xs transition-all ${
+                            isDone
+                              ? 'bg-emerald-600 border-emerald-400 text-white shadow-lg shadow-emerald-600/30'
+                              : 'bg-zinc-950 border-zinc-700 text-zinc-400 hover:border-red-500'
+                          }`}
+                        >
+                          {isDone ? '✓' : step.stepNumber}
+                        </button>
+                        <span className="font-black text-sm text-white tracking-wide">
+                          {step.title}
+                        </span>
                       </div>
-                      <div>
-                        <strong className="font-extrabold text-sm block text-white">{step.title}</strong>
-                        <span className="text-xs text-zinc-400 block">{step.offspringTarget.expectedIvsSummary}</span>
+
+                      <div className="flex items-center gap-3 text-xs font-mono">
+                        <div className="flex items-center gap-1.5 text-amber-400 bg-amber-950/50 px-3 py-1 rounded-xl border border-amber-800/50">
+                          <Flame className="w-3.5 h-3.5" />
+                          <span>~{step.flameBodyStepsEstimate} Pasos (Cuerpo Llama)</span>
+                        </div>
+                        <span className={`px-3 py-1 rounded-xl font-bold uppercase border text-[10px] ${
+                          isDone ? 'bg-emerald-950 border-emerald-800 text-emerald-300' : 'bg-zinc-950 border-zinc-800 text-amber-400'
+                        }`}>
+                          {isDone ? '✓ Completado' : '⏳ Pendiente'}
+                        </span>
                       </div>
                     </div>
 
-                    <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase border ${
-                      isDone ? 'bg-emerald-950 border-emerald-800 text-emerald-400' : 'bg-zinc-900 border-zinc-800 text-zinc-400'
-                    }`}>
-                      {isDone ? 'Completado' : 'Pendiente'}
-                    </span>
+                    {/* Visual Combination Grid (Parents A & B) */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                      
+                      {/* Parent A Card */}
+                      <div className="bg-zinc-950 p-4 rounded-2xl border border-zinc-800 flex items-center gap-4 relative overflow-hidden">
+                        <div className="w-16 h-16 bg-zinc-900/80 rounded-2xl border border-zinc-800 p-1 flex items-center justify-center shrink-0">
+                          <img
+                            src={step.parentA.spriteUrl}
+                            alt={step.parentA.name}
+                            className="w-14 h-14 object-contain drop-shadow"
+                          />
+                        </div>
+                        <div className="space-y-1 font-mono text-[11px] flex-1">
+                          <span className="font-extrabold text-amber-400 block text-xs">Padre A: {step.parentA.name}</span>
+                          <div><span className="text-zinc-500">Objeto:</span> <strong className="text-white font-bold">{step.parentA.equippedItem}</strong></div>
+                          <div><span className="text-zinc-500">IVs 31:</span> <strong className="text-emerald-400 font-bold">{step.parentA.ivSummary}</strong></div>
+                        </div>
+                      </div>
+
+                      {/* Parent B Card */}
+                      <div className="bg-zinc-950 p-4 rounded-2xl border border-zinc-800 flex items-center gap-4 relative overflow-hidden">
+                        <div className="w-16 h-16 bg-zinc-900/80 rounded-2xl border border-zinc-800 p-1 flex items-center justify-center shrink-0">
+                          <img
+                            src={step.parentB.spriteUrl}
+                            alt={step.parentB.name}
+                            className="w-14 h-14 object-contain drop-shadow"
+                          />
+                        </div>
+                        <div className="space-y-1 font-mono text-[11px] flex-1">
+                          <span className="font-extrabold text-amber-400 block text-xs">Padre B: {step.parentB.name}</span>
+                          <div><span className="text-zinc-500">Objeto:</span> <strong className="text-white font-bold">{step.parentB.equippedItem}</strong></div>
+                          <div><span className="text-zinc-500">IVs 31:</span> <strong className="text-emerald-400 font-bold">{step.parentB.ivSummary}</strong></div>
+                        </div>
+                      </div>
+
+                    </div>
+
+                    {/* Offspring Target Result Card */}
+                    <div className="bg-zinc-950 p-4 sm:p-5 rounded-2xl border border-zinc-800 flex flex-col sm:flex-row items-start sm:items-center gap-4 text-xs">
+                      <div className="w-16 h-16 bg-gradient-to-br from-amber-500/10 to-red-500/10 rounded-2xl border border-amber-500/30 p-1 flex items-center justify-center shrink-0">
+                        <img
+                          src={step.offspringTarget.spriteUrl}
+                          alt={step.offspringTarget.name}
+                          className="w-14 h-14 object-contain drop-shadow-[0_0_8px_rgba(251,191,36,0.3)]"
+                        />
+                      </div>
+
+                      <div className="space-y-1 flex-1">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <strong className="font-extrabold text-white text-xs flex items-center gap-2">
+                            <span>🐣 Resultado Esperado:</span>
+                            <span className="text-amber-400">{step.offspringTarget.name}</span>
+                          </strong>
+                          <span className="text-[11px] font-mono text-emerald-400 font-extrabold bg-emerald-950 px-2.5 py-0.5 rounded-full border border-emerald-800">
+                            {step.offspringTarget.expectedIvsSummary}
+                          </span>
+                        </div>
+
+                        {step.offspringTarget.genderCostAlert && (
+                          <p className="text-[11px] text-amber-400 bg-amber-500/10 p-2 rounded-xl border border-amber-500/30">
+                            {step.offspringTarget.genderCostAlert}
+                          </p>
+                        )}
+                        
+                        <p className="text-zinc-400 text-[11px] leading-relaxed">{step.strategyNotes}</p>
+                      </div>
+                    </div>
+
+                    {/* Interactive Completion Toggle Button */}
+                    <button
+                      onClick={() => toggleStepCompleted(step.stepNumber)}
+                      className={`w-full py-3 rounded-2xl font-extrabold text-xs transition-all flex items-center justify-center gap-2 shadow-md ${
+                        isDone
+                          ? 'bg-zinc-950 text-zinc-400 border border-zinc-800 hover:text-white'
+                          : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-600/20'
+                      }`}
+                    >
+                      <CheckCircle2 className="w-4 h-4" />
+                      <span>{isDone ? 'Marcar Paso como Pendiente' : '✓ Marcar Paso como Completado'}</span>
+                    </button>
+
                   </div>
                 );
               })}
             </div>
 
           </div>
-        </div>
-      )}
+        );
+      })()}
 
     </div>
   );
