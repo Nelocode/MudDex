@@ -1,4 +1,5 @@
 import { POKEMON_EGG_DATASET, PokemonEggData, EggGroup } from '../data/cobblemonEggGroups';
+import { getSpeciesHandicapByDex } from '../data/pokemonHandicapsData';
 
 export interface BreederInventoryItem {
   id: string;
@@ -72,28 +73,20 @@ export interface GeneratedBreedingPlan {
   steps: BreedingStepInstruction[];
   totalEstimatedEggs: number;
   genderAlertSummary?: string;
+  specialHandicapAlerts?: string[];
 }
 
-export function getGenderRatio(pokemonId: string): { maleRate: number; femaleRate: number; label: string } {
-  const s = pokemonId.toLowerCase().trim();
-  
-  if (['eevee', 'charmander', 'charmeleon', 'charizard', 'squirtle', 'wartortle', 'blastoise', 'bulbasaur', 'ivysaur', 'venusaur', 'torchic', 'mudkip', 'treecko', 'chimchar', 'piplup', 'turtwig', 'froakie', 'fennekin', 'chespin', 'litten', 'popplio', 'rowlet', 'grookey', 'scorbunny', 'sobble', 'sprigatito', 'fuecoco', 'quaxly', 'snorlax', 'munchlax', 'togepi', 'togetic', 'togekiss', 'lucario', 'riolu'].includes(s)) {
-    return { maleRate: 0.875, femaleRate: 0.125, label: '87.5% Macho / 12.5% Hembra (Alta dificultad para Hembras)' };
-  }
-
-  if (['chansey', 'blissey', 'happiny', 'bounsweet', 'steenee', 'tsareena', 'milcery', 'alcremie', 'tinkatink', 'tinkatuff', 'tinkaton', 'flabebe', 'floette', 'florges', 'petilil', 'lilligant', 'vullaby', 'mandibuzz', 'hatenna', 'hattrem', 'hatterene', 'froslass'].includes(s)) {
-    return { maleRate: 0, femaleRate: 1.0, label: '100% Hembra (Solo Hembras)' };
-  }
-
-  if (['hitmonlee', 'hitmonchan', 'hitmontop', 'tyrogue', 'gallade', 'tauros', 'braviary', 'rufflet', 'sawk', 'throh', 'grimmsnarl', 'impidimp', 'morgrem'].includes(s)) {
-    return { maleRate: 1.0, femaleRate: 0, label: '100% Macho (Solo Machos)' };
-  }
-
-  if (['ditto', 'magnemite', 'magneton', 'magnezone', 'voltorb', 'electrode', 'staryu', 'starmie', 'porygon', 'beldum', 'metang', 'metagross', 'bronzor', 'bronzong', 'rotom', 'falinks'].includes(s)) {
-    return { maleRate: 0, femaleRate: 0, label: 'Sin Género (Solo puede criar obligatoriamente con Ditto)' };
-  }
-
-  return { maleRate: 0.5, femaleRate: 0.5, label: '50% Macho / 50% Hembra (Estándar)' };
+export function getGenderRatio(pokemonId: string): { maleRate: number; femaleRate: number; label: string; genderType: string; isBaby: boolean; specialNotes: string[] } {
+  const target = POKEMON_EGG_DATASET.find(p => p.pokemonId === pokemonId) || POKEMON_EGG_DATASET[0];
+  const h = getSpeciesHandicapByDex(target.dexNumber);
+  return {
+    maleRate: h.maleRate,
+    femaleRate: h.femaleRate,
+    label: h.genderLabel,
+    genderType: h.genderType,
+    isBaby: h.isBaby,
+    specialNotes: h.specialNotes
+  };
 }
 
 export const POWER_ITEMS_MAP = [
@@ -521,6 +514,7 @@ export function generateBreedingPlan(
     shoppingList,
     steps,
     totalEstimatedEggs: useDestinyKnot ? (ivCount >= 5 ? 24 : 12) : (ivCount >= 5 ? 18 : 8),
-    genderAlertSummary: genderInfo.femaleRate <= 0.15 ? `⚠️ Atención: ${targetData.pokemonName} tiene un ratio de género de 87.5% Macho / 12.5% Hembra. Las fases que requieran Hembras tomarán más intentos.` : undefined
+    genderAlertSummary: genderInfo.femaleRate <= 0.15 && genderInfo.femaleRate > 0 ? `⚠️ Atención: ${targetData.pokemonName} tiene un ratio de género de 87.5% Macho / 12.5% Hembra. Las fases que requieran Hembras tomarán más intentos.` : undefined,
+    specialHandicapAlerts: genderInfo.specialNotes
   };
 }

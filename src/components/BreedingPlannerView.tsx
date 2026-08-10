@@ -742,14 +742,19 @@ export const BreedingPlannerView: React.FC = () => {
               </div>
             </div>
 
-            {/* Summary Alert */}
-            {generatedPlan.genderAlertSummary && (
-              <div className="bg-amber-500/10 border border-amber-500/30 rounded-3xl p-5 text-amber-400 text-xs flex items-start gap-3">
-                <AlertTriangle className="w-5 h-5 shrink-0 mt-0.5 text-amber-400" />
-                <div>
-                  <strong className="font-bold block mb-1">Alerta de Dificultad y Género:</strong>
-                  <p className="text-zinc-300 leading-relaxed">{generatedPlan.genderAlertSummary}</p>
+            {/* Handicap & Gender Special Alerts */}
+            {(generatedPlan.genderAlertSummary || (generatedPlan.specialHandicapAlerts && generatedPlan.specialHandicapAlerts.length > 0)) && (
+              <div className="bg-amber-500/10 border border-amber-500/30 rounded-3xl p-5 text-amber-400 text-xs space-y-2 shadow-lg">
+                <div className="flex items-center gap-2 font-extrabold text-xs text-amber-300">
+                  <AlertTriangle className="w-4 h-4 shrink-0 text-amber-400" />
+                  <span>⚠️ Especificación Especial de Genética para {generatedPlan.targetPokemonName}:</span>
                 </div>
+                {generatedPlan.genderAlertSummary && (
+                  <p className="text-zinc-300 leading-relaxed font-mono text-[11px] pl-6">{generatedPlan.genderAlertSummary}</p>
+                )}
+                {generatedPlan.specialHandicapAlerts?.map((note, idx) => (
+                  <p key={idx} className="text-amber-200 font-mono text-[11px] leading-relaxed pl-6">{note}</p>
+                ))}
               </div>
             )}
 
