@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { Layers, Dna, ShoppingBag, CheckCircle2, AlertTriangle, Plus, Trash2, Download, Upload, Flame, Sparkles, RefreshCw, ChevronRight, Shield, Award } from 'lucide-react';
 import { POKEMON_EGG_DATASET } from '../data/cobblemonEggGroups';
 import { getSmogonBuildsForPokemon, SmogonBuild } from '../data/smogonBuilds';
+import { OFFICIAL_POKEMON_NATURES } from '../data/pokemonNatures';
 import { getAbilitiesAndEggMovesForDex } from '../data/cobblemonSpeciesAbilitiesAndEggMoves';
 import {
   generateBreedingPlan,
@@ -22,6 +23,13 @@ export const BreedingPlannerView: React.FC = () => {
 
   const targetData = useMemo(() => POKEMON_EGG_DATASET.find(p => p.pokemonId === selectedSpeciesId) || POKEMON_EGG_DATASET[0], [selectedSpeciesId]);
   const speciesData = useMemo(() => getAbilitiesAndEggMovesForDex(targetData.dexNumber), [targetData.dexNumber]);
+
+  const effectiveRecommendedAbility = useMemo(() => {
+    if (activeBuild.recommendedAbility && !activeBuild.recommendedAbility.includes('Habilidad Primaria')) {
+      return activeBuild.recommendedAbility;
+    }
+    return speciesData.abilities[0]?.label || speciesData.abilities[0]?.name || 'Habilidad Estándar';
+  }, [activeBuild, speciesData]);
 
   const [targetIvs, setTargetIvs] = useState({
     hp: true,
@@ -332,39 +340,47 @@ export const BreedingPlannerView: React.FC = () => {
             {/* Nature, Ability & Egg Moves Form */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               
-              {/* Nature Selector */}
+              {/* Nature Dropdown Selector */}
               <div className="space-y-1.5">
                 <div className="flex justify-between items-center text-xs">
                   <label className="font-bold text-zinc-400 block">Naturaleza Objetivo:</label>
                   <span className="text-[10px] text-amber-400 font-mono font-bold">💡 Rec. Smogon: {activeBuild.recommendedNature}</span>
                 </div>
-                <input
-                  type="text"
+                <select
                   value={targetNature}
                   onChange={(e) => setTargetNature(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-white font-mono text-xs focus:outline-none focus:border-red-500"
-                />
+                  className="w-full px-4 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-white font-bold text-xs focus:outline-none focus:border-red-500"
+                >
+                  {OFFICIAL_POKEMON_NATURES.map(n => {
+                    const isRec = activeBuild.recommendedNature.toLowerCase().includes(n.nameEs.toLowerCase());
+                    return (
+                      <option key={n.nameEs} value={n.label}>
+                        {isRec ? `⭐ ${n.label} [Recomendada por Smogon]` : n.label}
+                      </option>
+                    );
+                  })}
+                </select>
               </div>
 
               {/* Ability Dropdown Selector */}
               <div className="space-y-1.5">
                 <div className="flex justify-between items-center text-xs">
                   <label className="font-bold text-zinc-400 block">Habilidad Objetivo:</label>
-                  <span className="text-[10px] text-amber-400 font-mono font-bold">💡 Rec. Smogon: {activeBuild.recommendedAbility}</span>
+                  <span className="text-[10px] text-amber-400 font-mono font-bold">💡 Rec. Smogon: {effectiveRecommendedAbility}</span>
                 </div>
                 <select
                   value={targetAbility}
                   onChange={(e) => setTargetAbility(e.target.value)}
                   className="w-full px-4 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-white font-bold text-xs focus:outline-none focus:border-red-500"
                 >
-                  <option value={activeBuild.recommendedAbility}>
-                    ⭐ {activeBuild.recommendedAbility} [Recomendada por Smogon]
-                  </option>
-                  {speciesData.abilities.map((a, idx) => (
-                    <option key={idx} value={a.label}>
-                      {a.label} {a.isHidden ? '(Habilidad Oculta HO)' : '(Habilidad Normal)'}
-                    </option>
-                  ))}
+                  {speciesData.abilities.map((a, idx) => {
+                    const isRec = effectiveRecommendedAbility.toLowerCase().includes(a.name.toLowerCase()) || effectiveRecommendedAbility.toLowerCase().includes(a.label.toLowerCase());
+                    return (
+                      <option key={idx} value={a.label}>
+                        {isRec ? `⭐ ${a.label} [Recomendada por Smogon]` : a.label}
+                      </option>
+                    );
+                  })}
                 </select>
               </div>
 
