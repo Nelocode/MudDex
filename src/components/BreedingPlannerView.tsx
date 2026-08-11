@@ -271,6 +271,93 @@ export const BreedingPlannerView: React.FC = () => {
               </div>
             </div>
 
+            {/* Rich Smogon Strategy Guide Card */}
+            <div className="bg-zinc-950 border border-amber-500/30 rounded-3xl p-4 sm:p-5 space-y-4 shadow-2xl relative overflow-hidden">
+              <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-2xl bg-zinc-900 border border-zinc-800 p-1 flex items-center justify-center shrink-0">
+                    <img
+                      src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${targetData.dexNumber}.png`}
+                      alt={targetData.pokemonName}
+                      className="w-11 h-11 object-contain drop-shadow"
+                    />
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-mono text-amber-400 font-bold uppercase tracking-wider block">
+                      Ficha Guía Smogon • {activeBuild.tier || 'Competitivo SV'}
+                    </span>
+                    <h4 className="text-sm font-black text-white">{activeBuild.buildName}</h4>
+                  </div>
+                </div>
+              </div>
+
+              {/* Core Attributes: Item, Nature, Ability, EVs */}
+              <div className="grid grid-cols-2 gap-2 text-xs font-mono">
+                <div className="bg-zinc-900/80 p-2.5 rounded-xl border border-zinc-800 space-y-0.5">
+                  <span className="text-[10px] text-zinc-500 block font-bold">🎒 Objeto Recomendado:</span>
+                  <strong className="text-amber-300 font-extrabold text-[11px]">{activeBuild.recommendedItem || 'Restos (Leftovers)'}</strong>
+                </div>
+
+                <div className="bg-zinc-900/80 p-2.5 rounded-xl border border-zinc-800 space-y-0.5">
+                  <span className="text-[10px] text-zinc-500 block font-bold">🏋️ Distribución de EVs:</span>
+                  <strong className="text-emerald-300 font-extrabold text-[11px]">{activeBuild.recommendedEvs || '252 HP / 4 Def / 252 SpD'}</strong>
+                </div>
+
+                <div className="bg-zinc-900/80 p-2.5 rounded-xl border border-zinc-800 space-y-0.5">
+                  <span className="text-[10px] text-zinc-500 block font-bold">🌿 Naturaleza:</span>
+                  <strong className="text-sky-300 font-extrabold text-[11px]">{activeBuild.recommendedNature}</strong>
+                </div>
+
+                <div className="bg-zinc-900/80 p-2.5 rounded-xl border border-zinc-800 space-y-0.5">
+                  <span className="text-[10px] text-zinc-500 block font-bold">✨ Habilidad:</span>
+                  <strong className="text-purple-300 font-extrabold text-[11px]">{effectiveRecommendedAbility}</strong>
+                </div>
+              </div>
+
+              {/* Recommended Competitive Moveset (4 Slots) */}
+              <div className="space-y-1.5 bg-zinc-900/80 p-3 rounded-2xl border border-zinc-800">
+                <span className="text-[10px] font-bold text-zinc-400 block font-mono flex items-center gap-1.5">
+                  ⚔️ Moveset Competitivo Recomendado:
+                </span>
+                <div className="grid grid-cols-2 gap-1.5 font-mono text-[11px]">
+                  {(activeBuild.recommendedMoveset || ['Deseo (Wish) [Huevo]', 'Protección (Protect)', 'Juego Sucio (Foul Play)', 'Tóxico (Toxic) [Huevo]']).map((move, i) => {
+                    const isEgg = move.toLowerCase().includes('huevo') || activeBuild.recommendedEggMoves.some(em => move.toLowerCase().includes(em.toLowerCase()));
+                    return (
+                      <div key={i} className={`p-2 rounded-xl border flex items-center justify-between ${isEgg ? 'bg-amber-950/40 border-amber-500/40 text-amber-300' : 'bg-zinc-950 border-zinc-800 text-zinc-300'}`}>
+                        <span className="truncate font-bold">{move}</span>
+                        {isEgg && <span className="text-[9px] font-extrabold px-1 py-0.2 rounded bg-amber-500/20 text-amber-400 shrink-0">🥚 Huevo</span>}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Egg Moves Badges */}
+              {activeBuild.recommendedEggMoves.length > 0 && (
+                <div className="space-y-1 bg-zinc-900/80 p-2.5 rounded-xl border border-zinc-800">
+                  <span className="text-[10px] text-zinc-400 font-mono font-bold block">🥚 Movimientos Huevo Requeridos por la Build:</span>
+                  <div className="flex flex-wrap gap-1 font-mono text-[10px]">
+                    {activeBuild.recommendedEggMoves.map((em, i) => (
+                      <span key={i} className="px-2 py-0.5 rounded bg-amber-500/20 border border-amber-500/40 text-amber-300 font-extrabold">
+                        ⭐ {em}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Fast Apply Button */}
+              <button
+                type="button"
+                onClick={() => handleSelectBuild(selectedBuildIndex)}
+                className="w-full py-2.5 rounded-2xl bg-gradient-to-r from-amber-600 to-red-600 hover:from-amber-500 hover:to-red-500 text-white font-extrabold text-xs shadow-md transition-all flex items-center justify-center gap-2"
+              >
+                <Sparkles className="w-4 h-4 text-amber-200" />
+                <span>⚡ Cargar esta Ficha Smogon en el Planificador</span>
+              </button>
+
+            </div>
+
           </div>
 
           {/* Target Configuration (Fully Editable) */}
