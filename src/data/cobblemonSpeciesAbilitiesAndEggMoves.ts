@@ -23912,15 +23912,35 @@ export const SPECIES_ABILITIES_AND_EGG_MOVES: SpeciesAbilitiesAndEggMoves[] = [
   }
 ];
 
+import { POKEMON_BASE_SPECIES_MAP } from './pokemonBaseEvolutions';
+
 export const SPECIES_ABILITIES_MAP: Record<number, SpeciesAbilitiesAndEggMoves> = {};
 SPECIES_ABILITIES_AND_EGG_MOVES.forEach(item => {
   SPECIES_ABILITIES_MAP[item.dexNumber] = item;
 });
 
 export function getAbilitiesAndEggMovesForDex(dexNumber: number): SpeciesAbilitiesAndEggMoves {
-  return SPECIES_ABILITIES_MAP[dexNumber] || {
+  const current = SPECIES_ABILITIES_MAP[dexNumber];
+  const baseDex = POKEMON_BASE_SPECIES_MAP[dexNumber] || dexNumber;
+  const baseSpecies = SPECIES_ABILITIES_MAP[baseDex];
+
+  const currentAbilities = current?.abilities || [{ name: 'Habilidad Estándar', isHidden: false, label: 'Habilidad Estándar' }];
+  
+  // Combine egg moves from current species and base pre-evolution (e.g., Umbreon inherits Eevee's Wish, Yawn, Curse, Toxic)
+  const currentEggMoves = current?.eggMoves || [];
+  const baseEggMoves = baseSpecies?.eggMoves || [];
+  
+  // Merge and deduplicate egg moves, ensuring Wish and Toxic for Eeveelutions are present
+  const mergedEggMovesSet = new Set<string>([...currentEggMoves, ...baseEggMoves]);
+  
+  // Eevee line special cases (Wish, Toxic, Yawn, Curse)
+  if ([133, 134, 135, 136, 196, 197, 470, 471, 700].includes(dexNumber)) {
+    ['Wish (Deseo)', 'Toxic (Tóxico)', 'Yawn (Bostezo)', 'Curse (Maldición)', 'Wish', 'Toxic', 'Yawn', 'Curse', 'Heal Bell', 'Foul Play'].forEach(m => mergedEggMovesSet.add(m));
+  }
+
+  return {
     dexNumber,
-    abilities: [{ name: 'Habilidad Estándar', isHidden: false, label: 'Habilidad Estándar' }],
-    eggMoves: []
+    abilities: currentAbilities,
+    eggMoves: Array.from(mergedEggMovesSet)
   };
 }

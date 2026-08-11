@@ -417,6 +417,9 @@ export const BreedingPlannerView: React.FC = () => {
                   </div>
                 ) : (
                   <div className="space-y-2">
+                    <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-2.5 text-[11px] text-amber-300 flex items-center gap-2 font-mono">
+                      <span>💡 <strong>Regla de Herencia Cobblemon:</strong> Los movimientos huevo de <strong>{targetData.pokemonName}</strong> incluyen los de su forma base (ej. <em>Wish/Deseo, Toxic, Yawn, Curse</em>). El huevo nace como la forma base heredando los movimientos y luego evoluciona.</span>
+                    </div>
                     <span className="text-[10px] text-zinc-400 block">Toca los movimientos compatibles para añadirlos o quitarlos:</span>
                     <div className="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto p-2 bg-zinc-950 rounded-2xl border border-zinc-800 scrollbar-thin">
                       {speciesData.eggMoves.map(move => {
