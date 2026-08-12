@@ -1076,18 +1076,52 @@ export const BreedingPlannerView: React.FC = () => {
                       </div>
                     </div>
 
-                    {/* Interactive Completion Toggle Button */}
-                    <button
-                      onClick={() => toggleStepCompleted(step.stepNumber)}
-                      className={`w-full py-3 rounded-2xl font-extrabold text-xs transition-all flex items-center justify-center gap-2 shadow-md ${
-                        isDone
-                          ? 'bg-zinc-950 text-zinc-400 border border-zinc-800 hover:text-white'
-                          : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-600/20'
-                      }`}
-                    >
-                      <CheckCircle2 className="w-4 h-4" />
-                      <span>{isDone ? 'Marcar Paso como Pendiente' : '✓ Marcar Paso como Completado'}</span>
-                    </button>
+                    {/* Interactive Actions: Register to Pasture & Completion Toggle */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                      <button
+                        onClick={() => {
+                          const genderVal = step.offspringTarget.genderRequired === 'female' ? 'female' : step.offspringTarget.genderRequired === 'male' ? 'male' : 'genderless';
+                          const data = POKEMON_EGG_DATASET.find(p => p.pokemonId === selectedSpeciesId) || POKEMON_EGG_DATASET[0];
+                          
+                          // Determine IVs from step
+                          const ivObj = { hp: false, attack: false, defense: false, specialAttack: false, specialDefense: false, speed: false };
+                          if (step.offspringTarget.expectedIvsSummary.toLowerCase().includes('hp')) ivObj.hp = true;
+                          if (step.offspringTarget.expectedIvsSummary.toLowerCase().includes('ataque')) ivObj.attack = true;
+                          if (step.offspringTarget.expectedIvsSummary.toLowerCase().includes('defensa')) ivObj.defense = true;
+                          if (step.offspringTarget.expectedIvsSummary.toLowerCase().includes('atk esp')) ivObj.specialAttack = true;
+                          if (step.offspringTarget.expectedIvsSummary.toLowerCase().includes('def esp')) ivObj.specialDefense = true;
+                          if (step.offspringTarget.expectedIvsSummary.toLowerCase().includes('velocidad')) ivObj.speed = true;
+
+                          const newBreeder: BreederInventoryItem = {
+                            id: `pasture_step_${step.stepNumber}_${Date.now()}`,
+                            speciesId: data.pokemonId,
+                            speciesName: `${data.pokemonName} (${step.offspringTarget.name})`,
+                            gender: genderVal,
+                            ivs: ivObj,
+                            nature: targetNature
+                          };
+
+                          setPastura(prev => [...prev, newBreeder]);
+                          alert(`✓ ¡${data.pokemonName} (${step.offspringTarget.name}) fue registrado exitosamente en tu Pastura Global!`);
+                        }}
+                        className="w-full py-3 rounded-2xl bg-amber-600/20 hover:bg-amber-600/30 text-amber-300 border border-amber-500/40 font-extrabold text-xs transition-all flex items-center justify-center gap-2 shadow-md"
+                      >
+                        <Plus className="w-4 h-4 text-amber-400" />
+                        <span>➕ Registrar Cría del Paso en mi Pastura Global</span>
+                      </button>
+
+                      <button
+                        onClick={() => toggleStepCompleted(step.stepNumber)}
+                        className={`w-full py-3 rounded-2xl font-extrabold text-xs transition-all flex items-center justify-center gap-2 shadow-md ${
+                          isDone
+                            ? 'bg-zinc-950 text-zinc-400 border border-zinc-800 hover:text-white'
+                            : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-600/20'
+                        }`}
+                      >
+                        <CheckCircle2 className="w-4 h-4" />
+                        <span>{isDone ? 'Marcar Paso como Pendiente' : '✓ Marcar Paso como Completado'}</span>
+                      </button>
+                    </div>
 
                   </div>
                 );

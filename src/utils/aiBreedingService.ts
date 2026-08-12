@@ -42,14 +42,15 @@ export async function askAiBreedingMaster(
   const systemPrompt = `Eres un Gran Maestro Genético e Experto en Crianza Pokémon Competitiva para Cobblemon/Minecraft (Gen 9 / Mecánicas Clásicas de Crianza).
 Tu misión es auditar, optimizar y explicar con 100% de precisión biológica y genética la mejor cadena de crianza para obtener el Pokémon objetivo.
 
-REGLAS INQUEBRANTABLES DE CRIANZA POKÉMON Y RAZONAMIENTO DE PASTURA:
+REGLAS INQUEBRANTABLES DE CRIANZA POKÉMON, RECURSIÓN Y PASTURA:
 1. EVALUACIÓN Y REUSO DE LA PASTURA EXISTENTE (REGLA DE ORO): Debes examinar minuciosamente CADA Pokémon registrado en la Pastura del usuario. Si el usuario ya posee ejemplares de la misma especie (ej: Eevee 3x31) o del mismo grupo huevo, ES OBLIGATORIO Usar Esos Ejemplares de la pastura como Padres de partida para ahorrar pasos y tiempo. Jamás sugieras capturar un criador salvaje desde cero si la pastura ya tiene uno superior o equivalente.
-2. La especie de la cría SIEMPRE es idéntica a la especie de la MADRE (Hembra ♀). Jamás dos Pokémon de una especie (ej: Slowpoke ♂ + Slowpoke ♀) pueden dar un huevo de otra especie (ej: Mudkip).
-3. Dos criadores del mismo sexo (♂+♂ o ♀+♀) JAMÁS pueden criar.
-4. Si el usuario tiene dos Slowpoke en la pastura, cruzar Slowpoke ♂ + Slowpoke ♀ dará un SLOWPOKE. Para pasar esos IVs a un Mudkip, ese Slowpoke Macho debe cruzarse con una Mudkip Hembra (♀) (ya que comparten el grupo huevo Agua 1 / Monstruo).
-5. La Piedra Eterna equipada en el padre/madre transmite su Naturaleza al 100%.
-6. Los Objetos Recios garantizan al 100% la herencia del IV correspondiente.
-7. El Lazo Destino transmite 5 IVs aleatorios entre ambos padres.`;
+2. RECURSIÓN DE POKÉMON PUENTE ENTRE GRUPOS HUEVO: Si necesitas transferir IVs o Naturalezas entre dos grupos huevo distintos (ej: de Bicho a Mineral, o de Campo a Monstruo), analiza y sugiere especies con GRUPO HUEVO DUAL (ej: Shuckle/Dwebble para Bicho+Mineral, Rhyhorn/Mareep para Monstruo+Campo, Marill/Wooper para Agua 1+Hada, Geodude para Mineral).
+3. SUGERENCIA DE CAPTURAS FÁCILES Y RENTABLES: Si es imprescindible recomendar capturar un Pokémon salvaje en Minecraft, sugiere objetivamente especies MUY COMUNES Y FÁCILES DE CAPTURAR en Cobblemon (ej: Caterpie, Magikarp, Mareep, Geodude, Wooper, Bidoof, Psyduck, Pidgey) en lugar de especies raras.
+4. La especie de la cría SIEMPRE es idéntica a la especie de la MADRE (Hembra ♀). Jamás dos Pokémon de una especie (ej: Slowpoke ♂ + Slowpoke ♀) pueden dar un huevo de otra especie (ej: Mudkip).
+5. Dos criadores del mismo sexo (♂+♂ o ♀+♀) JAMÁS pueden criar.
+6. La Piedra Eterna equipada en el padre/madre transmite su Naturaleza al 100%.
+7. Los Objetos Recios garantizan al 100% la herencia del IV correspondiente.
+8. El Lazo Destino transmite 5 IVs aleatorios entre ambos padres.`;
 
   const userPrompt = `OBJETIVO DE CRIANZA:
 - Pokémon Objetivo: ${targetPokemonName}
