@@ -195,14 +195,15 @@ export function generateBreedingPlan(
 
   const requiredOffspringGenderInStep1 = 'male';
 
-  // Offspring species in Step 1A matches the MOTHER (Parent B species)
-  const step1AOffspringName = pastureBreederB && pBSpeciesData && pBSpeciesData.pokemonId !== targetData.pokemonId
-    ? `${pBSpeciesData.pokemonName} Macho (Cría 2x31)`
-    : `${targetData.pokemonName} Macho (Cría 2x31 Cadena 1)`;
+  // Offspring species in Step 1A matches the MOTHER or non-Ditto parent
+  const step1AOffspringSpeciesData = (pastureBreederA && pASpeciesData && pASpeciesData.pokemonId !== 'ditto' && pASpeciesData.pokemonId !== targetData.pokemonId)
+    ? pASpeciesData
+    : ((pastureBreederB && pBSpeciesData && pBSpeciesData.pokemonId !== 'ditto' && pBSpeciesData.pokemonId !== targetData.pokemonId)
+      ? pBSpeciesData
+      : (pASpeciesData && pASpeciesData.pokemonId !== 'ditto' ? pASpeciesData : targetData));
 
-  const step1AOffspringSprite = pastureBreederB && pBSpeciesData && pBSpeciesData.pokemonId !== targetData.pokemonId
-    ? pBSprite
-    : targetSprite;
+  const step1AOffspringName = `${step1AOffspringSpeciesData.pokemonName} Macho (Cría 2x31)`;
+  const step1AOffspringSprite = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${step1AOffspringSpeciesData.dexNumber}.png`;
 
   steps.push({
     stepNumber: 1,
@@ -251,13 +252,13 @@ export function generateBreedingPlan(
       chainName: '🌉 CADENA PUENTE: Transferencia de Grupos Huevo',
       title: `Paso Puente: Cruce de Transferencia con ${bridgeSpeciesData.pokemonName}`,
       parentA: {
-        name: `${pASpeciesData?.pokemonName || 'Criador'} Macho (♂) (2x31)`,
+        name: `${step1AOffspringSpeciesData.pokemonName} Macho (♂) (2x31)`,
         gender: 'male',
         equippedItem: item1 ? item1.name : 'Pesa Recia',
-        ivSummary: `2x31 IVs (${pASpeciesData?.eggGroups.join(', ')})`,
+        ivSummary: `2x31 IVs (${step1AOffspringSpeciesData.eggGroups.join(', ')})`,
         isPreOwned: false,
         originLabel: '🐣 Cría Obtenida en el Paso 1A',
-        spriteUrl: pASprite
+        spriteUrl: step1AOffspringSprite
       },
       parentB: {
         name: `💡 ${bridgeSpeciesData.pokemonName} Hembra (♀) (Pokémon Puente)`,
