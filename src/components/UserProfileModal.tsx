@@ -233,6 +233,33 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({ isOpen, onCl
           </div>
         </div>
 
+        {/* AI API Key Config Section */}
+        <div className="p-3.5 rounded-2xl bg-zinc-950/80 border border-zinc-800 space-y-2">
+          <label className="block text-xs font-bold text-zinc-300 flex items-center justify-between">
+            <span className="flex items-center gap-1.5">
+              <Key className="w-3.5 h-3.5 text-amber-400" />
+              <span>Clave de API de IA (Gemini / OpenAI):</span>
+            </span>
+            <span className="text-[10px] text-amber-400 font-mono">
+              {localStorage.getItem('muddex_ai_key') ? '✓ Guardada' : 'No Ingresada'}
+            </span>
+          </label>
+          <input
+            type="password"
+            placeholder="Pega aquí tu Gemini API Key (ej: AIzaSy...)"
+            defaultValue={localStorage.getItem('muddex_ai_key') || ''}
+            onChange={(e) => {
+              const val = e.target.value.trim();
+              if (val) {
+                localStorage.setItem('muddex_ai_key', val);
+              } else {
+                localStorage.removeItem('muddex_ai_key');
+              }
+            }}
+            className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-3.5 py-2 text-xs text-white font-mono placeholder-zinc-500 focus:outline-none focus:border-amber-500"
+          />
+        </div>
+
         {/* Session Vault Export / Import */}
         <div className="space-y-2 pt-2 border-t border-zinc-800">
           <span className="text-xs font-bold text-zinc-400 uppercase block">Bóveda de Sesiones & Portabilidad:</span>
