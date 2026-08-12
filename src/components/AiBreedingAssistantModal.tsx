@@ -171,9 +171,23 @@ export const AiBreedingAssistantModal: React.FC<AiBreedingAssistantModalProps> =
             <div className="p-4 rounded-2xl bg-zinc-950 border border-zinc-800 space-y-3">
               {result.isSuccess ? (
                 <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-xs font-extrabold text-emerald-400 border-b border-zinc-800 pb-2">
-                    <Check className="w-4 h-4" />
-                    <span>Respuesta del Maestro IA de Crianza:</span>
+                  <div className="flex items-center justify-between border-b border-zinc-800 pb-2">
+                    <div className="flex items-center gap-2 text-xs font-extrabold text-emerald-400">
+                      <Check className="w-4 h-4" />
+                      <span>Respuesta del Maestro IA de Crianza:</span>
+                    </div>
+
+                    <button
+                      onClick={() => {
+                        const discordText = `# 🧬 PLAN DE CRIANZA POKÉMON IA - MUDDEX (${targetPokemonName})\n\n${result.adviceMarkdown}\n\n*Generado en MudDex para Diosesmon (Fabric 1.21.1)*`;
+                        navigator.clipboard.writeText(discordText);
+                        alert('✓ ¡Guía de crianza copiada en formato Discord Markdown!');
+                      }}
+                      className="px-3 py-1 rounded-xl bg-amber-600/20 border border-amber-500/40 text-amber-300 hover:bg-amber-600/30 text-[10px] font-mono font-bold transition-all flex items-center gap-1.5"
+                    >
+                      <BookOpen className="w-3.5 h-3.5" />
+                      <span>📋 Copiar Guía para Discord</span>
+                    </button>
                   </div>
                   <div className="prose prose-invert prose-xs font-mono text-xs text-zinc-200 whitespace-pre-wrap leading-relaxed">
                     {result.adviceMarkdown}

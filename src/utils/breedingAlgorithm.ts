@@ -16,6 +16,7 @@ export interface BreederInventoryItem {
   };
   nature?: string;
   ability?: string;
+  notes?: string;
 }
 
 export interface BreedingStepInstruction {
