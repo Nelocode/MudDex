@@ -117,14 +117,6 @@ export const BreedingPlannerView: React.FC = () => {
         notes: 'Caja 1 - Criador Especial'
       },
       {
-        id: 'p_ditto_4x31',
-        speciesId: 'ditto',
-        speciesName: 'Ditto (4x31)',
-        gender: 'genderless',
-        ivs: { hp: true, attack: true, defense: true, specialAttack: false, specialDefense: true, speed: false },
-        notes: 'Caja 3 - Comodín Ditto'
-      },
-      {
         id: 'p_slowpoke_2x31',
         speciesId: 'slowpoke',
         speciesName: 'Slowpoke (Macho ♂ 2x31)',
@@ -135,6 +127,38 @@ export const BreedingPlannerView: React.FC = () => {
       }
     ];
     setPastura(demoPastura);
+  };
+
+  // Export Pasture JSON
+  const handleExportPasturaJson = () => {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(pastura, null, 2));
+    const downloadAnchor = document.createElement('a');
+    downloadAnchor.setAttribute("href", dataStr);
+    downloadAnchor.setAttribute("download", `muddex_pastura_${Date.now()}.json`);
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
+  };
+
+  // Import Pasture JSON
+  const handleImportPasturaJson = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const fileReader = new FileReader();
+    if (e.target.files && e.target.files[0]) {
+      fileReader.readAsText(e.target.files[0], "UTF-8");
+      fileReader.onload = (event) => {
+        try {
+          const parsed = JSON.parse(event.target?.result as string);
+          if (Array.isArray(parsed)) {
+            setPastura(parsed);
+            alert(`✓ ¡Se importaron ${parsed.length} Pokémon a tu Pastura Global!`);
+          } else {
+            alert('⚠️ El archivo JSON no contiene un formato de pastura válido.');
+          }
+        } catch (err) {
+          alert('⚠️ Error al leer el archivo JSON de la pastura.');
+        }
+      };
+    }
   };
 
   // Form for adding breeder to Pasture
@@ -659,16 +683,39 @@ export const BreedingPlannerView: React.FC = () => {
                 <Layers className="w-4 h-4 text-amber-400" />
                 <span>Pastura / Caja de Crianza (Tus Criadores Disponibles)</span>
               </h3>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={handleRestoreDefaultPastura}
-                  className="px-3 py-1.5 rounded-xl bg-amber-600/20 hover:bg-amber-600/30 text-amber-300 border border-amber-500/40 text-xs font-mono font-bold transition-all flex items-center gap-1.5"
-                >
-                  <RefreshCw className="w-3.5 h-3.5" />
-                  <span>🔄 Restaurar Eevees 3x31 & Ejemplo</span>
-                </button>
-                <span className="text-xs text-zinc-400 font-mono">
-                  {pastura.length} Pokémon en inventario
+              <div className="flex flex-wrap items-center gap-2">
+                <label className="px-3 py-1.5 rounded-xl bg-zinc-950 border border-zinc-800 hover:border-zinc-700 text-zinc-300 hover:text-white text-xs font-mono font-bold transition-all cursor-pointer flex items-center gap-1.5">
+                  <Upload className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>Importar Pastura JSON</span>
+                  <input type="file" accept=".json" onChange={handleImportPasturaJson} className="hidden" />
+                </label>
+
+                {pastura.length > 0 && (
+                  <>
+                    <button
+                      onClick={handleExportPasturaJson}
+                      className="px-3 py-1.5 rounded-xl bg-zinc-950 border border-zinc-800 hover:border-zinc-700 text-zinc-300 hover:text-white text-xs font-mono font-bold transition-all flex items-center gap-1.5"
+                    >
+                      <Download className="w-3.5 h-3.5 text-sky-400" />
+                      <span>Exportar Pastura</span>
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        if (confirm('¿Estás seguro de vaciar la pastura global?')) {
+                          setPastura([]);
+                        }
+                      }}
+                      className="px-3 py-1.5 rounded-xl bg-red-950/40 border border-red-800/50 text-red-300 hover:bg-red-900/40 text-xs font-mono font-bold transition-all flex items-center gap-1.5"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Vaciar Pastura</span>
+                    </button>
+                  </>
+                )}
+
+                <span className="text-xs text-zinc-400 font-mono pl-1">
+                  ({pastura.length} en inventario)
                 </span>
               </div>
             </div>
