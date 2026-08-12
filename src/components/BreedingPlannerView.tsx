@@ -35,11 +35,20 @@ export const BreedingPlannerView: React.FC = () => {
   const speciesData = useMemo(() => getAbilitiesAndEggMovesForDex(targetData.dexNumber), [targetData.dexNumber]);
 
   const effectiveRecommendedAbility = useMemo(() => {
-    if (activeBuild.recommendedAbility && !activeBuild.recommendedAbility.includes('Habilidad Primaria')) {
+    if (activeBuild?.recommendedAbility && !activeBuild.recommendedAbility.includes('Habilidad Primaria')) {
       return activeBuild.recommendedAbility;
     }
     return speciesData.abilities[0]?.label || speciesData.abilities[0]?.name || 'Habilidad Estándar';
   }, [activeBuild, speciesData]);
+
+  // Combined ability options ensuring Smogon recommended ability is always available
+  const abilityOptions = useMemo(() => {
+    const options = speciesData.abilities.map(a => a.label);
+    if (effectiveRecommendedAbility && !options.some(o => o.toLowerCase() === effectiveRecommendedAbility.toLowerCase() || o.toLowerCase().includes(effectiveRecommendedAbility.toLowerCase()) || effectiveRecommendedAbility.toLowerCase().includes(o.toLowerCase()))) {
+      options.unshift(effectiveRecommendedAbility);
+    }
+    return Array.from(new Set(options));
+  }, [speciesData, effectiveRecommendedAbility]);
 
   const [targetIvs, setTargetIvs] = useState({
     hp: true,
@@ -61,31 +70,16 @@ export const BreedingPlannerView: React.FC = () => {
       setTargetIvs({ ...b.targetIvs });
       setTargetNature(b.recommendedNature);
       setEggMovesInput(b.recommendedEggMoves.join(', '));
-
-      // Match recommended ability with target species abilities
-      const matched = speciesData.abilities.find(a =>
-        a.name.toLowerCase() === b.recommendedAbility.toLowerCase() ||
-        a.label.toLowerCase() === b.recommendedAbility.toLowerCase() ||
-        b.recommendedAbility.toLowerCase().includes(a.name.toLowerCase()) ||
-        a.label.toLowerCase().includes(b.recommendedAbility.toLowerCase())
-      );
-      setTargetAbility(matched ? matched.label : speciesData.abilities[0]?.label || b.recommendedAbility);
+      setTargetAbility(b.recommendedAbility || speciesData.abilities[0]?.label || 'Habilidad Estándar');
     }
   };
 
   // Auto-sync ability when species or build changes
   useEffect(() => {
-    const b = smogonBuilds[selectedBuildIndex] || smogonBuilds[0];
-    if (b && speciesData.abilities.length > 0) {
-      const matched = speciesData.abilities.find(a =>
-        a.name.toLowerCase() === b.recommendedAbility.toLowerCase() ||
-        a.label.toLowerCase() === b.recommendedAbility.toLowerCase() ||
-        b.recommendedAbility.toLowerCase().includes(a.name.toLowerCase()) ||
-        a.label.toLowerCase().includes(b.recommendedAbility.toLowerCase())
-      );
-      setTargetAbility(matched ? matched.label : speciesData.abilities[0].label);
+    if (effectiveRecommendedAbility) {
+      setTargetAbility(effectiveRecommendedAbility);
     }
-  }, [selectedSpeciesId, selectedBuildIndex, speciesData]);
+  }, [selectedSpeciesId, selectedBuildIndex, effectiveRecommendedAbility]);
 
   // Quick IV Count Presets (3x31, 4x31, 5x31, 6x31)
   const applyIvPreset = (count: 3 | 4 | 5 | 6) => {
@@ -670,11 +664,13 @@ export const BreedingPlannerView: React.FC = () => {
                   onChange={(e) => setTargetAbility(e.target.value)}
                   className="w-full px-4 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-white font-bold text-xs focus:outline-none focus:border-red-500"
                 >
-                  {speciesData.abilities.map((a, idx) => {
-                    const isRec = effectiveRecommendedAbility.toLowerCase().includes(a.name.toLowerCase()) || effectiveRecommendedAbility.toLowerCase().includes(a.label.toLowerCase());
+                  {abilityOptions.map((optLabel, idx) => {
+                    const isRec = optLabel.toLowerCase() === effectiveRecommendedAbility.toLowerCase() ||
+                                  effectiveRecommendedAbility.toLowerCase().includes(optLabel.toLowerCase()) ||
+                                  optLabel.toLowerCase().includes(effectiveRecommendedAbility.toLowerCase());
                     return (
-                      <option key={idx} value={a.label}>
-                        {isRec ? `⭐ ${a.label} [Recomendada por Smogon]` : a.label}
+                      <option key={idx} value={optLabel}>
+                        {isRec ? `⭐ ${optLabel} [Recomendada por Smogon]` : optLabel}
                       </option>
                     );
                   })}
