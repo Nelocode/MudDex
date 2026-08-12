@@ -63,8 +63,15 @@ export const BreedingPlannerView: React.FC = () => {
   const [manualAcquiredItems, setManualAcquiredItems] = useState<Record<string, boolean>>({});
   const [pastura, setPastura] = useState<BreederInventoryItem[]>(() => {
     try {
-      const saved = localStorage.getItem('muddex_global_pastura');
-      return saved ? JSON.parse(saved) : [];
+      const k1 = localStorage.getItem('muddex_global_pastura');
+      if (k1) return JSON.parse(k1);
+      const k2 = localStorage.getItem('diosesmon_pastura');
+      if (k2) return JSON.parse(k2);
+      const k3 = localStorage.getItem('muddex_pastura');
+      if (k3) return JSON.parse(k3);
+      const k4 = localStorage.getItem('muddex_ai_pastura');
+      if (k4) return JSON.parse(k4);
+      return [];
     } catch (e) {
       return [];
     }
@@ -78,6 +85,57 @@ export const BreedingPlannerView: React.FC = () => {
       console.error('Error saving pastura to localStorage', e);
     }
   }, [pastura]);
+
+  // Restore Default Pasture Preset
+  const handleRestoreDefaultPastura = () => {
+    const demoPastura: BreederInventoryItem[] = [
+      {
+        id: 'p_eevee_3x31_m',
+        speciesId: 'eevee',
+        speciesName: 'Eevee (Macho ♂ 3x31)',
+        gender: 'male',
+        ivs: { hp: true, attack: true, defense: false, specialAttack: false, specialDefense: false, speed: true },
+        nature: 'Firme',
+        notes: 'Caja 1 - Ejemplar 3x31'
+      },
+      {
+        id: 'p_eevee_2x31_f',
+        speciesId: 'eevee',
+        speciesName: 'Eevee (Hembra ♀ 2x31)',
+        gender: 'female',
+        ivs: { hp: false, attack: false, defense: true, specialAttack: false, specialDefense: true, speed: false },
+        nature: 'Cauta',
+        notes: 'Caja 1 - Hembra para Crianza'
+      },
+      {
+        id: 'p_eevee_2x31_m2',
+        speciesId: 'eevee',
+        speciesName: 'Eevee (Macho ♂ 2x31 SpA/Vel)',
+        gender: 'male',
+        ivs: { hp: false, attack: false, defense: false, specialAttack: true, specialDefense: false, speed: true },
+        nature: 'Modesta',
+        notes: 'Caja 1 - Criador Especial'
+      },
+      {
+        id: 'p_ditto_4x31',
+        speciesId: 'ditto',
+        speciesName: 'Ditto (4x31)',
+        gender: 'genderless',
+        ivs: { hp: true, attack: true, defense: true, specialAttack: false, specialDefense: true, speed: false },
+        notes: 'Caja 3 - Comodín Ditto'
+      },
+      {
+        id: 'p_slowpoke_2x31',
+        speciesId: 'slowpoke',
+        speciesName: 'Slowpoke (Macho ♂ 2x31)',
+        gender: 'male',
+        ivs: { hp: true, attack: false, defense: true, specialAttack: false, specialDefense: false, speed: false },
+        nature: 'Plácida',
+        notes: 'Puente Agua 1 / Monstruo'
+      }
+    ];
+    setPastura(demoPastura);
+  };
 
   // Form for adding breeder to Pasture
   const [newBreederSpecies, setNewBreederSpecies] = useState<string>('ditto');
@@ -596,14 +654,23 @@ export const BreedingPlannerView: React.FC = () => {
       {currentWizardStep === 2 && (
         <div className="space-y-6">
           <div className="bg-zinc-900/90 border border-zinc-800 rounded-3xl p-6 space-y-5 shadow-xl">
-            <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-800 pb-3">
               <h3 className="text-sm font-extrabold text-white flex items-center gap-2">
                 <Layers className="w-4 h-4 text-amber-400" />
                 <span>Pastura / Caja de Crianza (Tus Criadores Disponibles)</span>
               </h3>
-              <span className="text-xs text-zinc-400 font-mono">
-                {pastura.length} Pokémon registrados en tu inventario
-              </span>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handleRestoreDefaultPastura}
+                  className="px-3 py-1.5 rounded-xl bg-amber-600/20 hover:bg-amber-600/30 text-amber-300 border border-amber-500/40 text-xs font-mono font-bold transition-all flex items-center gap-1.5"
+                >
+                  <RefreshCw className="w-3.5 h-3.5" />
+                  <span>🔄 Restaurar Eevees 3x31 & Ejemplo</span>
+                </button>
+                <span className="text-xs text-zinc-400 font-mono">
+                  {pastura.length} Pokémon en inventario
+                </span>
+              </div>
             </div>
 
             {/* Add New Breeder Form */}
