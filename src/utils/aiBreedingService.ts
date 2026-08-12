@@ -85,39 +85,60 @@ ${customQuestion ? `PREGUNTA / INSTRUCCIÓN ESPECÍFICA DEL JUGADOR:\n"${customQ
 
   try {
     if (config.provider === 'gemini') {
-      const modelName = config.model || 'gemini-1.5-flash';
-      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${config.apiKey.trim()}`;
+      const geminiCandidateModels = [
+        config.model || 'gemini-1.5-flash',
+        'gemini-1.5-flash-latest',
+        'gemini-2.0-flash',
+        'gemini-1.5-pro',
+        'gemini-2.0-flash-exp',
+        'gemini-pro'
+      ];
 
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [
-            {
-              role: 'user',
-              parts: [{ text: `${systemPrompt}\n\n${userPrompt}` }]
-            }
-          ],
-          generationConfig: {
-            temperature: 0.2,
-            maxOutputTokens: 1500
+      // Deduplicate model candidates
+      const uniqueModels = Array.from(new Set(geminiCandidateModels.filter(Boolean)));
+      let lastErrorMessage = '';
+
+      for (const modelName of uniqueModels) {
+        try {
+          const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${config.apiKey.trim()}`;
+
+          const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [
+                {
+                  role: 'user',
+                  parts: [{ text: `${systemPrompt}\n\n${userPrompt}` }]
+                }
+              ],
+              generationConfig: {
+                temperature: 0.2,
+                maxOutputTokens: 1500
+              }
+            })
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            const text = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No se recibió respuesta de la IA.';
+
+            return {
+              isSuccess: true,
+              adviceMarkdown: text,
+              rawResponse: text
+            };
           }
-        })
-      });
 
-      if (!response.ok) {
-        const errJson = await response.json().catch(() => ({}));
-        throw new Error(errJson.error?.message || `Error de API Gemini HTTP ${response.status}`);
+          const errJson = await response.json().catch(() => ({}));
+          lastErrorMessage = errJson.error?.message || `Error de API Gemini HTTP ${response.status} en modelo ${modelName}`;
+          console.warn(`Gemini model ${modelName} failed, trying next fallback...`, lastErrorMessage);
+        } catch (e: any) {
+          lastErrorMessage = e.message || `Error de conexión en modelo ${modelName}`;
+        }
       }
 
-      const data = await response.json();
-      const text = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No se recibió respuesta de la IA.';
-
-      return {
-        isSuccess: true,
-        adviceMarkdown: text,
-        rawResponse: text
-      };
+      throw new Error(lastErrorMessage || 'No se pudo conectar con los modelos de Gemini. Verifica tu API Key.');
     } else {
       // OpenAI Provider
       const modelName = config.model || 'gpt-4o-mini';
