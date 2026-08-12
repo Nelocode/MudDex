@@ -58,10 +58,24 @@ export const BreedingPlannerView: React.FC = () => {
     setSelectedBuildIndex(idx);
     const b = smogonBuilds[idx];
     if (b) {
-      setTargetIvs(b.targetIvs);
+      setTargetIvs({ ...b.targetIvs });
       setTargetNature(b.recommendedNature);
       setTargetAbility(b.recommendedAbility);
       setEggMovesInput(b.recommendedEggMoves.join(', '));
+    }
+  };
+
+  // Quick IV Count Presets (3x31, 4x31, 5x31, 6x31)
+  const applyIvPreset = (count: 3 | 4 | 5 | 6) => {
+    if (count === 6) {
+      setTargetIvs({ hp: true, attack: true, defense: true, specialAttack: true, specialDefense: true, speed: true });
+    } else if (count === 5) {
+      const activeBuild = smogonBuilds[selectedBuildIndex] || smogonBuilds[0];
+      setTargetIvs(activeBuild ? { ...activeBuild.targetIvs } : { hp: true, attack: true, defense: true, specialAttack: false, specialDefense: true, speed: true });
+    } else if (count === 4) {
+      setTargetIvs({ hp: true, attack: true, defense: true, specialAttack: false, specialDefense: false, speed: true });
+    } else if (count === 3) {
+      setTargetIvs({ hp: true, attack: true, defense: false, specialAttack: false, specialDefense: false, speed: true });
     }
   };
 
@@ -306,14 +320,6 @@ export const BreedingPlannerView: React.FC = () => {
             Diseña la ruta exacta sin saltos para criar tus Pokémon competitivos de 3x31 a 6x31. Incluye recomendaciones de Smogon, registro de tu Pastura, lista de compras y alertas de costo por sexo.
           </p>
         </div>
-
-        <button
-          onClick={() => setIsAiModalOpen(true)}
-          className="px-4 py-2.5 rounded-2xl bg-gradient-to-r from-amber-600 to-red-600 hover:from-amber-500 hover:to-red-500 text-white font-extrabold text-xs shadow-lg shadow-amber-600/20 transition-all flex items-center gap-2.5 shrink-0"
-        >
-          <Sparkles className="w-4 h-4 text-amber-200 animate-pulse" />
-          <span>🤖 Maestro IA de Crianza (Gemini / GPT)</span>
-        </button>
       </div>
 
       {/* 4-Step Unified Wizard Navigation Header */}
@@ -506,9 +512,45 @@ export const BreedingPlannerView: React.FC = () => {
               </span>
             </div>
 
-            {/* IVs 31 Checklist */}
-            <div className="space-y-2">
-              <span className="text-xs font-bold text-zinc-300 block">Estadísticas Objetivo de IVs en 31:</span>
+            {/* IVs 31 Checklist & Quick Count Selectors */}
+            <div className="space-y-3">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <span className="text-xs font-bold text-zinc-300 block">Estadísticas Objetivo de IVs en 31:</span>
+                
+                {/* 3x31 to 6x31 Quick Buttons */}
+                <div className="flex items-center gap-1.5 font-mono text-[10px]">
+                  <span className="text-zinc-500 font-bold text-[10px]">Presets:</span>
+                  <button
+                    type="button"
+                    onClick={() => applyIvPreset(3)}
+                    className="px-2.5 py-1 rounded-lg bg-zinc-950 hover:bg-zinc-800 border border-zinc-800 text-amber-300 font-extrabold transition-all"
+                  >
+                    3x31
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => applyIvPreset(4)}
+                    className="px-2.5 py-1 rounded-lg bg-zinc-950 hover:bg-zinc-800 border border-zinc-800 text-sky-300 font-extrabold transition-all"
+                  >
+                    4x31
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => applyIvPreset(5)}
+                    className="px-2.5 py-1 rounded-lg bg-zinc-950 hover:bg-zinc-800 border border-zinc-800 text-emerald-300 font-extrabold transition-all"
+                  >
+                    5x31 (Smogon)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => applyIvPreset(6)}
+                    className="px-2.5 py-1 rounded-lg bg-gradient-to-r from-amber-500/20 to-red-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-400 font-extrabold transition-all"
+                  >
+                    6x31 (Perfecto)
+                  </button>
+                </div>
+              </div>
+
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                 {[
                   { key: 'hp', label: 'HP (Puntos de Vida)' },
