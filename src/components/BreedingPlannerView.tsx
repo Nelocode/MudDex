@@ -60,10 +60,32 @@ export const BreedingPlannerView: React.FC = () => {
     if (b) {
       setTargetIvs({ ...b.targetIvs });
       setTargetNature(b.recommendedNature);
-      setTargetAbility(b.recommendedAbility);
       setEggMovesInput(b.recommendedEggMoves.join(', '));
+
+      // Match recommended ability with target species abilities
+      const matched = speciesData.abilities.find(a =>
+        a.name.toLowerCase() === b.recommendedAbility.toLowerCase() ||
+        a.label.toLowerCase() === b.recommendedAbility.toLowerCase() ||
+        b.recommendedAbility.toLowerCase().includes(a.name.toLowerCase()) ||
+        a.label.toLowerCase().includes(b.recommendedAbility.toLowerCase())
+      );
+      setTargetAbility(matched ? matched.label : speciesData.abilities[0]?.label || b.recommendedAbility);
     }
   };
+
+  // Auto-sync ability when species or build changes
+  useEffect(() => {
+    const b = smogonBuilds[selectedBuildIndex] || smogonBuilds[0];
+    if (b && speciesData.abilities.length > 0) {
+      const matched = speciesData.abilities.find(a =>
+        a.name.toLowerCase() === b.recommendedAbility.toLowerCase() ||
+        a.label.toLowerCase() === b.recommendedAbility.toLowerCase() ||
+        b.recommendedAbility.toLowerCase().includes(a.name.toLowerCase()) ||
+        a.label.toLowerCase().includes(b.recommendedAbility.toLowerCase())
+      );
+      setTargetAbility(matched ? matched.label : speciesData.abilities[0].label);
+    }
+  }, [selectedSpeciesId, selectedBuildIndex, speciesData]);
 
   // Quick IV Count Presets (3x31, 4x31, 5x31, 6x31)
   const applyIvPreset = (count: 3 | 4 | 5 | 6) => {
