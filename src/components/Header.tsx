@@ -10,6 +10,8 @@ interface HeaderProps {
   onOpenProfileModal: () => void;
 }
 
+import { getActiveTrainerSession } from '../utils/userSessionService';
+
 export const SERVER_IP = 'mc.diosesmon.net';
 
 export const Header: React.FC<HeaderProps> = ({
@@ -20,13 +22,11 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenProfileModal
 }) => {
   const [copied, setCopied] = useState(false);
-  const [username, setUsername] = useState<string>(() => {
-    return localStorage.getItem('diosesmon_username') || '';
-  });
+  const [session, setSession] = useState(getActiveTrainerSession);
 
   useEffect(() => {
     const handleStorage = () => {
-      setUsername(localStorage.getItem('diosesmon_username') || '');
+      setSession(getActiveTrainerSession());
     };
     window.addEventListener('storage', handleStorage);
     return () => window.removeEventListener('storage', handleStorage);
@@ -38,6 +38,7 @@ export const Header: React.FC<HeaderProps> = ({
     setTimeout(() => setCopied(false), 2200);
   };
 
+  const username = session?.username || localStorage.getItem('diosesmon_username') || '';
   const avatarUrl = username
     ? `https://minotar.net/avatar/${encodeURIComponent(username)}/32`
     : null;
