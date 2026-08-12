@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Layers, Dna, ShoppingBag, CheckCircle2, AlertTriangle, Plus, Trash2, Download, Upload, Flame, Sparkles, RefreshCw, ChevronRight, Shield, Award } from 'lucide-react';
+import { Layers, Dna, ShoppingBag, CheckCircle2, AlertTriangle, Plus, Trash2, Download, Upload, Flame, Sparkles, RefreshCw, ChevronRight, Shield, Award, Bot } from 'lucide-react';
 import { getSmogonBuildsForPokemon, SmogonBuild } from '../data/smogonBuilds';
 import { OFFICIAL_POKEMON_NATURES } from '../data/pokemonNatures';
 import { getAbilitiesAndEggMovesForDex } from '../data/cobblemonSpeciesAbilitiesAndEggMoves';
@@ -1215,6 +1215,32 @@ export const BreedingPlannerView: React.FC = () => {
                   />
                 </div>
               </div>
+            </div>
+
+            {/* Prominent AI Double-Check Action Banner */}
+            <div className="p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-amber-950/40 via-red-950/30 to-zinc-900 border border-amber-500/30 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shrink-0">
+                  <Bot className="w-6 h-6" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h4 className="text-sm font-extrabold text-white">🤖 Doble-Check Genético con Maestro IA</h4>
+                    <span className="text-[9px] font-mono font-bold px-2 py-0.5 rounded-full bg-amber-950 text-amber-300 border border-amber-800">
+                      {localStorage.getItem('muddex_ai_key') ? '🟢 Clave IA Configurada' : '⚡ Gemini 1.5 / GPT-4o'}
+                    </span>
+                  </div>
+                  <p className="text-xs text-zinc-400">Solicita una auditoría IA en tiempo real sobre tu Pastura y la Ruta de Crianza</p>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setIsAiModalOpen(true)}
+                className="w-full sm:w-auto px-5 py-2.5 rounded-2xl bg-gradient-to-r from-amber-500 to-red-600 hover:from-amber-400 hover:to-red-500 text-white font-extrabold text-xs shadow-lg transition-all shrink-0 flex items-center justify-center gap-2 active:scale-95"
+              >
+                <Sparkles className="w-4 h-4 text-amber-200" />
+                <span>Auditar / Doble-Check con IA</span>
+              </button>
             </div>
 
             {/* Handicap & Gender Special Alerts */}
