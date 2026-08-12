@@ -15,6 +15,9 @@ export interface AiBreedingAuditResult {
   error?: string;
 }
 
+import { POKEMON_BASE_SPECIES_MAP } from '../data/pokemonBaseEvolutions';
+import { getSpeciesHandicapByDex } from '../data/pokemonHandicapsData';
+
 export async function askAiBreedingMaster(
   targetPokemonName: string,
   targetIvs: Record<string, boolean>,
@@ -35,34 +38,50 @@ export async function askAiBreedingMaster(
 
   const activeIvs = Object.entries(targetIvs).filter(([, v]) => v).map(([k]) => k).join(', ');
 
+  // Lookup target species data from authentic dataset
+  const targetData = POKEMON_EGG_DATASET.find(p => p.pokemonName.toLowerCase() === targetPokemonName.toLowerCase()) || POKEMON_EGG_DATASET[0];
+  const targetHandicap = getSpeciesHandicapByDex(targetData.dexNumber);
+  const targetBaseDex = POKEMON_BASE_SPECIES_MAP[targetData.dexNumber] || targetData.dexNumber;
+  const targetBaseData = POKEMON_EGG_DATASET.find(p => p.dexNumber === targetBaseDex) || targetData;
+
+  // Enrich pastura summary with authentic Egg Groups and metadata
   const pasturaSummary = pastura.length === 0
-    ? 'Ninguno (Pastura Vacía - Iniciar desde criadores salvajes)'
-    : pastura.map((b, i) => `${i + 1}. ${b.speciesName} (${b.gender === 'male' ? 'Macho ♂' : b.gender === 'female' ? 'Hembra ♀' : 'Sin Género'}), IVs: ${Object.entries(b.ivs).filter(([, v]) => v).map(([k]) => k).join('/') || 'Ninguno'}, Naturaleza: ${b.nature || 'Desconocida'}`).join('\n');
+    ? 'Ninguno (Pastura Vacía - Iniciar desde criadores salvajes de bajo costo)'
+    : pastura.map((b, i) => {
+        const bData = POKEMON_EGG_DATASET.find(p => p.pokemonId === b.speciesId) || POKEMON_EGG_DATASET[0];
+        const ivList = Object.entries(b.ivs).filter(([, v]) => v).map(([k]) => k).join('/') || 'Sin IVs 31';
+        return `${i + 1}. ${bData.pokemonName} (#${bData.dexNumber}, Grupos Huevo: ${bData.eggGroups.join(', ')}), Sexo: ${b.gender === 'male' ? 'Macho ♂' : b.gender === 'female' ? 'Hembra ♀' : 'Sin Género ⚲'}, IVs 31: ${ivList}, Naturaleza: ${b.nature || 'Desconocida'}${b.notes ? `, Nota/Ubicación: "${b.notes}"` : ''}`;
+      }).join('\n');
 
-  const systemPrompt = `Eres un Gran Maestro Genético e Experto en Crianza Pokémon Competitiva para Cobblemon/Minecraft (Gen 9 / Mecánicas Clásicas de Crianza).
-Tu misión es auditar, optimizar y explicar con 100% de precisión biológica y genética la mejor cadena de crianza para obtener el Pokémon objetivo.
+  const systemPrompt = `Eres el Gran Maestro Genético Supremo y Experto en Crianza Pokémon Competitiva para Cobblemon/Minecraft (Gen 9 / Mecánicas Clásicas de Crianza).
+Posees acceso a la BASE DE DATOS COMPLETA DE LAS 1,025 ESPECIES, sus Grupos Huevo, Handicaps, Inciensos, Formas Regionales y Mecánicas de Crianza Oficiales.
 
-REGLAS INQUEBRANTABLES DE CRIANZA POKÉMON, RECURSIÓN Y PASTURA:
+REGLAS COMPLETAS DE LA BASE DE DATOS DE CRIANZA POKÉMON:
 1. EVALUACIÓN Y REUSO DE LA PASTURA EXISTENTE (REGLA DE ORO): Debes examinar minuciosamente CADA Pokémon registrado en la Pastura del usuario. Si el usuario ya posee ejemplares de la misma especie (ej: Eevee 3x31) o del mismo grupo huevo, ES OBLIGATORIO Usar Esos Ejemplares de la pastura como Padres de partida para ahorrar pasos y tiempo. Jamás sugieras capturar un criador salvaje desde cero si la pastura ya tiene uno superior o equivalente.
-2. RECURSIÓN DE POKÉMON PUENTE ENTRE GRUPOS HUEVO: Si necesitas transferir IVs o Naturalezas entre dos grupos huevo distintos (ej: de Bicho a Mineral, o de Campo a Monstruo), analiza y sugiere especies con GRUPO HUEVO DUAL (ej: Shuckle/Dwebble para Bicho+Mineral, Rhyhorn/Mareep para Monstruo+Campo, Marill/Wooper para Agua 1+Hada, Geodude para Mineral).
-3. SUGERENCIA DE CAPTURAS FÁCILES Y RENTABLES: Si es imprescindible recomendar capturar un Pokémon salvaje en Minecraft, sugiere objetivamente especies MUY COMUNES Y FÁCILES DE CAPTURAR en Cobblemon (ej: Caterpie, Magikarp, Mareep, Geodude, Wooper, Bidoof, Psyduck, Pidgey) en lugar de especies raras.
-4. La especie de la cría SIEMPRE es idéntica a la especie de la MADRE (Hembra ♀). Jamás dos Pokémon de una especie (ej: Slowpoke ♂ + Slowpoke ♀) pueden dar un huevo de otra especie (ej: Mudkip).
-5. Dos criadores del mismo sexo (♂+♂ o ♀+♀) JAMÁS pueden criar.
-6. La Piedra Eterna equipada en el padre/madre transmite su Naturaleza al 100%.
-7. Los Objetos Recios garantizan al 100% la herencia del IV correspondiente.
-8. El Lazo Destino transmite 5 IVs aleatorios entre ambos padres.`;
+2. RECURSIÓN Y ESPECIES PUENTE (DUAL EGG GROUPS): Si necesitas transferir IVs o Naturalezas entre dos grupos huevo distintos, analiza y sugiere especies con GRUPO HUEVO DUAL (ej: Shuckle/Dwebble para Bicho+Mineral, Rhyhorn/Mareep para Monstruo+Campo, Marill/Wooper para Agua 1+Hada, Geodude para Mineral, Slowpoke/Psyduck para Agua 1+Monstruo/Campo).
+3. ESPECIES SIN GÉNERO (155 Especies): Pokémon como Beldum, Magnemite, Voltorb, Staryu, Porygon, Rotom no tienen género y OBLIGATORIAMENTE deben criar con DITTO.
+4. ESPECIES 100% MACHO (26 Especies): Pokémon como Tauros, Hitmonlee, Braviary, Impidimp al criar con una hembra producen la especie de la madre. Para transmitir la especie Macho, OBLIGATORIAMENTE deben criar con DITTO.
+5. ESPECIES 100% HEMBRA (37 Especies): Pokémon como Chansey, Blissey, Tinkatink, Hatenna, Petilil al criar con cualquier macho de su grupo huevo SIEMPRE producen la especie Hembra objetivo.
+6. POKÉMON BEBÉ (19 Especies en Grupo No Descubierto): Riolu, Pichu, Togepi, Cleffa, Wynaut, Munchlax NO PUEDEN CRIAR. Deben evolucionarse a su forma adulta antes de colocarse en la pastura.
+7. HERENCIA DE FORMAS REGIONALES (Alola, Galar, Hisui, Paldea): Si el progenitor es una forma regional no nativa (ej: Vulpix Alola, Meowth Galar, Zorua Hisui), DEBE EQUIPAR PIEDRA ETERNA para transmitir su forma regional; de lo contrario nacerá la forma estándar.
+8. CRIANZA CON INCIENSOS: Snorlax requiere Incienso Lento para Munchlax, Marill requiere Incienso Suave para Azurill, Roselia requiere Incienso Floral para Budew, Sudowoodo requiere Incienso Roca para Bonsly, Mantine requiere Incienso Ola para Mantyke.
+9. CRIANZA ASIMÉTRICA: En Salandit y Combee, solo las Hembras (12.5%) pueden evolucionar a Salazzle/Vespiquen. Los Machos no evolucionan.
+10. MADRE DETERMINA ESPECIE: La cría nacerá SIEMPRE como la especie base de la MADRE (Hembra ♀). Los movimientos huevo se heredan en la forma base (ej: Eevee hereda Wish/Toxic antes de evolucionar a Umbreon).`;
 
-  const userPrompt = `OBJETIVO DE CRIANZA:
-- Pokémon Objetivo: ${targetPokemonName}
+  const userPrompt = `OBJETIVO DE CRIANZA SOLICITADO:
+- Pokémon Objetivo: ${targetData.pokemonName} (#${targetData.dexNumber})
+- Forma Base / Pre-evolución Huevo: ${targetBaseData.pokemonName} (#${targetBaseData.dexNumber})
+- Grupos Huevo de la Especie: ${targetData.eggGroups.join(', ')}
+- Handicap Genético / Ratio Género: ${targetHandicap.genderLabel} (${targetHandicap.genderType})
 - IVs Objetivo (31): ${activeIvs}
-- Naturaleza: ${targetNature}
-- Habilidad: ${targetAbility}
-- Movimientos Huevo: ${eggMoves.join(', ') || 'Ninguno'}
+- Naturaleza Objetivo: ${targetNature}
+- Habilidad Objetivo: ${targetAbility}
+- Movimientos Huevo Requeridos: ${eggMoves.join(', ') || 'Ninguno'}
 
-INVENTARIO EN PASTURA DEL JUGADOR (EVALUAR Y PRIORIZAR CADA UNO):
+INVENTARIO EN PASTURA GLOBAL DEL JUGADOR (EVALUAR Y PRIORIZAR CADA UNO):
 ${pasturaSummary}
 
-${customQuestion ? `PREGUNTA ESPECÍFICA DEL JUGADOR:\n"${customQuestion}"` : 'Por favor genera un análisis paso a paso optimizado en Markdown evaluando la pastura del usuario, aprovechando sus ejemplares existentes (ej: Eevees con IVs) para construir la ruta más corta posible.'}`;
+${customQuestion ? `PREGUNTA / INSTRUCCIÓN ESPECÍFICA DEL JUGADOR:\n"${customQuestion}"` : 'Por favor genera un análisis y plan de crianza paso a paso en Markdown evaluando la pastura del usuario, indicando qué Pokémon de la pastura usar como Padres A/B en cada paso, los objetos a equipar (Objetos Recios / Piedra Eterna / Lazo Destino) y recomendaciones de eficiencia.'}`;
 
   try {
     if (config.provider === 'gemini') {
