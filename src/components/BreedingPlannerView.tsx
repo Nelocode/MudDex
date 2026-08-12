@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Layers, Dna, ShoppingBag, CheckCircle2, AlertTriangle, Plus, Trash2, Download, Upload, Flame, Sparkles, RefreshCw, ChevronRight, Shield, Award } from 'lucide-react';
 import { POKEMON_EGG_DATASET } from '../data/cobblemonEggGroups';
 import { getSmogonBuildsForPokemon, SmogonBuild } from '../data/smogonBuilds';
@@ -61,7 +61,23 @@ export const BreedingPlannerView: React.FC = () => {
 
   // Step 2 & 3: Pasture Inventory & Shopping Items State
   const [manualAcquiredItems, setManualAcquiredItems] = useState<Record<string, boolean>>({});
-  const [pastura, setPastura] = useState<BreederInventoryItem[]>([]);
+  const [pastura, setPastura] = useState<BreederInventoryItem[]>(() => {
+    try {
+      const saved = localStorage.getItem('muddex_global_pastura');
+      return saved ? JSON.parse(saved) : [];
+    } catch (e) {
+      return [];
+    }
+  });
+
+  // Persist pastura globally across all breeding projects
+  useEffect(() => {
+    try {
+      localStorage.setItem('muddex_global_pastura', JSON.stringify(pastura));
+    } catch (e) {
+      console.error('Error saving pastura to localStorage', e);
+    }
+  }, [pastura]);
 
   // Form for adding breeder to Pasture
   const [newBreederSpecies, setNewBreederSpecies] = useState<string>('ditto');
@@ -663,27 +679,78 @@ export const BreedingPlannerView: React.FC = () => {
 
             {/* List of Pre-Owned Breeders */}
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
-              {pastura.map(item => (
-                <div key={item.id} className="bg-zinc-950 border border-zinc-800 rounded-2xl p-3.5 space-y-2 relative shadow-md">
-                  <div className="flex items-center justify-between">
-                    <strong className="text-xs font-extrabold text-white">{item.speciesName}</strong>
-                    <button
-                      onClick={() => handleRemoveBreeder(item.id)}
-                      className="p-1 rounded-lg hover:bg-red-500/20 text-zinc-500 hover:text-red-400 transition-colors"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-
-                  <div className="flex flex-wrap gap-1 font-mono text-[10px]">
-                    {Object.entries(item.ivs).map(([k, v]) => v ? (
-                      <span key={k} className="px-2 py-0.5 rounded bg-emerald-950 border border-emerald-800 text-emerald-300 font-bold uppercase">
-                        {k === 'hp' ? 'HP' : k === 'attack' ? 'ATT' : k === 'defense' ? 'DEF' : k === 'specialAttack' ? 'SpA' : k === 'specialDefense' ? 'SpD' : 'VEL'} 31
-                      </span>
-                    ) : null)}
-                  </div>
+              {pastura.length === 0 ? (
+                <div className="sm:col-span-2 md:col-span-3 bg-zinc-950/60 border border-dashed border-zinc-800 rounded-2xl p-6 text-center text-zinc-500 text-xs space-y-1">
+                  <p className="font-bold text-zinc-400">🌾 Pastura Global Vacía</p>
+                  <p className="text-[11px]">Agrega los Pokémon de tu caja arriba. Permanecerán guardados automáticamente para todos tus proyectos de crianza.</p>
                 </div>
-              ))}
+              ) : (
+                pastura.map(item => {
+                  const data = POKEMON_EGG_DATASET.find(p => p.pokemonId === item.speciesId) || POKEMON_EGG_DATASET[0];
+                  const iv31Count = Object.values(item.ivs).filter(Boolean).length;
+
+                  return (
+                    <div key={item.id} className="bg-zinc-950 border border-zinc-800 hover:border-amber-500/40 rounded-2xl p-3.5 space-y-2.5 relative shadow-md transition-all group">
+                      
+                      {/* Top Header: Sprite, Species Name, Gender & Remove */}
+                      <div className="flex items-center justify-between gap-2 border-b border-zinc-800/80 pb-2">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-800 p-0.5 flex items-center justify-center shrink-0">
+                            <img
+                              src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${data.dexNumber}.png`}
+                              alt={data.pokemonName}
+                              className="w-9 h-9 object-contain drop-shadow"
+                            />
+                          </div>
+                          <div>
+                            <strong className="text-xs font-black text-white block leading-tight">{data.pokemonName}</strong>
+                            <div className="flex items-center gap-1.5 text-[10px] font-mono">
+                              <span className={item.gender === 'male' ? 'text-sky-400 font-bold' : item.gender === 'female' ? 'text-pink-400 font-bold' : 'text-purple-400 font-bold'}>
+                                {item.gender === 'male' ? '♂ Macho' : item.gender === 'female' ? '♀ Hembra' : '⚲ Sin Género'}
+                              </span>
+                              <span className="text-zinc-600">•</span>
+                              <span className="text-amber-400 font-bold">{iv31Count}x31 IVs</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <button
+                          onClick={() => handleRemoveBreeder(item.id)}
+                          className="p-1.5 rounded-lg hover:bg-red-500/20 text-zinc-500 hover:text-red-400 transition-colors shrink-0"
+                          title="Eliminar de la pastura global"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+
+                      {/* Nature & Egg Groups Info */}
+                      <div className="flex items-center justify-between text-[10px] font-mono">
+                        {item.nature ? (
+                          <span className="px-2 py-0.5 rounded-md bg-amber-500/10 border border-amber-500/30 text-amber-300 font-bold">
+                            🌿 {item.nature}
+                          </span>
+                        ) : (
+                          <span className="text-zinc-500 italic">Sin Naturaleza</span>
+                        )}
+
+                        <span className="text-zinc-400 font-bold uppercase text-[9px]">
+                          {data.eggGroups.join(' / ')}
+                        </span>
+                      </div>
+
+                      {/* IVs Badges */}
+                      <div className="flex flex-wrap gap-1 font-mono text-[10px] pt-0.5 border-t border-zinc-900">
+                        {Object.entries(item.ivs).map(([k, v]) => v ? (
+                          <span key={k} className="px-1.5 py-0.5 rounded bg-emerald-950 border border-emerald-800 text-emerald-300 font-bold uppercase text-[9px]">
+                            {k === 'hp' ? 'HP' : k === 'attack' ? 'ATT' : k === 'defense' ? 'DEF' : k === 'specialAttack' ? 'SpA' : k === 'specialDefense' ? 'SpD' : 'VEL'} 31
+                          </span>
+                        ) : null)}
+                      </div>
+
+                    </div>
+                  );
+                })
+              )}
             </div>
 
             <button
