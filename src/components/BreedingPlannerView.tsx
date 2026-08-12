@@ -1,15 +1,21 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { Layers, Dna, ShoppingBag, CheckCircle2, AlertTriangle, Plus, Trash2, Download, Upload, Flame, Sparkles, RefreshCw, ChevronRight, Shield, Award } from 'lucide-react';
-import { POKEMON_EGG_DATASET } from '../data/cobblemonEggGroups';
 import { getSmogonBuildsForPokemon, SmogonBuild } from '../data/smogonBuilds';
 import { OFFICIAL_POKEMON_NATURES } from '../data/pokemonNatures';
 import { getAbilitiesAndEggMovesForDex } from '../data/cobblemonSpeciesAbilitiesAndEggMoves';
 import { PokemonSearchSelect } from './PokemonSearchSelect';
 import {
+  POKEMON_EGG_DATASET,
+  PokemonEggData,
+  EggGroup
+} from '../data/cobblemonEggGroups';
+import {
   generateBreedingPlan,
   BreederInventoryItem,
   GeneratedBreedingPlan,
-  getGenderRatio
+  simulateMonteCarloBreeding,
+  parseCobblemonCheckIvsText,
+  MonteCarloResult
 } from '../utils/breedingAlgorithm';
 
 import { AiBreedingAssistantModal } from './AiBreedingAssistantModal';
@@ -159,6 +165,29 @@ export const BreedingPlannerView: React.FC = () => {
         }
       };
     }
+  };
+
+  // Cobblemon /checkivs Quick Paste text state
+  const [checkIvsQuickText, setCheckIvsQuickText] = useState<string>('');
+  const [showCheckIvsBox, setShowCheckIvsBox] = useState<boolean>(false);
+
+  // Montecarlo Simulation state
+  const [showMonteCarloModal, setShowMonteCarloModal] = useState<boolean>(false);
+  const [monteCarloResults, setMonteCarloResults] = useState<MonteCarloResult | null>(null);
+
+  const handleParseCheckIvsText = () => {
+    const parsed = parseCobblemonCheckIvsText(checkIvsQuickText);
+    if (!parsed) {
+      alert('⚠️ No se reconocieron datos en el texto proporcionado.');
+      return;
+    }
+    if (parsed.speciesId) setNewBreederSpecies(parsed.speciesId);
+    if (parsed.gender) setNewBreederGender(parsed.gender);
+    if (parsed.nature) setNewBreederNature(parsed.nature);
+    if (parsed.ivs) setNewBreederIvs(parsed.ivs as any);
+    setCheckIvsQuickText('');
+    setShowCheckIvsBox(false);
+    alert('✓ ¡Datos del comando /checkivs aplicados correctamente al formulario!');
   };
 
   // Form for adding breeder to Pasture
@@ -722,7 +751,38 @@ export const BreedingPlannerView: React.FC = () => {
 
             {/* Add New Breeder Form */}
             <div className="bg-zinc-950 p-4 sm:p-5 rounded-2xl border border-zinc-800 space-y-4">
-              <span className="text-xs font-extrabold text-zinc-300 block">➕ Añadir Nuevo Pokémon a tu Pastura:</span>
+              <div className="flex items-center justify-between border-b border-zinc-900 pb-2">
+                <span className="text-xs font-extrabold text-zinc-300 block">➕ Añadir Nuevo Pokémon a tu Pastura:</span>
+                <button
+                  onClick={() => setShowCheckIvsBox(prev => !prev)}
+                  className="px-3 py-1 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[11px] font-mono font-extrabold transition-all flex items-center gap-1.5"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                  <span>{showCheckIvsBox ? 'Ocultar Lector' : '📋 Pegar Salida de /checkivs'}</span>
+                </button>
+              </div>
+
+              {showCheckIvsBox && (
+                <div className="p-4 rounded-xl bg-zinc-900 border border-amber-500/40 space-y-3">
+                  <div className="flex items-center justify-between text-xs font-bold text-amber-300">
+                    <span>⚡ Lector Rápido de Comandos Cobblemon:</span>
+                    <span className="text-[10px] font-mono text-zinc-400">Pega el texto copiado de Minecraft</span>
+                  </div>
+                  <textarea
+                    rows={2}
+                    value={checkIvsQuickText}
+                    onChange={(e) => setCheckIvsQuickText(e.target.value)}
+                    placeholder="Ej: Eevee | Male | Adamant | HP: 31 | Atk: 31 | Def: 14 | SpA: 20 | SpD: 31 | Spe: 31"
+                    className="w-full p-2.5 rounded-xl bg-zinc-950 border border-zinc-800 text-white font-mono text-xs focus:outline-none focus:border-amber-500"
+                  />
+                  <button
+                    onClick={handleParseCheckIvsText}
+                    className="w-full py-2 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-extrabold text-xs transition-all shadow-md"
+                  >
+                    <span>✓ Extraer Especie e IVs Automáticamente</span>
+                  </button>
+                </div>
+              )}
               
               <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
                 <div className="sm:col-span-1">
@@ -1047,8 +1107,25 @@ export const BreedingPlannerView: React.FC = () => {
                   </span>
                 </div>
 
-                {/* JSON Export / Import Buttons */}
-                <div className="flex items-center gap-2">
+                {/* JSON Export / Import & Montecarlo Buttons */}
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    onClick={() => {
+                      const res = simulateMonteCarloBreeding(
+                        { hp: true, attack: true, defense: true, specialAttack: false, specialDefense: false, speed: true },
+                        { hp: false, attack: false, defense: true, specialAttack: false, specialDefense: true, speed: true },
+                        true,
+                        1000
+                      );
+                      setMonteCarloResults(res);
+                      setShowMonteCarloModal(true);
+                    }}
+                    className="px-3.5 py-2 rounded-xl bg-amber-600/20 hover:bg-amber-600/30 text-amber-300 border border-amber-500/40 text-xs font-bold transition-all flex items-center gap-2"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                    <span>🎲 Simular Probabilidades (Montecarlo)</span>
+                  </button>
+
                   <button
                     onClick={handleExportJson}
                     className="px-3.5 py-2 rounded-xl bg-zinc-950 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 text-xs font-bold transition-colors flex items-center gap-2"
@@ -1324,6 +1401,56 @@ export const BreedingPlannerView: React.FC = () => {
         eggMoves={eggMovesInput.split(',').map(s => s.trim()).filter(Boolean)}
         pastura={pastura}
       />
+
+      {/* Montecarlo Simulation Modal */}
+      {showMonteCarloModal && monteCarloResults && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+          <div className="bg-zinc-900 border border-zinc-800 rounded-3xl w-full max-w-lg p-6 space-y-5 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
+              <h3 className="text-sm font-extrabold text-white flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-amber-400" />
+                <span>Simulación Genética Montecarlo (1,000 Eclosiones)</span>
+              </h3>
+              <button
+                onClick={() => setShowMonteCarloModal(false)}
+                className="p-1 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 text-xs font-mono">
+              <div className="bg-zinc-950 p-4 rounded-2xl border border-zinc-800 space-y-1">
+                <span className="text-zinc-400 block text-[10px]">Probabilidad 6x31 IVs:</span>
+                <strong className="text-amber-400 text-lg font-black">{monteCarloResults.pct6x31}%</strong>
+              </div>
+              <div className="bg-zinc-950 p-4 rounded-2xl border border-zinc-800 space-y-1">
+                <span className="text-zinc-400 block text-[10px]">Probabilidad 5x31+ IVs:</span>
+                <strong className="text-emerald-400 text-lg font-black">{monteCarloResults.pct5x31}%</strong>
+              </div>
+              <div className="bg-zinc-950 p-4 rounded-2xl border border-zinc-800 space-y-1">
+                <span className="text-zinc-400 block text-[10px]">Probabilidad 4x31+ IVs:</span>
+                <strong className="text-sky-400 text-lg font-black">{monteCarloResults.pct4x31}%</strong>
+              </div>
+              <div className="bg-zinc-950 p-4 rounded-2xl border border-zinc-800 space-y-1">
+                <span className="text-zinc-400 block text-[10px]">Huevos Estimados para 5x31:</span>
+                <strong className="text-purple-400 text-lg font-black">~{monteCarloResults.avgEggsFor5x31} huevos</strong>
+              </div>
+            </div>
+
+            <div className="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4 text-[11px] text-amber-300 font-mono leading-relaxed">
+              💡 <strong>Nota del Montecarlo:</strong> Simulación computada con 1,000 iteraciones genéticas asumiendo Lazo Destino equipado (5 IVs heredados de padres y 1 IV generado al azar 1/32).
+            </div>
+
+            <button
+              onClick={() => setShowMonteCarloModal(false)}
+              className="w-full py-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white font-extrabold text-xs transition-all"
+            >
+              Cerrar Simulación
+            </button>
+          </div>
+        </div>
+      )}
 
     </div>
   );

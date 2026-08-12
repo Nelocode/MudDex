@@ -271,6 +271,57 @@ export const TeamBuilderView: React.FC<TeamBuilderViewProps> = ({ onSendToBreedi
         })}
       </div>
 
+      {/* Cobblemon EV Training Guide Card */}
+      <div className="bg-zinc-900/90 border border-zinc-800 rounded-3xl p-6 space-y-4 shadow-xl">
+        <div className="flex items-center justify-between border-b border-zinc-800 pb-3">
+          <h3 className="text-sm font-extrabold text-white flex items-center gap-2">
+            <Zap className="w-4 h-4 text-amber-400" />
+            <span>Guía de Entrenamiento de EVs en Minecraft / Cobblemon</span>
+          </h3>
+          <span className="text-xs font-mono text-emerald-400 font-bold">
+            Brazales Recios (+8 EVs por victoria)
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 text-xs font-mono">
+          <div className="bg-zinc-950 p-3.5 rounded-2xl border border-zinc-800 space-y-1">
+            <strong className="text-emerald-400 block text-xs">❤️ HP / Puntos de Salud (+EV HP):</strong>
+            <p className="text-zinc-300 text-[11px]">Vencer a: <strong>Whismur, Wooper, Bidoof, Gastrodon</strong></p>
+            <span className="text-zinc-500 text-[10px]">Objeto: Pesa Recia (+8 HP)</span>
+          </div>
+
+          <div className="bg-zinc-950 p-3.5 rounded-2xl border border-zinc-800 space-y-1">
+            <strong className="text-red-400 block text-xs">⚔️ Ataque Físico (+EV ATT):</strong>
+            <p className="text-zinc-300 text-[11px]">Vencer a: <strong>Shinx, Machop, Patrat, Poochyena</strong></p>
+            <span className="text-zinc-500 text-[10px]">Objeto: Brazal Recio (+8 ATT)</span>
+          </div>
+
+          <div className="bg-zinc-950 p-3.5 rounded-2xl border border-zinc-800 space-y-1">
+            <strong className="text-amber-400 block text-xs">🛡️ Defensa Física (+EV DEF):</strong>
+            <p className="text-zinc-300 text-[11px]">Vencer a: <strong>Geodude, Roggenrola, Aron, Sandshrew</strong></p>
+            <span className="text-zinc-500 text-[10px]">Objeto: Cinto Recio (+8 DEF)</span>
+          </div>
+
+          <div className="bg-zinc-950 p-3.5 rounded-2xl border border-zinc-800 space-y-1">
+            <strong className="text-sky-400 block text-xs">🔮 Ataque Especial (+EV SpA):</strong>
+            <p className="text-zinc-300 text-[11px]">Vencer a: <strong>Gastly, Psyduck, Mareep, Litwick</strong></p>
+            <span className="text-zinc-500 text-[10px]">Objeto: Lente Recia (+8 SpA)</span>
+          </div>
+
+          <div className="bg-zinc-950 p-3.5 rounded-2xl border border-zinc-800 space-y-1">
+            <strong className="text-purple-400 block text-xs">🧬 Defensa Especial (+EV SpD):</strong>
+            <p className="text-zinc-300 text-[11px]">Vencer a: <strong>Tentacool, Spoink, Hoppip, Swablu</strong></p>
+            <span className="text-zinc-500 text-[10px]">Objeto: Banda Recia (+8 SpD)</span>
+          </div>
+
+          <div className="bg-zinc-950 p-3.5 rounded-2xl border border-zinc-800 space-y-1">
+            <strong className="text-cyan-400 block text-xs">⚡ Velocidad (+EV VEL):</strong>
+            <p className="text-zinc-300 text-[11px]">Vencer a: <strong>Zubat, Magikarp, Pidgey, Rattata</strong></p>
+            <span className="text-zinc-500 text-[10px]">Objeto: Franja Recia (+8 VEL)</span>
+          </div>
+        </div>
+      </div>
+
     </div>
   );
 };

@@ -519,3 +519,113 @@ export function generateBreedingPlan(
     specialHandicapAlerts: genderInfo.specialNotes
   };
 }
+
+/**
+ * Montecarlo Genetic Breeder Simulation (1,000 runs)
+ */
+export interface MonteCarloResult {
+  pct6x31: number;
+  pct5x31: number;
+  pct4x31: number;
+  pct3x31: number;
+  avgEggsFor5x31: number;
+}
+
+export function simulateMonteCarloBreeding(
+  parentAIvs: Record<string, boolean>,
+  parentBIvs: Record<string, boolean>,
+  hasDestinyKnot: boolean = true,
+  iterations: number = 1000
+): MonteCarloResult {
+  const stats = ['hp', 'attack', 'defense', 'specialAttack', 'specialDefense', 'speed'];
+  let count6 = 0;
+  let count5 = 0;
+  let count4 = 0;
+  let count3 = 0;
+
+  for (let i = 0; i < iterations; i++) {
+    const inheritedStats = new Set<string>();
+    const childIvs: Record<string, boolean> = {};
+
+    // Sample 5 stats if Destiny Knot, else 3
+    const statCountToInherit = hasDestinyKnot ? 5 : 3;
+    const shuffled = [...stats].sort(() => Math.random() - 0.5);
+    const chosenStats = shuffled.slice(0, statCountToInherit);
+
+    chosenStats.forEach(stat => {
+      inheritedStats.add(stat);
+      const fromParentA = Math.random() < 0.5;
+      childIvs[stat] = fromParentA ? !!parentAIvs[stat] : !!parentBIvs[stat];
+    });
+
+    // Random non-inherited stats (1/32 chance of 31)
+    stats.forEach(stat => {
+      if (!inheritedStats.has(stat)) {
+        childIvs[stat] = Math.random() < (1 / 32);
+      }
+    });
+
+    const iv31Total = Object.values(childIvs).filter(Boolean).length;
+    if (iv31Total === 6) count6++;
+    if (iv31Total >= 5) count5++;
+    if (iv31Total >= 4) count4++;
+    if (iv31Total >= 3) count3++;
+  }
+
+  const pct5 = (count5 / iterations) * 100;
+  const avgEggsFor5 = pct5 > 0 ? Math.round(100 / pct5) : 999;
+
+  return {
+    pct6x31: Number(((count6 / iterations) * 100).toFixed(1)),
+    pct5x31: Number(pct5.toFixed(1)),
+    pct4x31: Number(((count4 / iterations) * 100).toFixed(1)),
+    pct3x31: Number(((count3 / iterations) * 100).toFixed(1)),
+    avgEggsFor5x31: avgEggsFor5
+  };
+}
+
+/**
+ * Parser for Cobblemon /checkivs output text
+ */
+export function parseCobblemonCheckIvsText(rawText: string): Partial<BreederInventoryItem> | null {
+  if (!rawText.trim()) return null;
+
+  const text = rawText.toLowerCase();
+
+  // Try to find species name
+  let speciesId = 'ditto';
+  const foundSpecies = POKEMON_EGG_DATASET.find(p => text.includes(p.pokemonName.toLowerCase()) || text.includes(p.pokemonId.toLowerCase()));
+  if (foundSpecies) {
+    speciesId = foundSpecies.pokemonId;
+  }
+
+  // Gender
+  let gender: 'male' | 'female' | 'genderless' = 'genderless';
+  if (text.includes('female') || text.includes('hembra') || text.includes('♀')) gender = 'female';
+  else if (text.includes('male') || text.includes('macho') || text.includes('♂')) gender = 'male';
+
+  // Nature
+  let nature: string | undefined = undefined;
+  const naturesList = ['adamant', 'bold', 'brave', 'calm', 'careful', 'docile', 'gentle', 'hardy', 'hasty', 'impish', 'jolly', 'lax', 'lonely', 'mild', 'modest', 'naive', 'naughty', 'quiet', 'quirky', 'rash', 'relaxed', 'sassy', 'serious', 'timid'];
+  const foundNature = naturesList.find(n => text.includes(n));
+  if (foundNature) {
+    nature = foundNature.charAt(0).toUpperCase() + foundNature.slice(1);
+  }
+
+  // Parse IVs (look for "hp: 31", "hp 31", "hp - 31", etc.)
+  const ivs = {
+    hp: /hp[:\s-]+31/.test(text) || /ps[:\s-]+31/.test(text),
+    attack: /atk[:\s-]+31/.test(text) || /attack[:\s-]+31/.test(text) || /ataque[:\s-]+31/.test(text),
+    defense: /def[:\s-]+31/.test(text) || /defensa[:\s-]+31/.test(text),
+    specialAttack: /spa[:\s-]+31/.test(text) || /sp\.?\s*atk[:\s-]+31/.test(text) || /atk\s*esp[:\s-]+31/.test(text),
+    specialDefense: /spd[:\s-]+31/.test(text) || /sp\.?\s*def[:\s-]+31/.test(text) || /def\s*esp[:\s-]+31/.test(text),
+    speed: /spe[:\s-]+31/.test(text) || /speed[:\s-]+31/.test(text) || /vel[:\s-]+31/.test(text) || /velocidad[:\s-]+31/.test(text)
+  };
+
+  return {
+    speciesId,
+    gender,
+    nature,
+    ivs
+  };
+}
