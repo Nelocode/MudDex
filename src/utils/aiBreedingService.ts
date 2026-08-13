@@ -189,3 +189,37 @@ ${customQuestion ? `PREGUNTA / INSTRUCCIÓN ESPECÍFICA DEL JUGADOR:\n"${customQ
     };
   }
 }
+
+export async function generateAiDrivenBreedingPlan(
+  targetPokemonName: string,
+  targetIvs: Record<string, boolean>,
+  targetNature: string,
+  targetAbility: string,
+  eggMoves: string[],
+  pastura: BreederInventoryItem[],
+  config: AiConfig
+): Promise<{ isSuccess: boolean; aiAnalysis: string; plan?: GeneratedBreedingPlan; error?: string }> {
+  const auditRes = await askAiBreedingMaster(
+    targetPokemonName,
+    targetIvs,
+    targetNature,
+    targetAbility,
+    eggMoves,
+    pastura,
+    config,
+    'Analiza la pastura y genera el plan óptimo de crianza usando razonamiento de IA.'
+  );
+
+  if (!auditRes.isSuccess) {
+    return {
+      isSuccess: false,
+      aiAnalysis: '',
+      error: auditRes.error || 'No se pudo generar el plan con IA.'
+    };
+  }
+
+  return {
+    isSuccess: true,
+    aiAnalysis: auditRes.adviceMarkdown
+  };
+}

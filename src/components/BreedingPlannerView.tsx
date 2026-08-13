@@ -19,6 +19,7 @@ import {
 } from '../utils/breedingAlgorithm';
 
 import { AiBreedingAssistantModal } from './AiBreedingAssistantModal';
+import { generateAiDrivenBreedingPlan, AiConfig } from '../utils/aiBreedingService';
 
 export const BreedingPlannerView: React.FC = () => {
   const [currentWizardStep, setCurrentWizardStep] = useState<number>(1);
@@ -256,6 +257,57 @@ export const BreedingPlannerView: React.FC = () => {
   const handleRemoveBreeder = (id: string) => {
     setPastura(prev => prev.filter(item => item.id !== id));
   };
+
+  // 100% AI-Driven Breeding Plan State
+  const [aiPlanAnalysisState, setAiPlanAnalysisState] = useState<{
+    isLoading: boolean;
+    analysisMarkdown: string;
+    error?: string;
+    lastGeneratedKey?: string;
+  }>({
+    isLoading: false,
+    analysisMarkdown: ''
+  });
+
+  const handleTriggerAiPlan = async () => {
+    setAiPlanAnalysisState({ isLoading: true, analysisMarkdown: '' });
+    const moves = eggMovesInput.split(',').map(m => m.trim()).filter(Boolean);
+    const config: AiConfig = {
+      provider: 'gemini',
+      apiKey: localStorage.getItem('muddex_ai_key') || ''
+    };
+
+    const res = await generateAiDrivenBreedingPlan(
+      targetData.pokemonName,
+      targetIvs,
+      targetNature,
+      targetAbility,
+      moves,
+      pastura,
+      config
+    );
+
+    if (res.isSuccess) {
+      setAiPlanAnalysisState({
+        isLoading: false,
+        analysisMarkdown: res.aiAnalysis,
+        lastGeneratedKey: `${selectedSpeciesId}_${pastura.length}`
+      });
+    } else {
+      setAiPlanAnalysisState({
+        isLoading: false,
+        analysisMarkdown: '',
+        error: res.error || 'Error al conectar con la API de IA.'
+      });
+    }
+  };
+
+  useEffect(() => {
+    const currentKey = `${selectedSpeciesId}_${pastura.length}`;
+    if (currentWizardStep === 4 && aiPlanAnalysisState.lastGeneratedKey !== currentKey && !aiPlanAnalysisState.isLoading) {
+      handleTriggerAiPlan();
+    }
+  }, [currentWizardStep, selectedSpeciesId, pastura.length]);
 
   const [useDestinyKnot, setUseDestinyKnot] = useState<boolean>(true);
 
@@ -1217,30 +1269,59 @@ export const BreedingPlannerView: React.FC = () => {
               </div>
             </div>
 
-            {/* Prominent AI Double-Check Action Banner */}
-            <div className="p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-amber-950/40 via-red-950/30 to-zinc-900 border border-amber-500/30 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shrink-0">
-                  <Bot className="w-6 h-6" />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h4 className="text-sm font-extrabold text-white">🤖 Doble-Check Genético con Maestro IA</h4>
-                    <span className="text-[9px] font-mono font-bold px-2 py-0.5 rounded-full bg-amber-950 text-amber-300 border border-amber-800">
-                      {localStorage.getItem('muddex_ai_key') ? '🟢 Clave IA Configurada' : '⚡ Gemini 1.5 / GPT-4o'}
-                    </span>
+            {/* 100% AI-Driven Breeding Plan & Reasoning Card */}
+            <div className="bg-zinc-900/90 border border-amber-500/40 rounded-3xl p-5 sm:p-6 space-y-4 shadow-2xl relative overflow-hidden">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-800 pb-3">
+                <div className="flex items-center gap-3">
+                  <div className="p-2.5 rounded-2xl bg-amber-500/20 border border-amber-500/40 text-amber-400">
+                    <Bot className="w-6 h-6" />
                   </div>
-                  <p className="text-xs text-zinc-400">Solicita una auditoría IA en tiempo real sobre tu Pastura y la Ruta de Crianza</p>
+                  <div>
+                    <h3 className="text-base font-extrabold text-white flex items-center gap-2">
+                      <span>🧠 Razonamiento Genético 100% por Maestro IA</span>
+                      <span className="text-[9px] font-mono font-extrabold px-2.5 py-0.5 rounded-full bg-amber-950 text-amber-300 border border-amber-800">
+                        Gemini 1.5 / GPT-4o
+                      </span>
+                    </h3>
+                    <p className="text-xs text-zinc-400">
+                      Análisis en tiempo real de tu Pastura Global ({pastura.length} Pokémon) y generación del plan óptimo
+                    </p>
+                  </div>
                 </div>
+
+                <button
+                  onClick={handleTriggerAiPlan}
+                  disabled={aiPlanAnalysisState.isLoading}
+                  className="px-4 py-2 rounded-xl bg-amber-600/20 hover:bg-amber-600/30 text-amber-300 border border-amber-500/40 text-xs font-bold transition-all flex items-center gap-2 shrink-0 self-start sm:self-auto"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 ${aiPlanAnalysisState.isLoading ? 'animate-spin' : ''}`} />
+                  <span>{aiPlanAnalysisState.isLoading ? 'Analizando...' : '🔄 Re-analizar con IA'}</span>
+                </button>
               </div>
 
-              <button
-                onClick={() => setIsAiModalOpen(true)}
-                className="w-full sm:w-auto px-5 py-2.5 rounded-2xl bg-gradient-to-r from-amber-500 to-red-600 hover:from-amber-400 hover:to-red-500 text-white font-extrabold text-xs shadow-lg transition-all shrink-0 flex items-center justify-center gap-2 active:scale-95"
-              >
-                <Sparkles className="w-4 h-4 text-amber-200" />
-                <span>Auditar / Doble-Check con IA</span>
-              </button>
+              {aiPlanAnalysisState.isLoading ? (
+                <div className="p-8 text-center space-y-3 bg-zinc-950/80 rounded-2xl border border-zinc-800 animate-pulse">
+                  <Bot className="w-8 h-8 text-amber-400 mx-auto animate-bounce" />
+                  <p className="text-xs font-bold text-amber-300">
+                    🧠 El Maestro de Crianza IA está evaluando los {pastura.length} Pokémon de tu pastura y calculando la ruta genética óptima...
+                  </p>
+                  <span className="text-[10px] text-zinc-500 font-mono block">Aplicando reglas de especies puente, handicaps, 100% género y transferencia de IVs</span>
+                </div>
+              ) : aiPlanAnalysisState.analysisMarkdown ? (
+                <div className="p-4 sm:p-5 bg-zinc-950/90 rounded-2xl border border-zinc-800 text-xs leading-relaxed text-zinc-300 whitespace-pre-line font-sans shadow-inner max-h-[350px] overflow-y-auto scrollbar-thin">
+                  {aiPlanAnalysisState.analysisMarkdown}
+                </div>
+              ) : (
+                <div className="p-4 bg-zinc-950 rounded-2xl border border-zinc-800 text-xs text-zinc-400 flex items-center justify-between">
+                  <span>Haz clic en "Re-analizar con IA" para solicitar una evaluación genética en tiempo real de tu pastura.</span>
+                  <button
+                    onClick={handleTriggerAiPlan}
+                    className="px-3 py-1.5 rounded-lg bg-amber-600 text-white font-bold text-xs"
+                  >
+                    Generar Análisis IA
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Handicap & Gender Special Alerts */}
