@@ -1324,6 +1324,18 @@ export const BreedingPlannerView: React.FC = () => {
               )}
             </div>
 
+            {/* Diosesmon Consumed Breeders & Items Alert */}
+            <div className="bg-gradient-to-r from-red-950/80 via-amber-950/50 to-zinc-900 border border-red-500/40 rounded-3xl p-5 text-zinc-200 text-xs space-y-2 shadow-xl relative overflow-hidden">
+              <div className="flex items-center gap-2 font-extrabold text-sm text-red-400">
+                <AlertTriangle className="w-5 h-5 shrink-0 text-red-500 animate-pulse" />
+                <span>⚠️ ADVERTENCIA CRÍTICA DE DIOSESMON: CONSUMO DE PADRES Y OBJETOS RECIOS</span>
+              </div>
+              <p className="text-zinc-300 leading-relaxed font-mono text-[11px]">
+                En Diosesmon, <strong>AMBOS PADRES Y LOS OBJETOS EQUIPADOS SE CONSUMEN Y SE PIERDEN TRAS ECLOSIONAR EL HUEVO</strong>.
+                El Maestro IA ha calculado esta ruta con herencia garantizada (0% RNG) para evitar pérdidas accidentales de ejemplares 3x31 valiosos.
+              </p>
+            </div>
+
             {/* Handicap & Gender Special Alerts */}
             {(generatedPlan.genderAlertSummary || (generatedPlan.specialHandicapAlerts && generatedPlan.specialHandicapAlerts.length > 0)) && (
               <div className="bg-amber-500/10 border border-amber-500/30 rounded-3xl p-5 text-amber-400 text-xs space-y-2 shadow-lg">

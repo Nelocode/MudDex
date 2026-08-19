@@ -23,6 +23,7 @@ export interface BreedingStepInstruction {
   stepNumber: number;
   chainName?: string;
   title: string;
+  isConsumedOnBreeding?: boolean;
   parentA: {
     name: string;
     gender: 'male' | 'female' | 'genderless';
