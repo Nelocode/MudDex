@@ -1322,184 +1322,7 @@ export const BreedingPlannerView: React.FC = () => {
                   </p>
                   <span className="text-[10px] text-zinc-500 font-mono block">Aplicando reglas de especies puente, handicaps, 100% género y herencia garantizada</span>
                 </div>
-              ) : aiPlanAnalysisState.analysisMarkdown ? (() => {
-                const parseAiPayload = (rawText: string) => {
-                  let naturalLanguageText = rawText;
-                  let parsedSteps: any[] = [];
-
-                  const match = rawText.match(/```json\s*([\s\S]*?)\s*```/);
-                  if (match && match[1]) {
-                    try {
-                      const data = JSON.parse(match[1]);
-                      if (Array.isArray(data.steps)) {
-                        parsedSteps = data.steps.map((s: any) => {
-                          const pA = s.parentA?.name || '';
-                          const pB = s.parentB?.name || '';
-                          let off = s.offspringTarget?.name || '';
-
-                          const isADitto = pA.toLowerCase().includes('ditto');
-                          const isBDitto = pB.toLowerCase().includes('ditto');
-
-                          if (isADitto && !isBDitto && off.toLowerCase() !== pB.toLowerCase()) {
-                            off = pB;
-                          } else if (isBDitto && !isADitto && off.toLowerCase() !== pA.toLowerCase()) {
-                            off = pA;
-                          }
-
-                          return {
-                            ...s,
-                            offspringTarget: {
-                              ...s.offspringTarget,
-                              name: off
-                            }
-                          };
-                        });
-                      }
-                      naturalLanguageText = rawText.replace(/```json\s*[\s\S]*?\s*```/, '').trim();
-                    } catch (e) {
-                      console.warn('Failed to parse AI JSON steps:', e);
-                    }
-                  }
-
-                  return { naturalLanguageText, parsedSteps };
-                };
-
-                const { naturalLanguageText, parsedSteps } = parseAiPayload(aiPlanAnalysisState.analysisMarkdown);
-
-                return (
-                  <div className="space-y-6">
-                    {/* Natural Language Report */}
-                    {naturalLanguageText && (
-                      <div className="p-4 sm:p-5 bg-zinc-950/90 rounded-2xl border border-zinc-800 text-xs leading-relaxed text-zinc-300 whitespace-pre-line font-sans shadow-inner max-h-[300px] overflow-y-auto scrollbar-thin">
-                        {naturalLanguageText}
-                      </div>
-                    )}
-
-                    {/* Interactive Visual AI Step Cards */}
-                    {parsedSteps.length > 0 && (
-                      <div className="space-y-4 pt-2">
-                        <h4 className="text-xs font-extrabold text-white uppercase tracking-wider flex items-center gap-2 border-b border-zinc-800 pb-2">
-                          <Sparkles className="w-4 h-4 text-amber-400" />
-                          <span>Ruta Guiada Paso a Paso Generada por IA ({parsedSteps.length} Pasos)</span>
-                        </h4>
-
-                        {parsedSteps.map((step: any, idx: number) => {
-                          const stepNum = step.stepNumber || (idx + 1);
-                          const isDone = !!completedSteps[stepNum];
-
-                          const getDex = (nameStr?: string) => {
-                            if (!nameStr) return 25;
-                            const match = POKEMON_EGG_DATASET.find(p => p.pokemonName.toLowerCase() === nameStr.toLowerCase());
-                            return match ? match.dexNumber : 25;
-                          };
-
-                          const pADex = getDex(step.parentA?.name);
-                          const pBDex = getDex(step.parentB?.name);
-                          const offDex = getDex(step.offspringTarget?.name);
-
-                          return (
-                            <div
-                              key={stepNum}
-                              className={`border rounded-3xl p-5 space-y-4 shadow-xl transition-all ${
-                                isDone
-                                  ? 'bg-emerald-950/20 border-emerald-500/40 opacity-90'
-                                  : 'bg-zinc-950 border-zinc-800'
-                              }`}
-                            >
-                              {/* Step Card Header */}
-                              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-800/80 pb-3">
-                                <div className="flex items-center gap-3">
-                                  <button
-                                    onClick={() => toggleStepCompleted(stepNum)}
-                                    className={`w-7 h-7 rounded-xl border flex items-center justify-center font-extrabold text-xs transition-all ${
-                                      isDone
-                                        ? 'bg-emerald-600 border-emerald-400 text-white shadow-lg shadow-emerald-600/30'
-                                        : 'bg-zinc-900 border-zinc-700 text-zinc-400 hover:border-red-500'
-                                    }`}
-                                  >
-                                    {isDone ? '✓' : stepNum}
-                                  </button>
-                                  <span className="font-extrabold text-sm text-white">
-                                    {step.title || `Paso ${stepNum}`}
-                                  </span>
-                                </div>
-
-                                <button
-                                  onClick={() => toggleStepCompleted(stepNum)}
-                                  className={`px-3 py-1 rounded-xl font-bold uppercase border text-[10px] transition-colors ${
-                                    isDone ? 'bg-emerald-950 border-emerald-800 text-emerald-300' : 'bg-zinc-900 border-zinc-800 text-amber-400'
-                                  }`}
-                                >
-                                  {isDone ? '✓ Paso Completado' : '⏳ Marcar como Completado'}
-                                </button>
-                              </div>
-
-                              {/* Visual Combination Grid (Parents A & B) */}
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs font-mono">
-                                
-                                {/* Parent A Card */}
-                                <div className="bg-zinc-900/90 p-3.5 rounded-2xl border border-zinc-800 flex items-center gap-3">
-                                  <img
-                                    src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pADex}.png`}
-                                    alt={step.parentA?.name}
-                                    className="w-12 h-12 object-contain drop-shadow"
-                                  />
-                                  <div className="space-y-0.5 text-[11px] flex-1">
-                                    <strong className="text-amber-400 font-extrabold block text-xs">
-                                      Padre A: {step.parentA?.name || 'Progenitor A'}
-                                    </strong>
-                                    <div><span className="text-zinc-500">Objeto:</span> <span className="text-white font-bold">{step.parentA?.equippedItem || 'Ninguno'}</span></div>
-                                    <div><span className="text-zinc-500">IVs:</span> <span className="text-emerald-400 font-bold">{step.parentA?.ivSummary || '31 IVs'}</span></div>
-                                  </div>
-                                </div>
-
-                                {/* Parent B Card */}
-                                <div className="bg-zinc-900/90 p-3.5 rounded-2xl border border-zinc-800 flex items-center gap-3">
-                                  <img
-                                    src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pBDex}.png`}
-                                    alt={step.parentB?.name}
-                                    className="w-12 h-12 object-contain drop-shadow"
-                                  />
-                                  <div className="space-y-0.5 text-[11px] flex-1">
-                                    <strong className="text-amber-400 font-extrabold block text-xs">
-                                      Padre B: {step.parentB?.name || 'Progenitor B'}
-                                    </strong>
-                                    <div><span className="text-zinc-500">Objeto:</span> <span className="text-white font-bold">{step.parentB?.equippedItem || 'Ninguno'}</span></div>
-                                    <div><span className="text-zinc-500">IVs:</span> <span className="text-emerald-400 font-bold">{step.parentB?.ivSummary || '31 IVs'}</span></div>
-                                  </div>
-                                </div>
-
-                              </div>
-
-                              {/* Offspring Target Result Card */}
-                              {step.offspringTarget && (
-                                <div className="bg-zinc-900/90 p-4 rounded-2xl border border-amber-500/30 flex items-center gap-3.5 text-xs font-mono">
-                                  <img
-                                    src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${offDex}.png`}
-                                    alt={step.offspringTarget.name}
-                                    className="w-12 h-12 object-contain drop-shadow"
-                                  />
-                                  <div className="space-y-1 flex-1">
-                                    <div className="flex flex-wrap items-center justify-between gap-2">
-                                      <strong className="font-extrabold text-white text-xs">
-                                        🐣 Resultado Esperado: <span className="text-amber-400">{step.offspringTarget.name}</span>
-                                      </strong>
-                                      <span className="text-emerald-400 font-extrabold bg-emerald-950 px-2.5 py-0.5 rounded-full border border-emerald-800 text-[10px]">
-                                        {step.offspringTarget.expectedIvsSummary}
-                                      </span>
-                                    </div>
-                                    <p className="text-zinc-400 text-[11px] leading-relaxed font-sans">{step.strategyNotes}</p>
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </div>
-                );
-              })() : aiPlanAnalysisState.error ? (
+              ) : aiPlanAnalysisState.error ? (
                 <div className="p-5 bg-red-950/40 border border-red-500/40 rounded-2xl text-xs space-y-3">
                   <div className="flex items-center gap-2 font-bold text-red-400">
                     <AlertTriangle className="w-4 h-4" />
@@ -1513,14 +1336,136 @@ export const BreedingPlannerView: React.FC = () => {
                   </button>
                 </div>
               ) : (
-                <div className="p-4 bg-zinc-950 rounded-2xl border border-zinc-800 text-xs text-zinc-400 flex items-center justify-between">
-                  <span>Haz clic en "Generar Ruta IA" para solicitar una evaluación genética en tiempo real de tu pastura.</span>
-                  <button
-                    onClick={handleTriggerAiPlan}
-                    className="px-3.5 py-1.5 rounded-lg bg-amber-600 text-white font-bold text-xs"
-                  >
-                    Generar Ruta IA
-                  </button>
+                <div className="space-y-6">
+                  {/* AI Natural Language Strategy Report */}
+                  {aiPlanAnalysisState.analysisMarkdown && (
+                    <div className="p-4 sm:p-5 bg-zinc-950/90 rounded-2xl border border-zinc-800 text-xs leading-relaxed text-zinc-300 whitespace-pre-line font-sans shadow-inner max-h-[300px] overflow-y-auto scrollbar-thin">
+                      {aiPlanAnalysisState.analysisMarkdown.replace(/```json\s*[\s\S]*?\s*```/, '').trim()}
+                    </div>
+                  )}
+
+                  {/* 100% Authentic Biological Visual Step Cards */}
+                  {generatedPlan.steps.length > 0 && (
+                    <div className="space-y-4 pt-2">
+                      <h4 className="text-xs font-extrabold text-white uppercase tracking-wider flex items-center gap-2 border-b border-zinc-800 pb-2">
+                        <Sparkles className="w-4 h-4 text-amber-400" />
+                        <span>Ruta Guiada Paso a Paso Verificada Biológicamente ({generatedPlan.steps.length} Pasos)</span>
+                      </h4>
+
+                      {generatedPlan.steps.map((step) => {
+                        const stepNum = step.stepNumber;
+                        const isDone = !!completedSteps[stepNum];
+
+                        return (
+                          <div
+                            key={stepNum}
+                            className={`border rounded-3xl p-5 space-y-4 shadow-xl transition-all ${
+                              isDone
+                                ? 'bg-emerald-950/20 border-emerald-500/40 opacity-90'
+                                : 'bg-zinc-950 border-zinc-800'
+                            }`}
+                          >
+                            {/* Step Card Header */}
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-800/80 pb-3">
+                              <div className="flex items-center gap-3">
+                                <button
+                                  onClick={() => toggleStepCompleted(stepNum)}
+                                  className={`w-7 h-7 rounded-xl border flex items-center justify-center font-extrabold text-xs transition-all ${
+                                    isDone
+                                      ? 'bg-emerald-600 border-emerald-400 text-white shadow-lg shadow-emerald-600/30'
+                                      : 'bg-zinc-900 border-zinc-700 text-zinc-400 hover:border-red-500'
+                                  }`}
+                                >
+                                  {isDone ? '✓' : stepNum}
+                                </button>
+                                <span className="font-extrabold text-sm text-white">
+                                  {step.title || `Paso ${stepNum}`}
+                                </span>
+                              </div>
+
+                              <button
+                                onClick={() => toggleStepCompleted(stepNum)}
+                                className={`px-3 py-1 rounded-xl font-bold uppercase border text-[10px] transition-colors ${
+                                  isDone ? 'bg-emerald-950 border-emerald-800 text-emerald-300' : 'bg-zinc-900 border-zinc-800 text-amber-400'
+                                }`}
+                              >
+                                {isDone ? '✓ Paso Completado' : '⏳ Marcar como Completado'}
+                              </button>
+                            </div>
+
+                            {/* Visual Combination Grid (Parents A & B) */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs font-mono">
+                              
+                              {/* Parent A Card */}
+                              <div className="bg-zinc-900/90 p-3.5 rounded-2xl border border-zinc-800 flex items-center gap-3">
+                                <img
+                                  src={step.parentA.spriteUrl}
+                                  alt={step.parentA.name}
+                                  className="w-12 h-12 object-contain drop-shadow"
+                                />
+                                <div className="space-y-0.5 text-[11px] flex-1">
+                                  <div className="flex items-center justify-between">
+                                    <strong className="text-amber-400 font-extrabold block text-xs">
+                                      Padre A: {step.parentA.name}
+                                    </strong>
+                                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-300 font-sans">
+                                      {step.parentA.gender === 'female' ? 'Hembra ♀' : step.parentA.gender === 'male' ? 'Macho ♂' : 'Sin Género ⚲'}
+                                    </span>
+                                  </div>
+                                  <div><span className="text-zinc-500">Objeto:</span> <span className="text-white font-bold">{step.parentA.equippedItem}</span></div>
+                                  <div><span className="text-zinc-500">IVs / Origen:</span> <span className="text-emerald-400 font-bold">{step.parentA.ivSummary} ({step.parentA.originLabel})</span></div>
+                                </div>
+                              </div>
+
+                              {/* Parent B Card */}
+                              <div className="bg-zinc-900/90 p-3.5 rounded-2xl border border-zinc-800 flex items-center gap-3">
+                                <img
+                                  src={step.parentB.spriteUrl}
+                                  alt={step.parentB.name}
+                                  className="w-12 h-12 object-contain drop-shadow"
+                                />
+                                <div className="space-y-0.5 text-[11px] flex-1">
+                                  <div className="flex items-center justify-between">
+                                    <strong className="text-amber-400 font-extrabold block text-xs">
+                                      Padre B: {step.parentB.name}
+                                    </strong>
+                                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-300 font-sans">
+                                      {step.parentB.gender === 'female' ? 'Hembra ♀' : step.parentB.gender === 'male' ? 'Macho ♂' : 'Sin Género ⚲'}
+                                    </span>
+                                  </div>
+                                  <div><span className="text-zinc-500">Objeto:</span> <span className="text-white font-bold">{step.parentB.equippedItem}</span></div>
+                                  <div><span className="text-zinc-500">IVs / Origen:</span> <span className="text-emerald-400 font-bold">{step.parentB.ivSummary} ({step.parentB.originLabel})</span></div>
+                                </div>
+                              </div>
+
+                            </div>
+
+                            {/* Offspring Target Result Card */}
+                            {step.offspringTarget && (
+                              <div className="bg-zinc-900/90 p-4 rounded-2xl border border-amber-500/30 flex items-center gap-3.5 text-xs font-mono">
+                                <img
+                                  src={step.offspringTarget.spriteUrl}
+                                  alt={step.offspringTarget.name}
+                                  className="w-12 h-12 object-contain drop-shadow"
+                                />
+                                <div className="space-y-1 flex-1">
+                                  <div className="flex flex-wrap items-center justify-between gap-2">
+                                    <strong className="font-extrabold text-white text-xs">
+                                      🐣 Resultado Esperado: <span className="text-amber-400">{step.offspringTarget.name}</span>
+                                    </strong>
+                                    <span className="text-emerald-400 font-extrabold bg-emerald-950 px-2.5 py-0.5 rounded-full border border-emerald-800 text-[10px]">
+                                      {step.offspringTarget.expectedIvsSummary}
+                                    </span>
+                                  </div>
+                                  <p className="text-zinc-400 text-[11px] leading-relaxed font-sans">{step.strategyNotes}</p>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               )}
             </div>
