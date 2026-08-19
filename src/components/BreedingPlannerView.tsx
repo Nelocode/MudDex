@@ -1337,232 +1337,46 @@ export const BreedingPlannerView: React.FC = () => {
             </div>
 
             {/* Handicap & Gender Special Alerts */}
-            {(generatedPlan.genderAlertSummary || (generatedPlan.specialHandicapAlerts && generatedPlan.specialHandicapAlerts.length > 0)) && (
+            {generatedPlan.genderAlertSummary && (
               <div className="bg-amber-500/10 border border-amber-500/30 rounded-3xl p-5 text-amber-400 text-xs space-y-2 shadow-lg">
                 <div className="flex items-center gap-2 font-extrabold text-xs text-amber-300">
                   <AlertTriangle className="w-4 h-4 shrink-0 text-amber-400" />
                   <span>⚠️ Especificación Especial de Genética para {generatedPlan.targetPokemonName}:</span>
                 </div>
-                {generatedPlan.genderAlertSummary && (
-                  <p className="text-zinc-300 leading-relaxed font-mono text-[11px] pl-6">{generatedPlan.genderAlertSummary}</p>
-                )}
-                {generatedPlan.specialHandicapAlerts?.map((note, idx) => (
-                  <p key={idx} className="text-amber-200 font-mono text-[11px] leading-relaxed pl-6">{note}</p>
-                ))}
+                <p className="text-zinc-300 leading-relaxed font-mono text-[11px] pl-6">{generatedPlan.genderAlertSummary}</p>
               </div>
             )}
+              {/* Register Offspring Quick Action Banner */}
+            <div className="p-4 sm:p-5 rounded-3xl bg-zinc-900 border border-zinc-800 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shrink-0">
+                  <Plus className="w-6 h-6" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-extrabold text-white">➕ Registrar Nueva Cría en la Pastura Global</h4>
+                  <p className="text-xs text-zinc-400">Guarda cualquier ejemplar obtenido en Diosesmon para reusarlo en futuras crianzas</p>
+                </div>
+              </div>
 
-            {/* Steps Tree with Visual Sprites */}
-            <div className="space-y-6">
-              {generatedPlan.steps.map(step => {
-                const isDone = !!completedSteps[step.stepNumber];
+              <button
+                onClick={() => {
+                  const data = POKEMON_EGG_DATASET.find(p => p.pokemonId === selectedSpeciesId) || POKEMON_EGG_DATASET[0];
+                  const newBreeder: BreederInventoryItem = {
+                    id: `pasture_ai_${Date.now()}`,
+                    speciesId: data.pokemonId,
+                    speciesName: `${data.pokemonName} (Cría IA)`,
+                    gender: 'female',
+                    ivs: { ...targetIvs },
+                    nature: targetNature
+                  };
 
-                return (
-                  <div
-                    key={step.stepNumber}
-                    className={`border rounded-3xl p-6 space-y-5 shadow-2xl transition-all ${
-                      isDone
-                        ? 'bg-emerald-950/20 border-emerald-500/40 opacity-90'
-                        : 'bg-zinc-900/90 border-zinc-800'
-                    }`}
-                  >
-                    
-                    {/* Step Card Header */}
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-800/80 pb-3">
-                      <div className="flex flex-col gap-1.5">
-                        {step.chainName && (
-                          <span className={`text-[10px] font-mono font-extrabold px-3 py-0.5 rounded-full border self-start ${
-                            step.chainName.includes('CADENA 1')
-                              ? 'bg-sky-950/90 text-sky-300 border-sky-800'
-                              : step.chainName.includes('CADENA 2')
-                              ? 'bg-pink-950/90 text-pink-300 border-pink-800'
-                              : 'bg-amber-950/90 text-amber-300 border-amber-800'
-                          }`}>
-                            {step.chainName}
-                          </span>
-                        )}
-                        <div className="flex items-center gap-3">
-                          <button
-                            onClick={() => toggleStepCompleted(step.stepNumber)}
-                            className={`w-7 h-7 rounded-xl border flex items-center justify-center font-extrabold text-xs transition-all ${
-                              isDone
-                                ? 'bg-emerald-600 border-emerald-400 text-white shadow-lg shadow-emerald-600/30'
-                                : 'bg-zinc-950 border-zinc-700 text-zinc-400 hover:border-red-500'
-                            }`}
-                          >
-                            {isDone ? '✓' : step.stepNumber}
-                          </button>
-                          <span className="font-black text-sm text-white tracking-wide">
-                            {step.title}
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-3 text-xs font-mono">
-                        <div className="flex items-center gap-1.5 text-amber-400 bg-amber-950/50 px-3 py-1 rounded-xl border border-amber-800/50">
-                          <Flame className="w-3.5 h-3.5" />
-                          <span>~{step.flameBodyStepsEstimate} Pasos (Cuerpo Llama)</span>
-                        </div>
-                        <span className={`px-3 py-1 rounded-xl font-bold uppercase border text-[10px] ${
-                          isDone ? 'bg-emerald-950 border-emerald-800 text-emerald-300' : 'bg-zinc-950 border-zinc-800 text-amber-400'
-                        }`}>
-                          {isDone ? '✓ Completado' : '⏳ Pendiente'}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Visual Combination Grid (Parents A & B) */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-                      
-                      {/* Parent A Card */}
-                      <div className="bg-zinc-950 p-4 rounded-2xl border border-zinc-800 flex items-center gap-4 relative overflow-hidden">
-                        <div className="w-16 h-16 bg-zinc-900/80 rounded-2xl border border-zinc-800 p-1 flex items-center justify-center shrink-0">
-                          <img
-                            src={step.parentA.spriteUrl}
-                            alt={step.parentA.name}
-                            className="w-14 h-14 object-contain drop-shadow"
-                          />
-                        </div>
-                        <div className="space-y-1 font-mono text-[11px] flex-1">
-                          <div className="flex flex-wrap items-center justify-between gap-1">
-                            <span className="font-extrabold text-amber-400 block text-xs">Padre A: {step.parentA.name}</span>
-                            <span className={`text-[9px] font-bold px-2 py-0.5 rounded border ${
-                              step.parentA.originLabel.includes('Cría')
-                                ? 'bg-amber-950/80 text-amber-300 border-amber-800'
-                                : step.parentA.originLabel.includes('Pastura')
-                                ? 'bg-emerald-950/80 text-emerald-300 border-emerald-800'
-                                : 'bg-purple-950/80 text-purple-300 border-purple-800'
-                            }`}>
-                              {step.parentA.originLabel}
-                            </span>
-                          </div>
-                          <div><span className="text-zinc-500">Objeto:</span> <strong className="text-white font-bold">{step.parentA.equippedItem}</strong></div>
-                          <div><span className="text-zinc-500">IVs 31:</span> <strong className="text-emerald-400 font-bold">{step.parentA.ivSummary}</strong></div>
-                        </div>
-                      </div>
-
-                      {/* Parent B Card */}
-                      <div className="bg-zinc-950 p-4 rounded-2xl border border-zinc-800 flex items-center gap-4 relative overflow-hidden">
-                        <div className="w-16 h-16 bg-zinc-900/80 rounded-2xl border border-zinc-800 p-1 flex items-center justify-center shrink-0">
-                          <img
-                            src={step.parentB.spriteUrl}
-                            alt={step.parentB.name}
-                            className="w-14 h-14 object-contain drop-shadow"
-                          />
-                        </div>
-                        <div className="space-y-1 font-mono text-[11px] flex-1">
-                          <div className="flex flex-wrap items-center justify-between gap-1">
-                            <span className="font-extrabold text-amber-400 block text-xs">Padre B: {step.parentB.name}</span>
-                            <span className={`text-[9px] font-bold px-2 py-0.5 rounded border ${
-                              step.parentB.originLabel.includes('Cría')
-                                ? 'bg-amber-950/80 text-amber-300 border-amber-800'
-                                : step.parentB.originLabel.includes('Pastura')
-                                ? 'bg-emerald-950/80 text-emerald-300 border-emerald-800'
-                                : 'bg-purple-950/80 text-purple-300 border-purple-800'
-                            }`}>
-                              {step.parentB.originLabel}
-                            </span>
-                          </div>
-                          <div><span className="text-zinc-500">Objeto:</span> <strong className="text-white font-bold">{step.parentB.equippedItem}</strong></div>
-                          <div><span className="text-zinc-500">IVs 31:</span> <strong className="text-emerald-400 font-bold">{step.parentB.ivSummary}</strong></div>
-                        </div>
-                      </div>
-
-                    </div>
-
-                    {/* Offspring Target Result Card */}
-                    <div className="bg-zinc-950 p-4 sm:p-5 rounded-2xl border border-zinc-800 flex flex-col sm:flex-row items-start sm:items-center gap-4 text-xs">
-                      <div className="w-16 h-16 bg-gradient-to-br from-amber-500/10 to-red-500/10 rounded-2xl border border-amber-500/30 p-1 flex items-center justify-center shrink-0">
-                        <img
-                          src={step.offspringTarget.spriteUrl}
-                          alt={step.offspringTarget.name}
-                          className="w-14 h-14 object-contain drop-shadow-[0_0_8px_rgba(251,191,36,0.3)]"
-                        />
-                      </div>
-
-                      <div className="space-y-1 flex-1">
-                        <div className="flex flex-wrap items-center justify-between gap-2">
-                          <strong className="font-extrabold text-white text-xs flex items-center gap-2">
-                            <span>🐣 Resultado Esperado:</span>
-                            <span className="text-amber-400">{step.offspringTarget.name}</span>
-                          </strong>
-                          
-                          <div className="flex flex-wrap items-center gap-2">
-                            <span className={`text-[10px] font-mono font-extrabold px-2.5 py-0.5 rounded-full border ${
-                              step.offspringTarget.genderRequired === 'female'
-                                ? 'bg-pink-950 text-pink-300 border-pink-800'
-                                : step.offspringTarget.genderRequired === 'male'
-                                ? 'bg-sky-950 text-sky-300 border-sky-800'
-                                : 'bg-zinc-800 text-zinc-300 border-zinc-700'
-                            }`}>
-                              {step.offspringTarget.genderRequiredLabel}
-                            </span>
-                            <span className="text-[11px] font-mono text-emerald-400 font-extrabold bg-emerald-950 px-2.5 py-0.5 rounded-full border border-emerald-800">
-                              {step.offspringTarget.expectedIvsSummary}
-                            </span>
-                          </div>
-                        </div>
-
-                        {step.offspringTarget.genderCostAlert && (
-                          <p className="text-[11px] text-amber-400 bg-amber-500/10 p-2 rounded-xl border border-amber-500/30">
-                            {step.offspringTarget.genderCostAlert}
-                          </p>
-                        )}
-                        
-                        <p className="text-zinc-400 text-[11px] leading-relaxed">{step.strategyNotes}</p>
-                      </div>
-                    </div>
-
-                    {/* Interactive Actions: Register to Pasture & Completion Toggle */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-                      <button
-                        onClick={() => {
-                          const genderVal = step.offspringTarget.genderRequired === 'female' ? 'female' : step.offspringTarget.genderRequired === 'male' ? 'male' : 'genderless';
-                          const data = POKEMON_EGG_DATASET.find(p => p.pokemonId === selectedSpeciesId) || POKEMON_EGG_DATASET[0];
-                          
-                          // Determine IVs from step
-                          const ivObj = { hp: false, attack: false, defense: false, specialAttack: false, specialDefense: false, speed: false };
-                          if (step.offspringTarget.expectedIvsSummary.toLowerCase().includes('hp')) ivObj.hp = true;
-                          if (step.offspringTarget.expectedIvsSummary.toLowerCase().includes('ataque')) ivObj.attack = true;
-                          if (step.offspringTarget.expectedIvsSummary.toLowerCase().includes('defensa')) ivObj.defense = true;
-                          if (step.offspringTarget.expectedIvsSummary.toLowerCase().includes('atk esp')) ivObj.specialAttack = true;
-                          if (step.offspringTarget.expectedIvsSummary.toLowerCase().includes('def esp')) ivObj.specialDefense = true;
-                          if (step.offspringTarget.expectedIvsSummary.toLowerCase().includes('velocidad')) ivObj.speed = true;
-
-                          const newBreeder: BreederInventoryItem = {
-                            id: `pasture_step_${step.stepNumber}_${Date.now()}`,
-                            speciesId: data.pokemonId,
-                            speciesName: `${data.pokemonName} (${step.offspringTarget.name})`,
-                            gender: genderVal,
-                            ivs: ivObj,
-                            nature: targetNature
-                          };
-
-                          setPastura(prev => [...prev, newBreeder]);
-                          alert(`✓ ¡${data.pokemonName} (${step.offspringTarget.name}) fue registrado exitosamente en tu Pastura Global!`);
-                        }}
-                        className="w-full py-3 rounded-2xl bg-amber-600/20 hover:bg-amber-600/30 text-amber-300 border border-amber-500/40 font-extrabold text-xs transition-all flex items-center justify-center gap-2 shadow-md"
-                      >
-                        <Plus className="w-4 h-4 text-amber-400" />
-                        <span>➕ Registrar Cría del Paso en mi Pastura Global</span>
-                      </button>
-
-                      <button
-                        onClick={() => toggleStepCompleted(step.stepNumber)}
-                        className={`w-full py-3 rounded-2xl font-extrabold text-xs transition-all flex items-center justify-center gap-2 shadow-md ${
-                          isDone
-                            ? 'bg-zinc-950 text-zinc-400 border border-zinc-800 hover:text-white'
-                            : 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-600/20'
-                        }`}
-                      >
-                        <CheckCircle2 className="w-4 h-4" />
-                        <span>{isDone ? 'Marcar Paso como Pendiente' : '✓ Marcar Paso como Completado'}</span>
-                      </button>
-                    </div>
-
-                  </div>
-                );
-              })}
+                  setPastura(prev => [...prev, newBreeder]);
+                  alert(`✓ ¡${data.pokemonName} fue registrado exitosamente en tu Pastura Global!`);
+                }}
+                className="w-full sm:w-auto px-5 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs shadow-lg transition-all shrink-0 flex items-center justify-center gap-2 active:scale-95"
+              >
+                <span>➕ Registrar Cría en Mi Pastura</span>
+              </button>
             </div>
 
           </div>
