@@ -1332,7 +1332,28 @@ export const BreedingPlannerView: React.FC = () => {
                     try {
                       const data = JSON.parse(match[1]);
                       if (Array.isArray(data.steps)) {
-                        parsedSteps = data.steps;
+                        parsedSteps = data.steps.map((s: any) => {
+                          const pA = s.parentA?.name || '';
+                          const pB = s.parentB?.name || '';
+                          let off = s.offspringTarget?.name || '';
+
+                          const isADitto = pA.toLowerCase().includes('ditto');
+                          const isBDitto = pB.toLowerCase().includes('ditto');
+
+                          if (isADitto && !isBDitto && off.toLowerCase() !== pB.toLowerCase()) {
+                            off = pB;
+                          } else if (isBDitto && !isADitto && off.toLowerCase() !== pA.toLowerCase()) {
+                            off = pA;
+                          }
+
+                          return {
+                            ...s,
+                            offspringTarget: {
+                              ...s.offspringTarget,
+                              name: off
+                            }
+                          };
+                        });
                       }
                       naturalLanguageText = rawText.replace(/```json\s*[\s\S]*?\s*```/, '').trim();
                     } catch (e) {

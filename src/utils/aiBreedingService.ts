@@ -82,6 +82,18 @@ REGLAS DE BASE DE DATOS Y BIOLOGÍA POKÉMON:
 6. POKÉMON BEBÉ (19 Especies en Grupo No Descubierto): Riolu, Pichu, Togepi, Cleffa, Wynaut, Munchlax NO PUEDEN CRIAR. Deben evolucionarse a su forma adulta antes de colocarse en la pastura.
 7. HERENCIA DE FORMAS REGIONALES (Alola, Galar, Hisui, Paldea): Si el progenitor es una forma regional no nativa (ej: Vulpix Alola, Meowth Galar, Zorua Hisui), DEBE EQUIPAR PIEDRA ETERNA para transmitir su forma regional; de lo contrario nacerá la forma estándar.
 8. CRIANZA CON INCIENSOS: Snorlax requiere Incienso Lento para Munchlax, Marill requiere Incienso Suave para Azurill, Roselia requiere Incienso Floral para Budew, Sudowoodo requiere Incienso Roca para Bonsly, Mantine requiere Incienso Ola para Mantyke.
+
+🚨 LEYES DE BIOLOGÍA Y HERENCIA DE POKÉMON (VIOLACIÓN DE ESTAS REGLAS ES UN ERROR CRÍTICO):
+1. LA MADRE DETERMINA LA ESPECIE: Al criar un Macho y una Hembra, la cría SIEMPRE nacerá de la especie de la MADRE (Hembra ♀) o su forma base pre-evolucionada.
+   - Ejemplo: Eevee ♀ + Nidoran♂ = EEVEE 🐣 (Jamás nacerá Nidoran u otra especie).
+   - Ejemplo: Nidoran♀ + Eevee♂ = Nidoran♀ o Nidoran♂ 🐣.
+2. DITTO + OTRA ESPECIE: Al criar Ditto con otra especie, la cría NUNCA es Ditto ni otra especie arbitraria. NACE LA ESPECIE DEL COMPAÑERO NO-DITTO (o su pre-evolución base).
+   - Ejemplo: Ditto + Eevee = EEVEE 🐣 (Jamás nacerá Nidoran).
+   - Ejemplo: Ditto + Nidoran♂ = NIDORAN♂ 🐣.
+   - NUNCA pongas en un paso "Padre A: Ditto, Padre B: Eevee, Resultado: Nidoran M". ¡Eso es un error biológico imposible!
+3. LÓGICA DE PASOS DETERMINISTAS CON OBJETOS RECIOS:
+   - Al usar 2 Objetos Recios (ej: Brazal Recio + Pesa Recia), SE HEREDAN EXACTAMENTE 2 IVs DE 31 FIJOS.
+   - Para subir de 1x31 a 5x31, DEBES especificar la cadena de pasos completa acumulando IVs de 31 (Paso 1: 1x31+1x31=2x31; Paso 2: 2x31+2x31=3x31; Paso 3: 3x31+3x31=4x31; Paso 4: 4x31+4x31=5x31). NUNCA digas que se obtiene 5x31 en 1 solo paso.
 10. FORMATO ESTRUCTURADO OBLIGATORIO DE RESPUESTA EN JSON:
 Además del análisis explicativo en lenguaje natural, DEBES incluir al final de tu respuesta un bloque de código JSON válido delimitado por \`\`\`json ... \`\`\` con la estructura exacta de los pasos de crianza con las miniaturas de Pokémon para que la interfaz web genere las tarjetas interactivas con imágenes, sprites y checkboxes:
 
