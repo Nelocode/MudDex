@@ -303,11 +303,12 @@ export const BreedingPlannerView: React.FC = () => {
   };
 
   useEffect(() => {
-    const currentKey = `${selectedSpeciesId}_${pastura.length}`;
+    const ivKey = Object.entries(targetIvs).filter(([, v]) => v).map(([k]) => k).join(',');
+    const currentKey = `${selectedSpeciesId}_${targetNature}_${targetAbility}_${ivKey}_${pastura.length}`;
     if (currentWizardStep === 4 && aiPlanAnalysisState.lastGeneratedKey !== currentKey && !aiPlanAnalysisState.isLoading) {
       handleTriggerAiPlan();
     }
-  }, [currentWizardStep, selectedSpeciesId, pastura.length]);
+  }, [currentWizardStep, selectedSpeciesId, targetNature, targetAbility, targetIvs, eggMovesInput, pastura.length]);
 
   const [useDestinyKnot, setUseDestinyKnot] = useState<boolean>(true);
 
@@ -1289,37 +1290,27 @@ export const BreedingPlannerView: React.FC = () => {
                   </div>
                 </div>
 
-                <button
-                  onClick={handleTriggerAiPlan}
-                  disabled={aiPlanAnalysisState.isLoading}
-                  className="px-4 py-2 rounded-xl bg-amber-600/20 hover:bg-amber-600/30 text-amber-300 border border-amber-500/40 text-xs font-bold transition-all flex items-center gap-2 shrink-0 self-start sm:self-auto"
-                >
-                  <RefreshCw className={`w-3.5 h-3.5 ${aiPlanAnalysisState.isLoading ? 'animate-spin' : ''}`} />
-                  <span>{aiPlanAnalysisState.isLoading ? 'Analizando...' : '🔄 Re-analizar con IA'}</span>
-                </button>
+                <div className="px-3 py-1.5 rounded-xl bg-emerald-950/80 border border-emerald-500/40 text-emerald-300 text-xs font-bold shrink-0 self-start sm:self-auto flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+                  <span>🟢 Generado Automáticamente</span>
+                </div>
               </div>
 
               {aiPlanAnalysisState.isLoading ? (
                 <div className="p-8 text-center space-y-3 bg-zinc-950/80 rounded-2xl border border-zinc-800 animate-pulse">
                   <Bot className="w-8 h-8 text-amber-400 mx-auto animate-bounce" />
                   <p className="text-xs font-bold text-amber-300">
-                    🧠 El Maestro de Crianza IA está evaluando los {pastura.length} Pokémon de tu pastura y calculando la ruta genética óptima...
+                    🧠 El Maestro de Crianza IA está evaluando automáticamente los {pastura.length} Pokémon de tu pastura y calculando la ruta genética sin desperdicio...
                   </p>
-                  <span className="text-[10px] text-zinc-500 font-mono block">Aplicando reglas de especies puente, handicaps, 100% género y transferencia de IVs</span>
+                  <span className="text-[10px] text-zinc-500 font-mono block">Aplicando reglas de especies puente, handicaps, 100% género y herencia garantizada</span>
                 </div>
               ) : aiPlanAnalysisState.analysisMarkdown ? (
-                <div className="p-4 sm:p-5 bg-zinc-950/90 rounded-2xl border border-zinc-800 text-xs leading-relaxed text-zinc-300 whitespace-pre-line font-sans shadow-inner max-h-[350px] overflow-y-auto scrollbar-thin">
+                <div className="p-4 sm:p-5 bg-zinc-950/90 rounded-2xl border border-zinc-800 text-xs leading-relaxed text-zinc-300 whitespace-pre-line font-sans shadow-inner max-h-[400px] overflow-y-auto scrollbar-thin">
                   {aiPlanAnalysisState.analysisMarkdown}
                 </div>
               ) : (
-                <div className="p-4 bg-zinc-950 rounded-2xl border border-zinc-800 text-xs text-zinc-400 flex items-center justify-between">
-                  <span>Haz clic en "Re-analizar con IA" para solicitar una evaluación genética en tiempo real de tu pastura.</span>
-                  <button
-                    onClick={handleTriggerAiPlan}
-                    className="px-3 py-1.5 rounded-lg bg-amber-600 text-white font-bold text-xs"
-                  >
-                    Generar Análisis IA
-                  </button>
+                <div className="p-4 bg-zinc-950 rounded-2xl border border-zinc-800 text-xs text-zinc-400">
+                  <span>Calculando ruta automática con IA...</span>
                 </div>
               )}
             </div>
