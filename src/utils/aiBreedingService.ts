@@ -28,18 +28,24 @@ export async function askAiBreedingMaster(
   config: AiConfig,
   customQuestion?: string
 ): Promise<AiBreedingAuditResult> {
-  const effectiveApiKey = config.apiKey.trim() || (import.meta as any).env?.VITE_GEMINI_API_KEY || '';
+  const openAiKey = (import.meta as any).env?.VITE_OPENAI_API_KEY || '';
+  const geminiKey = (import.meta as any).env?.VITE_GEMINI_API_KEY || '';
+
+  const userKey = config.apiKey.trim();
+  const effectiveApiKey = userKey || openAiKey || geminiKey;
+  const effectiveProvider = userKey ? config.provider : (openAiKey ? 'openai' : 'gemini');
 
   if (!effectiveApiKey) {
     return {
       isSuccess: false,
       adviceMarkdown: '',
-      error: 'Por favor ingresa una Clave de API (Gemini o OpenAI) para consultar al Maestro de Crianza IA.'
+      error: 'Por favor ingresa una Clave de API (OpenAI o Gemini) para consultar al Maestro de Crianza IA.'
     };
   }
 
   config = {
     ...config,
+    provider: effectiveProvider,
     apiKey: effectiveApiKey
   };
 
