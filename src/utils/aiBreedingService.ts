@@ -82,7 +82,23 @@ REGLAS DE BASE DE DATOS Y BIOLOGÍA POKÉMON:
 6. POKÉMON BEBÉ (19 Especies en Grupo No Descubierto): Riolu, Pichu, Togepi, Cleffa, Wynaut, Munchlax NO PUEDEN CRIAR. Deben evolucionarse a su forma adulta antes de colocarse en la pastura.
 7. HERENCIA DE FORMAS REGIONALES (Alola, Galar, Hisui, Paldea): Si el progenitor es una forma regional no nativa (ej: Vulpix Alola, Meowth Galar, Zorua Hisui), DEBE EQUIPAR PIEDRA ETERNA para transmitir su forma regional; de lo contrario nacerá la forma estándar.
 8. CRIANZA CON INCIENSOS: Snorlax requiere Incienso Lento para Munchlax, Marill requiere Incienso Suave para Azurill, Roselia requiere Incienso Floral para Budew, Sudowoodo requiere Incienso Roca para Bonsly, Mantine requiere Incienso Ola para Mantyke.
-9. MADRE DETERMINA ESPECIE: La cría nacerá SIEMPRE como la especie base de la MADRE (Hembra ♀). Los movimientos huevo se heredan en la forma base (ej: Eevee hereda Wish/Toxic antes de evolucionar a Umbreon).`;
+10. FORMATO ESTRUCTURADO OBLIGATORIO DE RESPUESTA EN JSON:
+Además del análisis explicativo en lenguaje natural, DEBES incluir al final de tu respuesta un bloque de código JSON válido delimitado por \`\`\`json ... \`\`\` con la estructura exacta de los pasos de crianza con las miniaturas de Pokémon para que la interfaz web genere las tarjetas interactivas con imágenes, sprites y checkboxes:
+
+\`\`\`json
+{
+  "steps": [
+    {
+      "stepNumber": 1,
+      "title": "Paso 1: [Descripción Breve]",
+      "parentA": { "name": "Eevee", "gender": "female", "equippedItem": "Brazal Recio", "ivSummary": "31 en HP", "originLabel": "Pastura #1" },
+      "parentB": { "name": "Ditto", "gender": "genderless", "equippedItem": "Pesa Recia", "ivSummary": "31 en Defensa", "originLabel": "Pastura #3" },
+      "offspringTarget": { "name": "Eevee", "genderRequiredLabel": "Hembra ♀", "expectedIvsSummary": "31 en HP y Defensa" },
+      "strategyNotes": "Explicación del paso en lenguaje natural."
+    }
+  ]
+}
+\`\`\``;
 
   const userPrompt = `OBJETIVO DE CRIANZA SOLICITADO:
 - Pokémon Objetivo: ${targetData.pokemonName} (#${targetData.dexNumber})
@@ -97,7 +113,7 @@ REGLAS DE BASE DE DATOS Y BIOLOGÍA POKÉMON:
 INVENTARIO EN PASTURA GLOBAL DEL JUGADOR (EVALUAR Y PRIORIZAR CADA UNO):
 ${pasturaSummary}
 
-${customQuestion ? `PREGUNTA / INSTRUCCIÓN ESPECÍFICA DEL JUGADOR:\n"${customQuestion}"` : 'Por favor genera un análisis y plan de crianza paso a paso en Markdown evaluando la pastura del usuario, indicando qué Pokémon de la pastura usar como Padres A/B en cada paso, los objetos a equipar (Objetos Recios / Piedra Eterna / Lazo Destino) y recomendaciones de eficiencia.'}`;
+Por favor genera el análisis explicativo en lenguaje natural seguido OBLIGATORIAMENTE del bloque \`\`\`json con los pasos estructurados para las tarjetas interactivas con imágenes.`;
 
   try {
     if (config.provider === 'gemini') {
