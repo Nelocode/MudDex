@@ -124,7 +124,7 @@ ${customQuestion ? `PREGUNTA / INSTRUCCIÓN ESPECÍFICA DEL JUGADOR:\n"${customQ
               ],
               generationConfig: {
                 temperature: 0.2,
-                maxOutputTokens: 1500
+                maxOutputTokens: 3000
               }
             })
           });

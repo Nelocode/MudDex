@@ -272,7 +272,10 @@ export const BreedingPlannerView: React.FC = () => {
   });
 
   const handleTriggerAiPlan = async () => {
-    setAiPlanAnalysisState({ isLoading: true, analysisMarkdown: '' });
+    const ivKey = Object.entries(targetIvs).filter(([, v]) => v).map(([k]) => k).join(',');
+    const currentKey = `${selectedSpeciesId}_${targetNature}_${targetAbility}_${ivKey}_${pastura.length}`;
+    setAiPlanAnalysisState(prev => ({ ...prev, isLoading: true, error: undefined }));
+
     const moves = eggMovesInput.split(',').map(m => m.trim()).filter(Boolean);
     const config: AiConfig = {
       provider: 'gemini',
@@ -293,12 +296,14 @@ export const BreedingPlannerView: React.FC = () => {
       setAiPlanAnalysisState({
         isLoading: false,
         analysisMarkdown: res.aiAnalysis,
-        lastGeneratedKey: `${selectedSpeciesId}_${pastura.length}`
+        lastGeneratedKey: currentKey,
+        error: undefined
       });
     } else {
       setAiPlanAnalysisState({
         isLoading: false,
         analysisMarkdown: '',
+        lastGeneratedKey: currentKey,
         error: res.error || 'Error al conectar con la API de IA.'
       });
     }
@@ -1292,9 +1297,20 @@ export const BreedingPlannerView: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="px-3 py-1.5 rounded-xl bg-emerald-950/80 border border-emerald-500/40 text-emerald-300 text-xs font-bold shrink-0 self-start sm:self-auto flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-                  <span>🟢 Generado Automáticamente</span>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={handleTriggerAiPlan}
+                    disabled={aiPlanAnalysisState.isLoading}
+                    className="px-3.5 py-1.5 rounded-xl bg-amber-600/20 hover:bg-amber-600/30 text-amber-300 border border-amber-500/40 text-xs font-bold transition-all flex items-center gap-1.5 shrink-0"
+                  >
+                    <RefreshCw className={`w-3.5 h-3.5 ${aiPlanAnalysisState.isLoading ? 'animate-spin' : ''}`} />
+                    <span>{aiPlanAnalysisState.isLoading ? 'Analizando...' : '🔄 Generar Ruta IA'}</span>
+                  </button>
+
+                  <div className="px-3 py-1.5 rounded-xl bg-emerald-950/80 border border-emerald-500/40 text-emerald-300 text-xs font-bold shrink-0 flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+                    <span>🟢 Auto</span>
+                  </div>
                 </div>
               </div>
 
@@ -1302,17 +1318,36 @@ export const BreedingPlannerView: React.FC = () => {
                 <div className="p-8 text-center space-y-3 bg-zinc-950/80 rounded-2xl border border-zinc-800 animate-pulse">
                   <Bot className="w-8 h-8 text-amber-400 mx-auto animate-bounce" />
                   <p className="text-xs font-bold text-amber-300">
-                    🧠 El Maestro de Crianza IA está evaluando automáticamente los {pastura.length} Pokémon de tu pastura y calculando la ruta genética sin desperdicio...
+                    🧠 El Maestro de Crianza IA está evaluando automáticamente los {pastura.length} Pokémon de tu pastura (~3 segundos)...
                   </p>
                   <span className="text-[10px] text-zinc-500 font-mono block">Aplicando reglas de especies puente, handicaps, 100% género y herencia garantizada</span>
                 </div>
               ) : aiPlanAnalysisState.analysisMarkdown ? (
-                <div className="p-4 sm:p-5 bg-zinc-950/90 rounded-2xl border border-zinc-800 text-xs leading-relaxed text-zinc-300 whitespace-pre-line font-sans shadow-inner max-h-[400px] overflow-y-auto scrollbar-thin">
+                <div className="p-4 sm:p-5 bg-zinc-950/90 rounded-2xl border border-zinc-800 text-xs leading-relaxed text-zinc-300 whitespace-pre-line font-sans shadow-inner max-h-[450px] overflow-y-auto scrollbar-thin">
                   {aiPlanAnalysisState.analysisMarkdown}
                 </div>
+              ) : aiPlanAnalysisState.error ? (
+                <div className="p-5 bg-red-950/40 border border-red-500/40 rounded-2xl text-xs space-y-3">
+                  <div className="flex items-center gap-2 font-bold text-red-400">
+                    <AlertTriangle className="w-4 h-4" />
+                    <span>Error al conectar con el motor de IA: {aiPlanAnalysisState.error}</span>
+                  </div>
+                  <button
+                    onClick={handleTriggerAiPlan}
+                    className="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold text-xs"
+                  >
+                    🔄 Reintentar Generación de Ruta con IA
+                  </button>
+                </div>
               ) : (
-                <div className="p-4 bg-zinc-950 rounded-2xl border border-zinc-800 text-xs text-zinc-400">
-                  <span>Calculando ruta automática con IA...</span>
+                <div className="p-4 bg-zinc-950 rounded-2xl border border-zinc-800 text-xs text-zinc-400 flex items-center justify-between">
+                  <span>Haz clic en "Generar Ruta IA" para solicitar una evaluación genética en tiempo real de tu pastura.</span>
+                  <button
+                    onClick={handleTriggerAiPlan}
+                    className="px-3.5 py-1.5 rounded-lg bg-amber-600 text-white font-bold text-xs"
+                  >
+                    Generar Ruta IA
+                  </button>
                 </div>
               )}
             </div>
