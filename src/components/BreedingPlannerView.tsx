@@ -258,6 +258,8 @@ export const BreedingPlannerView: React.FC = () => {
     setPastura(prev => prev.filter(item => item.id !== id));
   };
 
+  const [selectedBreederToConsumeId, setSelectedBreederToConsumeId] = useState<string>('');
+
   // 100% AI-Driven Breeding Plan State
   const [aiPlanAnalysisState, setAiPlanAnalysisState] = useState<{
     isLoading: boolean;
@@ -1337,37 +1339,92 @@ export const BreedingPlannerView: React.FC = () => {
                 <p className="text-zinc-300 leading-relaxed font-mono text-[11px] pl-6">{generatedPlan.genderAlertSummary}</p>
               </div>
             )}
-              {/* Register Offspring Quick Action Banner */}
-            <div className="p-4 sm:p-5 rounded-3xl bg-zinc-900 border border-zinc-800 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shrink-0">
-                  <Plus className="w-6 h-6" />
+            {/* Quick Actions: Register Offspring & Consume Used Breeders */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              
+              {/* Register Offspring Action */}
+              <div className="p-4 sm:p-5 rounded-3xl bg-zinc-900 border border-zinc-800 flex flex-col justify-between gap-4 shadow-xl">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shrink-0">
+                    <Plus className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-extrabold text-white">➕ Registrar Nueva Cría Obtenida</h4>
+                    <p className="text-xs text-zinc-400">Guarda el ejemplar eclosionado en Diosesmon en tu pastura</p>
+                  </div>
                 </div>
-                <div>
-                  <h4 className="text-sm font-extrabold text-white">➕ Registrar Nueva Cría en la Pastura Global</h4>
-                  <p className="text-xs text-zinc-400">Guarda cualquier ejemplar obtenido en Diosesmon para reusarlo en futuras crianzas</p>
-                </div>
+
+                <button
+                  onClick={() => {
+                    const data = POKEMON_EGG_DATASET.find(p => p.pokemonId === selectedSpeciesId) || POKEMON_EGG_DATASET[0];
+                    const newBreeder: BreederInventoryItem = {
+                      id: `pasture_ai_${Date.now()}`,
+                      speciesId: data.pokemonId,
+                      speciesName: `${data.pokemonName} (Cría IA)`,
+                      gender: 'female',
+                      ivs: { ...targetIvs },
+                      nature: targetNature
+                    };
+
+                    setPastura(prev => [...prev, newBreeder]);
+                    alert(`✓ ¡${data.pokemonName} fue registrado exitosamente en tu Pastura Global!`);
+                  }}
+                  className="w-full py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs shadow-lg transition-all flex items-center justify-center gap-2 active:scale-95"
+                >
+                  <span>➕ Guardar Cría en Pastura</span>
+                </button>
               </div>
 
-              <button
-                onClick={() => {
-                  const data = POKEMON_EGG_DATASET.find(p => p.pokemonId === selectedSpeciesId) || POKEMON_EGG_DATASET[0];
-                  const newBreeder: BreederInventoryItem = {
-                    id: `pasture_ai_${Date.now()}`,
-                    speciesId: data.pokemonId,
-                    speciesName: `${data.pokemonName} (Cría IA)`,
-                    gender: 'female',
-                    ivs: { ...targetIvs },
-                    nature: targetNature
-                  };
+              {/* Consume Used Breeder Action */}
+              <div className="p-4 sm:p-5 rounded-3xl bg-zinc-900 border border-red-500/30 flex flex-col justify-between gap-4 shadow-xl">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-red-500/20 border border-red-500/40 flex items-center justify-center text-red-400 shrink-0">
+                    <Flame className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-extrabold text-white">🔥 Consumir Padre Usado en Diosesmon</h4>
+                    <p className="text-xs text-zinc-400">Elimina de la pastura el Pokémon consumido tras el cruce</p>
+                  </div>
+                </div>
 
-                  setPastura(prev => [...prev, newBreeder]);
-                  alert(`✓ ¡${data.pokemonName} fue registrado exitosamente en tu Pastura Global!`);
-                }}
-                className="w-full sm:w-auto px-5 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs shadow-lg transition-all shrink-0 flex items-center justify-center gap-2 active:scale-95"
-              >
-                <span>➕ Registrar Cría en Mi Pastura</span>
-              </button>
+                {pastura.length > 0 ? (
+                  <div className="flex items-center gap-2">
+                    <select
+                      value={selectedBreederToConsumeId}
+                      onChange={(e) => setSelectedBreederToConsumeId(e.target.value)}
+                      className="flex-1 px-3 py-2 rounded-xl bg-zinc-950 border border-zinc-800 text-zinc-300 text-xs font-mono focus:outline-none focus:border-red-500"
+                    >
+                      <option value="">-- Seleccionar Pokémon Consumido --</option>
+                      {pastura.map(b => {
+                        const bData = POKEMON_EGG_DATASET.find(p => p.pokemonId === b.speciesId) || POKEMON_EGG_DATASET[0];
+                        return (
+                          <option key={b.id} value={b.id}>
+                            {bData.pokemonName} ({b.gender === 'male' ? '♂' : b.gender === 'female' ? '♀' : '⚲'}) - {b.notes || 'Pastura'}
+                          </option>
+                        );
+                      })}
+                    </select>
+
+                    <button
+                      onClick={() => {
+                        if (!selectedBreederToConsumeId) {
+                          alert('Por favor selecciona un Pokémon de la pastura para consumir.');
+                          return;
+                        }
+                        handleRemoveBreeder(selectedBreederToConsumeId);
+                        setSelectedBreederToConsumeId('');
+                        alert('🔥 ¡Pokémon consumido y removido de la pastura exitosamente!');
+                      }}
+                      className="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-500 text-white font-extrabold text-xs shadow-lg transition-all shrink-0 active:scale-95"
+                    >
+                      🔥 Consumir
+                    </button>
+                  </div>
+                ) : (
+                  <span className="text-xs text-zinc-500 italic">No hay Pokémon en la pastura para consumir.</span>
+                )}
+              </div>
+
             </div>
 
           </div>
